@@ -1,10 +1,12 @@
-# Summary
+# google-translate --- Emacs interface to Google Translate
+
+## Summary
 
 Invoking the function `google-translate-query-translate` queries the
 source and target languages and text to translate, and shows a buffer
 with available translations of the text.
 
-# Installation
+## Installation
 
 Assuming that the file `google-translate.el` is somewhere on the
 load path, add the following lines to your `.emacs` file:
@@ -15,7 +17,7 @@ load path, add the following lines to your `.emacs` file:
 Change the key binding to your liking.
 
 
-# Customization
+## Customization
 
 You can customize the following variables:
 
