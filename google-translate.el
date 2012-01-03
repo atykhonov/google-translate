@@ -39,11 +39,11 @@
 
 ;; Customization:
 
-;; You can customize the following variables:
+;; You can customize the following two variables:
 ;;
-;; - `google-translate-default-source-language';
+;; - `google-translate-default-source-language'
 ;;
-;; - `google-translate-default-target-language'.
+;; - `google-translate-default-target-language'
 
 ;; If the variable `google-translate-default-source-language' is set
 ;; to a non-NIL value, the source language won't be queried and that
