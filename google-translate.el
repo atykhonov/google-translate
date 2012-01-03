@@ -23,15 +23,14 @@
 ;;; Commentary:
 
 ;; Invoking the function `google-translate-query-translate' queries
-;; the source and target languages and the text to translate, and
-;; shows a buffer with available translations of the text.
+;; the source and target languages and text to translate, and shows
+;; a buffer with available translations of the text.
 
 ;; Installation:
 
-;; Place `google-translate.el' in `/path/to/elisp', a directory of
-;; your choice, and add to your .emacs file:
+;; Assuming that the file `google-translate.el' is somewhere on the
+;; load path, add the following lines to your .emacs file:
 ;;
-;;   (add-to-list 'load-path "/path/to/elisp")
 ;;   (require 'google-translate)
 ;;   (global-set-key "\C-ct" 'google-translate-query-translate)
 ;;
@@ -40,44 +39,54 @@
 
 ;; Customization:
 
-;; There are two variables, `google-translate-default-source-language'
-;; and `google-translate-default-target-language', that you can
-;; customize.  E.g., if `google-translate-default-source-language' is
-;; set, the source language won't be queried and the value of the
-;; variable `google-translate-default-source-language' will be used
-;; instead; similarly for the target language.  You can always
-;; override this behavior by supplying a `C-u' prefix argument to the
-;; function `google-translate-query-translate'.
+;; You can customize the following variables:
+;;
+;; - `google-translate-default-source-language';
+;;
+;; - `google-translate-default-target-language'.
 
-;; By way of example, here are possible customizations.  Suppose that
-;; your native language is Russian and you frequently need to
-;; translate from various languages to Russian.  Then it is reasonable
-;; to set `google-translate-default-target-language' to "ru", and to
-;; leave `google-translate-default-source-language' set to its default
-;; value, NIL.  The function `google-translate-query-translate' will
-;; only query the source language and the text to translate.  When you
-;; need to translate to a language other than Russian, you can always
-;; override the default by supplying a `C-u' prefix argument, in which
-;; case you will be queried for both the source and target languages
-;; (and the text).
+;; If the variable `google-translate-default-source-language' is set
+;; to a non-NIL value, the source language won't be queried and that
+;; value will be used instead.  Analogously, if you set the variable
+;; `google-translate-default-target-language' to some non-NIL value,
+;; that value will be used without querying.
 
-;; If you frequently translate from some language (for example, from
-;; English), then it may also be reasonable to set the variable
-;; `google-translate-default-source-language' to some value (e.g., to
-;; "en").
+;; You can always override this behavior by supplying a `C-u' prefix
+;; argument to the function `google-translate-query-translate'.
 
-;; The values of `google-translate-default-source-language' and
-;; `google-translate-default-target-language' must be internal names
-;; of the languages supported by Google Translate; see the value of
-;; the variable `google-translate-supported-languages' for the list of
-;; available languages (or customize the default languages using the
-;; customization mechanism of Emacs).  Setting the default language to
-;; NIL means always query for it.  Furthermore, the variable
-;; `google-translate-default-source-language' admits a special value
-;; "auto", which is interpreted as an instruction for Google Translate
-;; to detect the source language.  This option is available at the
-;; source language prompt by leaving the source language value blank
-;; (by pressing RET).
+;; Here is an example.  Suppose that your native language is Russian
+;; and you frequently need to translate from various languages to
+;; Russian.  Then it is reasonable
+;;
+;; - to set the variable `google-translate-default-target-language'
+;;   to "ru", and
+;;
+;; - to leave `google-translate-default-source-language' set to its
+;;   default value, NIL.
+;;
+;; In this case, the function `google-translate-query-translate' is
+;; only going to query the source language and text to translate.
+;; If you need to translate to some language other than Russian, you
+;; can override the default for the target language by supplying a
+;; `C-u' prefix argument, in which case you will be queried for both
+;; the source and target languages, as well as text to translate.
+
+;; If you frequently translate from some fixed language, it is also
+;; reasonable to set `google-translate-default-source-language' to
+;; an appropriate value.
+
+;; The admitted values of `google-translate-default-source-language'
+;; and `google-translate-default-target-language' are the codes of the
+;; languages supported by Google Translate (like "ru" for Russian
+;; above).  See `google-translate-supported-languages' for the list of
+;; the supported languages, or customize the defaults using the
+;; customization mechanism of Emacs.  Setting a default language to
+;; NIL means that language will always be queried.  Moreover, the
+;; variable `google-translate-default-source-language' can be set to a
+;; special value "auto" that is interpreted as the instruction for
+;; Google Translate to detect the source language.  This option is
+;; also available when you are queried for the source language: simply
+;; leave this parameter blank by pressing RET.
 
 ;;; Code:
 
@@ -150,9 +159,9 @@
     ("Yiddish"             . "yi"))
   "Alist of the languages supported by Google Translate.
 
-Each element is a cons-cell of the form (NAME . ABBREVIATION), where
-NAME is a human-readable language name and ABBREVIATION is its
-internal name used as a query parameter in HTTP requests.")
+Each element is a cons-cell of the form (NAME . CODE), where NAME
+is a human-readable language name and CODE is its code used as a
+query parameter in HTTP requests.")
 
 (defgroup google-translate nil
   "Emacs interface to Google Translate."
