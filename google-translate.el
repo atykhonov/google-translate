@@ -94,7 +94,7 @@
 (require 'url)
 (require 'json)
 
-(defvar google-translate-supported-languages
+(defvar google-translate-supported-languages-alist
   '(("Afrikaans"           . "af")
     ("Albanian"            . "sq")
     ("Arabic"              . "ar")
@@ -164,6 +164,11 @@ Each element is a cons-cell of the form (NAME . CODE), where NAME
 is a human-readable language name and CODE is its code used as a
 query parameter in HTTP requests.")
 
+;; `ido-completing-read', unlike `completing-read', expects a list of
+;; strings (`completing-read' is more flexible and accepts an alist).
+(setq google-translate-supported-languages
+      (mapcar #'car google-translate-supported-languages-alist))
+
 (defgroup google-translate nil
   "Emacs interface to Google Translate."
   :group 'processes)
@@ -176,12 +181,12 @@ Set this variable to NIL (the default value) if you want to
 always be queried for the source language, or to \"auto\" if you
 want Google Translate to always detect the source language.
 
-See the variable `google-translate-supported-languages' for the
-list of available languages."
+See the variable `google-translate-supported-languages-alist' for
+the list of available languages."
   :group 'google-translate
   :type  `(radio ,@(mapcar #'(lambda (lang)
 			       `(const :tag ,(car lang) ,(cdr lang)))
-			   google-translate-supported-languages)
+			   google-translate-supported-languages-alist)
 		 (const :tag "Detect language" "auto")
 		 (other :tag "Always ask" nil)))
 
@@ -192,13 +197,30 @@ A string designating a language supported by Google Translate.
 Set this variable to NIL (the default value) if you want to
 always be queried for the target language.
 
-See the variable `google-translate-supported-languages' for the
-list of available languages."
+See the variable `google-translate-supported-languages-alist' for
+the list of available languages."
   :group 'google-translate
   :type  `(radio ,@(mapcar #'(lambda (lang)
 			       `(const :tag ,(car lang) ,(cdr lang)))
-			   google-translate-supported-languages)
+			   google-translate-supported-languages-alist)
 		 (other :tag "Always ask" nil)))
+
+(defcustom google-translate-enable-ido-completion nil
+  "If non-NIL, use `ido-completing-read' rather than
+  `completing-read' for reading input."
+  :group 'google-translate
+  :type  '(choice (const :tag "No"  nil)
+		  (other :tag "Yes" t)))
+
+(defun google-translate-completing-read (prompt choices &optional def)
+  "Read a string in the minibuffer with completion.
+
+If `google-translate-enable-ido-completion' is non-NIL, use
+ido-style completion."
+  (funcall (if google-translate-enable-ido-completion
+	       #'ido-completing-read
+	     #'completing-read)
+	   prompt choices nil t nil nil def))
 
 (defvar google-translate-base-url
   "http://translate.google.com/translate_a/t")
@@ -307,10 +329,10 @@ of TEXT."
 The null input is equivalent to \"Detect language\"."
   (let ((completion-ignore-case t))
     (google-translate-language-abbreviation
-     (ido-completing-read
+     (google-translate-completing-read
       prompt
-      (mapcar #'car google-translate-supported-languages)
-      nil t nil nil "Detect language"))))
+      google-translate-supported-languages
+      "Detect language"))))
 
 (defun google-translate-read-target-language (prompt)
   "Read a target language, with completion, and return its abbreviation.
@@ -318,10 +340,9 @@ The null input is equivalent to \"Detect language\"."
 The input is guaranteed to be non-null."
   (let ((completion-ignore-case t))
     (flet ((read-language ()
-	     (ido-completing-read
+	     (google-translate-completing-read
 	      prompt
-	      (mapcar #'car google-translate-supported-languages)
-	      nil t)))
+	      google-translate-supported-languages)))
       (let ((target-language (read-language)))
 	(while (string-equal target-language "")
 	  (setq target-language (read-language)))
@@ -331,7 +352,7 @@ The input is guaranteed to be non-null."
   "Return the abbreviation of LANGUAGE."
   (if (string-equal language "Detect language")
       "auto"
-    (cdr (assoc language google-translate-supported-languages))))
+    (cdr (assoc language google-translate-supported-languages-alist))))
 
 (defun google-translate-language-display-name (abbreviation)
   "Return a name suitable for use in prompts of the language whose
@@ -340,7 +361,7 @@ abbreviation is ABBREVIATION."
       "unspecified language"
     (car (find-if #'(lambda (lang)
 		      (string-equal abbreviation (cdr lang)))
-		  google-translate-supported-languages))))
+		  google-translate-supported-languages-alist))))
 
 (defun google-translate-read-args (override-p)
   "Query and return the arguments of `google-translate-translate'.
