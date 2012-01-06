@@ -90,6 +90,7 @@
 
 ;;; Code:
 
+(require 'ido)
 (require 'url)
 (require 'json)
 
@@ -306,9 +307,9 @@ of TEXT."
 The null input is equivalent to \"Detect language\"."
   (let ((completion-ignore-case t))
     (google-translate-language-abbreviation
-     (completing-read
+     (ido-completing-read
       prompt
-      google-translate-supported-languages
+      (mapcar #'car google-translate-supported-languages)
       nil t nil nil "Detect language"))))
 
 (defun google-translate-read-target-language (prompt)
@@ -317,9 +318,9 @@ The null input is equivalent to \"Detect language\"."
 The input is guaranteed to be non-null."
   (let ((completion-ignore-case t))
     (flet ((read-language ()
-	     (completing-read
+	     (ido-completing-read
 	      prompt
-	      google-translate-supported-languages
+	      (mapcar #'car google-translate-supported-languages)
 	      nil t)))
       (let ((target-language (read-language)))
 	(while (string-equal target-language "")
