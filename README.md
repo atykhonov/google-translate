@@ -19,11 +19,16 @@ Change the key binding to your liking.
 
 ## Customization
 
-You can customize the following two variables:
+You can customize the following variables:
+
+- `google-translate-enable-ido-completion`
 
 - `google-translate-default-source-language`
 
 - `google-translate-default-target-language`
+
+If `google-translate-enable-ido-completion` is non-NIL, the input
+will be read with ido-style completion.
 
 If the variable `google-translate-default-source-language` is set
 to a non-NIL value, the source language won't be queried and that
