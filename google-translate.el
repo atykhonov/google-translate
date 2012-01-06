@@ -91,7 +91,9 @@
 ;; special value "auto" that is interpreted as the instruction for
 ;; Google Translate to detect the source language.  This option is
 ;; also available when you are queried for the source language: simply
-;; leave this parameter blank by pressing RET.
+;; leave this parameter blank by pressing RET.  (If you have enabled
+;; the ido-style completion, "Detect language" is going to be the
+;; first option, which you can select simply by hitting RET.)
 
 ;;; Code:
 
