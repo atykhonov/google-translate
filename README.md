@@ -1,4 +1,4 @@
-# google-translate --- Emacs interface to Google Translate
+# Emacs interface to Google Translate
 
 ## Summary
 
