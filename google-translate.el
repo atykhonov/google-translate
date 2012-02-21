@@ -259,7 +259,7 @@ QUERY-PARAMS must be an alist of field-value pairs."
       (set-buffer-multibyte t)
       (goto-char (point-min))
       (re-search-forward (format "\n\n"))
-      (kill-region (point-min) (point))
+      (delete-region (point-min) (point))
       (prog1 (buffer-string) (kill-buffer buffer)))))
 
 ;; Google Translate responses with an almost valid JSON string
