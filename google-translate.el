@@ -3,6 +3,7 @@
 ;; Copyright (C) 2012 Oleksandr Manzyuk <manzyuk@gmail.com>
 
 ;; Author: Oleksandr Manzyuk <manzyuk@gmail.com>
+;; Version: 0.1
 ;; Keywords: convenience
 
 ;; This file is NOT part of GNU Emacs.
@@ -192,10 +193,10 @@ See the variable `google-translate-supported-languages-alist' for
 the list of available languages."
   :group 'google-translate
   :type  `(radio ,@(mapcar #'(lambda (lang)
-			       `(const :tag ,(car lang) ,(cdr lang)))
-			   google-translate-supported-languages-alist)
-		 (const :tag "Detect language" "auto")
-		 (other :tag "Always ask" nil)))
+                               `(const :tag ,(car lang) ,(cdr lang)))
+                           google-translate-supported-languages-alist)
+                 (const :tag "Detect language" "auto")
+                 (other :tag "Always ask" nil)))
 
 (defcustom google-translate-default-target-language nil
   "Default target language.
@@ -208,16 +209,16 @@ See the variable `google-translate-supported-languages-alist' for
 the list of available languages."
   :group 'google-translate
   :type  `(radio ,@(mapcar #'(lambda (lang)
-			       `(const :tag ,(car lang) ,(cdr lang)))
-			   google-translate-supported-languages-alist)
-		 (other :tag "Always ask" nil)))
+                               `(const :tag ,(car lang) ,(cdr lang)))
+                           google-translate-supported-languages-alist)
+                 (other :tag "Always ask" nil)))
 
 (defcustom google-translate-enable-ido-completion nil
   "If non-NIL, use `ido-completing-read' rather than
   `completing-read' for reading input."
   :group 'google-translate
   :type  '(choice (const :tag "No"  nil)
-		  (other :tag "Yes" t)))
+                  (other :tag "Yes" t)))
 
 (defun google-translate-completing-read (prompt choices &optional def)
   "Read a string in the minibuffer with completion.
@@ -225,9 +226,9 @@ the list of available languages."
 If `google-translate-enable-ido-completion' is non-NIL, use
 ido-style completion."
   (funcall (if google-translate-enable-ido-completion
-	       #'ido-completing-read
-	     #'completing-read)
-	   prompt choices nil t nil nil def))
+               #'ido-completing-read
+             #'completing-read)
+           prompt choices nil t nil nil def))
 
 (defvar google-translate-base-url
   "http://translate.google.com/translate_a/t")
@@ -237,18 +238,18 @@ ido-style completion."
 
 QUERY-PARAMS must be an alist of field-value pairs."
   (mapconcat #'(lambda (p)
-		 (format "%s=%s"
-			 (url-hexify-string (car p))
-			 (url-hexify-string (cdr p))))
-	     query-params "&"))
+                 (format "%s=%s"
+                         (url-hexify-string (car p))
+                         (url-hexify-string (cdr p))))
+             query-params "&"))
 
 (defun google-translate-format-request-url (query-params)
   "Format QUERY-PARAMS as a Google Translate HTTP request URL.
 
 QUERY-PARAMS must be an alist of field-value pairs."
   (concat google-translate-base-url
-	  "?"
-	  (google-translate-format-query-string query-params)))
+          "?"
+          (google-translate-format-query-string query-params)))
 
 (defun google-translate-http-response-body (url)
   "Retrieve URL and return the response body as a string."
@@ -270,9 +271,9 @@ QUERY-PARAMS must be an alist of field-value pairs."
     (insert string)
     (goto-char (point-min))
     (while (re-search-forward "," (point-max) t)
-	(when (or (looking-at ",")
-		  (looking-at "]"))
-	  (insert "null")))
+        (when (or (looking-at ",")
+                  (looking-at "]"))
+          (insert "null")))
     (buffer-string)))
 
 (defun google-translate-translate (source-language target-language text)
@@ -281,20 +282,20 @@ QUERY-PARAMS must be an alist of field-value pairs."
 Pops up a buffer named *Google Translate* with available translations
 of TEXT."
   (let* ((json
-	  (json-read-from-string
-	   (google-translate-insert-nulls
-	    ;; Google Translate won't let us make a request unless we
-	    ;; send a "User-Agent" header it recognizes.
-	    ;; "Mozilla/5.0" seems to work.
-	    (let ((url-request-extra-headers
-		   '(("User-Agent" . "Mozilla/5.0"))))
-	      (google-translate-http-response-body
-	       (google-translate-format-request-url
-		`(("client" . "t")
-		  ("sl"     . ,source-language)
-		  ("tl"     . ,target-language)
-		  ("text"   . ,text))))))))
-	 (dict (aref json 1)))
+          (json-read-from-string
+           (google-translate-insert-nulls
+            ;; Google Translate won't let us make a request unless we
+            ;; send a "User-Agent" header it recognizes.
+            ;; "Mozilla/5.0" seems to work.
+            (let ((url-request-extra-headers
+                   '(("User-Agent" . "Mozilla/5.0"))))
+              (google-translate-http-response-body
+               (google-translate-format-request-url
+                `(("client" . "t")
+                  ("sl"     . ,source-language)
+                  ("tl"     . ,target-language)
+                  ("text"   . ,text))))))))
+         (dict (aref json 1)))
     (with-output-to-temp-buffer "*Google Translate*"
       (set-buffer "*Google Translate*")
       (insert text)
@@ -303,32 +304,32 @@ of TEXT."
       (goto-char (point-min))
       (insert
        (format "Translate from %s to %s:\n\n"
-	       (if (string-equal source-language "auto")
-		   (format "%s (detected)"
-			   (google-translate-language-display-name
-			    (aref json 2)))
-		 (google-translate-language-display-name
-		  source-language))
-	       (google-translate-language-display-name
-		target-language)))
+               (if (string-equal source-language "auto")
+                   (format "%s (detected)"
+                           (google-translate-language-display-name
+                            (aref json 2)))
+                 (google-translate-language-display-name
+                  source-language))
+               (google-translate-language-display-name
+                target-language)))
       (goto-char (point-max))
       (if dict
-	  ;; DICT is, if non-nil, a dictionary article represented by
-	  ;; a vector of items, where each item is a 2-element vector
-	  ;; whose zeroth element is the name of a part of speech and
-	  ;; whose first element is a vector of translations for that
-	  ;; part of speech.
-	  (loop for item across dict do
-		(let ((index 0))
-		  (unless (string-equal (aref item 0) "")
-		    (insert (format "\n%s\n" (aref item 0)))
-		    (loop for translation across (aref item 1) do
-			  (insert (format "%2d. %s\n"
-					  (incf index) translation))))))
-	;; If DICT is nil, which occurs, for example, if we ask for a
-	;; translation of a whole phrase, then show the most probable
-	;; translation, found as the leftmost string in the JSON.
-	(insert (format "\n%s\n" (aref (aref (aref json 0) 0) 0)))))))
+          ;; DICT is, if non-nil, a dictionary article represented by
+          ;; a vector of items, where each item is a 2-element vector
+          ;; whose zeroth element is the name of a part of speech and
+          ;; whose first element is a vector of translations for that
+          ;; part of speech.
+          (loop for item across dict do
+                (let ((index 0))
+                  (unless (string-equal (aref item 0) "")
+                    (insert (format "\n%s\n" (aref item 0)))
+                    (loop for translation across (aref item 1) do
+                          (insert (format "%2d. %s\n"
+                                          (incf index) translation))))))
+        ;; If DICT is nil, which occurs, for example, if we ask for a
+        ;; translation of a whole phrase, then show the most probable
+        ;; translation, found as the leftmost string in the JSON.
+        (insert (format "\n%s\n" (aref (aref (aref json 0) 0) 0)))))))
 
 (defun google-translate-read-source-language (prompt)
   "Read a source language, with completion, and return its abbreviation.
@@ -347,13 +348,13 @@ The null input is equivalent to \"Detect language\"."
 The input is guaranteed to be non-null."
   (let ((completion-ignore-case t))
     (flet ((read-language ()
-	     (google-translate-completing-read
-	      prompt
-	      google-translate-supported-languages)))
+             (google-translate-completing-read
+              prompt
+              google-translate-supported-languages)))
       (let ((target-language (read-language)))
-	(while (string-equal target-language "")
-	  (setq target-language (read-language)))
-	(google-translate-language-abbreviation target-language)))))
+        (while (string-equal target-language "")
+          (setq target-language (read-language)))
+        (google-translate-language-abbreviation target-language)))))
 
 (defun google-translate-language-abbreviation (language)
   "Return the abbreviation of LANGUAGE."
@@ -367,8 +368,8 @@ abbreviation is ABBREVIATION."
   (if (string-equal abbreviation "auto")
       "unspecified language"
     (car (find-if #'(lambda (lang)
-		      (string-equal abbreviation (cdr lang)))
-		  google-translate-supported-languages-alist))))
+                      (string-equal abbreviation (cdr lang)))
+                  google-translate-supported-languages-alist))))
 
 (defun google-translate-read-args (override-p)
   "Query and return the arguments of `google-translate-translate'.
@@ -379,26 +380,26 @@ only if the variable `google-translate-default-source-language' (resp.
 non-NIL, both the source and target languages are queried, allowing
 one to override the defaults if they are specified."
   (let* ((source-language
-	  (if (and google-translate-default-source-language
-		   (not override-p))
-	      google-translate-default-source-language
-	    (google-translate-read-source-language
-	     "Translate from: ")))
-	 (target-language
-	  (if (and google-translate-default-target-language
-		   (not override-p))
-	      google-translate-default-target-language
-	    (google-translate-read-target-language
-	     (format "Translate from %s to: "
-		     (google-translate-language-display-name
-		      source-language)))))
-	 (text
-	  (read-from-minibuffer
-	   (format "Translate from %s to %s: "
-		   (google-translate-language-display-name
-		    source-language)
-		   (google-translate-language-display-name
-		    target-language)))))
+          (if (and google-translate-default-source-language
+                   (not override-p))
+              google-translate-default-source-language
+            (google-translate-read-source-language
+             "Translate from: ")))
+         (target-language
+          (if (and google-translate-default-target-language
+                   (not override-p))
+              google-translate-default-target-language
+            (google-translate-read-target-language
+             (format "Translate from %s to: "
+                     (google-translate-language-display-name
+                      source-language)))))
+         (text
+          (read-from-minibuffer
+           (format "Translate from %s to %s: "
+                   (google-translate-language-display-name
+                    source-language)
+                   (google-translate-language-display-name
+                    target-language)))))
     (list source-language target-language text)))
 
 (defun google-translate-query-translate (&optional override-p)
@@ -427,7 +428,7 @@ source language prompt is considered as an instruction for Google
 Translate to detect the source language."
   (interactive "P")
   (apply #'google-translate-translate
-	 (google-translate-read-args override-p)))
+         (google-translate-read-args override-p)))
 
 (provide 'google-translate)
 
