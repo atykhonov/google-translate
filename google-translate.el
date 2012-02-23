@@ -98,6 +98,7 @@
 
 ;;; Code:
 
+(require 'cl)
 (require 'ido)
 (require 'url)
 (require 'json)
