@@ -254,14 +254,12 @@ QUERY-PARAMS must be an alist of field-value pairs."
 
 (defun google-translate-http-response-body (url)
   "Retrieve URL and return the response body as a string."
-  (let ((buffer (url-retrieve-synchronously url)))
-    (save-excursion
-      (set-buffer buffer)
-      (set-buffer-multibyte t)
-      (goto-char (point-min))
-      (re-search-forward (format "\n\n"))
-      (delete-region (point-min) (point))
-      (prog1 (buffer-string) (kill-buffer buffer)))))
+  (with-current-buffer (url-retrieve-synchronously url)
+    (set-buffer-multibyte t)
+    (goto-char (point-min))
+    (re-search-forward (format "\n\n"))
+    (delete-region (point-min) (point))
+    (prog1 (buffer-string) (kill-buffer))))
 
 ;; Google Translate responses with an almost valid JSON string
 ;; respresentation except that the nulls appear to be dropped.
