@@ -3,7 +3,7 @@
 ;; Copyright (C) 2012 Oleksandr Manzyuk <manzyuk@gmail.com>
 
 ;; Author: Oleksandr Manzyuk <manzyuk@gmail.com>
-;; Version: 0.1
+;; Version: 0.1.1
 ;; Keywords: convenience
 
 ;; This file is NOT part of GNU Emacs.
