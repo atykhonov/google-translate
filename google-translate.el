@@ -175,8 +175,9 @@ query parameter in HTTP requests.")
 
 ;; `ido-completing-read', unlike `completing-read', expects a list of
 ;; strings (`completing-read' is more flexible and accepts an alist).
-(setq google-translate-supported-languages
-      (mapcar #'car google-translate-supported-languages-alist))
+(defvar google-translate-supported-languages
+  (mapcar #'car google-translate-supported-languages-alist)
+  "List of the languages supported by Google Translate.")
 
 (defgroup google-translate nil
   "Emacs interface to Google Translate."
