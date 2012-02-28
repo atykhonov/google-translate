@@ -98,7 +98,6 @@
 
 ;;; Code:
 
-(require 'cl)
 (require 'ido)
 (require 'url)
 (require 'json)
@@ -367,9 +366,7 @@ The input is guaranteed to be non-null."
 abbreviation is ABBREVIATION."
   (if (string-equal abbreviation "auto")
       "unspecified language"
-    (car (find-if #'(lambda (lang)
-                      (string-equal abbreviation (cdr lang)))
-                  google-translate-supported-languages-alist))))
+    (car (rassoc abbreviation google-translate-supported-languages-alist))))
 
 (defun google-translate-read-args (override-p)
   "Query and return the arguments of `google-translate-translate'.
