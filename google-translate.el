@@ -102,6 +102,8 @@
 (require 'url)
 (require 'json)
 
+(eval-when-compile (require 'cl))
+
 (defvar google-translate-supported-languages-alist
   '(("Afrikaans"           . "af")
     ("Albanian"            . "sq")
