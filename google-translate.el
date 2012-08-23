@@ -293,6 +293,8 @@ of TEXT."
               (google-translate-http-response-body
                (google-translate-format-request-url
                 `(("client" . "t")
+                  ("ie"     . "UTF-8")
+                  ("oe"     . "UTF-8")
                   ("sl"     . ,source-language)
                   ("tl"     . ,target-language)
                   ("text"   . ,text))))))))
