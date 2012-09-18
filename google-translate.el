@@ -3,8 +3,11 @@
 ;; Copyright (C) 2012 Oleksandr Manzyuk <manzyuk@gmail.com>
 
 ;; Author: Oleksandr Manzyuk <manzyuk@gmail.com>
-;; Version: 0.1.3
+;; Version: 0.2.0
 ;; Keywords: convenience
+
+;; Contributors:
+;;   Tassilo Horn <tsdh@gnu.org>
 
 ;; This file is NOT part of GNU Emacs.
 
@@ -23,9 +26,11 @@
 
 ;;; Commentary:
 
-;; Invoking the function `google-translate-query-translate' queries
-;; the source and target languages and text to translate, and shows
-;; a buffer with available translations of the text.
+;; Invoking the function `google-translate-query-translate' queries the source
+;; and target languages and text to translate, and shows a buffer with
+;; available translations of the text.  Invoking the function
+;; `google-translate-at-point' translates the word at point or the active
+;; region.
 
 ;; Installation:
 
@@ -33,7 +38,8 @@
 ;; load path, add the following lines to your .emacs file:
 ;;
 ;;   (require 'google-translate)
-;;   (global-set-key "\C-ct" 'google-translate-query-translate)
+;;   (global-set-key "\C-ct" 'google-translate-at-point)
+;;   (global-set-key "\C-cT" 'google-translate-query-translate)
 ;;
 ;; Change the key binding to your liking.
 
@@ -373,7 +379,7 @@ abbreviation is ABBREVIATION."
     (car (rassoc abbreviation google-translate-supported-languages-alist))))
 
 (defun google-translate-read-args (override-p)
-  "Query and return the arguments of `google-translate-translate'.
+  "Query and return the language arguments of `google-translate-translate'.
 
 When OVERRIDE-P is NIL, the source (resp. target) language is queried
 only if the variable `google-translate-default-source-language' (resp.
@@ -393,15 +399,8 @@ one to override the defaults if they are specified."
             (google-translate-read-target-language
              (format "Translate from %s to: "
                      (google-translate-language-display-name
-                      source-language)))))
-         (text
-          (read-from-minibuffer
-           (format "Translate from %s to %s: "
-                   (google-translate-language-display-name
-                    source-language)
-                   (google-translate-language-display-name
-                    target-language)))))
-    (list source-language target-language text)))
+                      source-language))))))
+    (list source-language target-language)))
 
 (defun google-translate-query-translate (&optional override-p)
   "Interactively translate text with Google Translate.
@@ -428,8 +427,28 @@ The languages are queried with completion, and the null input at the
 source language prompt is considered as an instruction for Google
 Translate to detect the source language."
   (interactive "P")
-  (apply #'google-translate-translate
-         (google-translate-read-args override-p)))
+  (let* ((langs (google-translate-read-args override-p))
+	 (source-language (car langs))
+	 (target-language (cadr langs)))
+    (google-translate-translate source-language target-language
+     (read-from-minibuffer
+      (format "Translate from %s to %s: "
+	      (google-translate-language-display-name source-language)
+	      (google-translate-language-display-name target-language))))))
+
+(defun google-translate-at-point (beg end &optional override-p)
+  "Translate the word at point or the words in the active region.
+
+For the meaning of OVERRIDE-P, see `google-translate-query-translate'."
+  (interactive "r\nP")
+  (let* ((langs (google-translate-read-args override-p))
+	 (source-language (car langs))
+	 (target-language (cadr langs)))
+    (google-translate-translate
+     source-language target-language
+     (if (use-region-p)
+	 (buffer-substring-no-properties beg end)
+       (current-word)))))
 
 (provide 'google-translate)
 
