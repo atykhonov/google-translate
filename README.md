@@ -2,9 +2,11 @@
 
 ## Summary
 
-Invoking the function `google-translate-query-translate` queries the
-source and target languages and text to translate, and shows a buffer
-with available translations of the text.
+Invoking the function `google-translate-query-translate` queries the source and
+target languages and text to translate, and shows a buffer with available
+translations of the text.  The function `google-translate-at-point` does the
+same, but instead of querying you, it uses the word at point or the currently
+active region as text to be translated.
 
 ## Installation
 
@@ -12,9 +14,10 @@ Assuming that the file `google-translate.el` is somewhere on the
 load path, add the following lines to your `.emacs` file:
 
     (require 'google-translate)
-    (global-set-key "\C-ct" 'google-translate-query-translate)
+    (global-set-key "\C-ct" 'google-translate-at-point)
+    (global-set-key "\C-cT" 'google-translate-query-translate)
 
-Change the key binding to your liking.
+Change the key bindings to your liking.
 
 
 ## Customization
