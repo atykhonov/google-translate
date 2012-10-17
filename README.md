@@ -63,6 +63,18 @@ If you frequently translate from some fixed language, it is also
 reasonable to set `google-translate-default-source-language` to
 an appropriate value.
 
+If you have both the default source and target languages specified,
+you may like to bind functions `google-translate-at-point-reverse`
+and `google-translate-query-translate-reverse` to some keys, e.g.:
+
+    (global-set-key (kbd "C-c r") 'google-translate-at-point-reverse)
+    (global-set-key (kbd "C-c R") 'google-translate-query-translate-reverse)
+
+This will allow you to quickly translate in the reverse direction.
+When the default source (resp. target) language is not set, the
+target (resp. source) language of the reverse translation will be
+queried interactively.
+
 The admitted values of `google-translate-default-source-language`
 and `google-translate-default-target-language` are the codes of the
 languages supported by Google Translate (like `"ru"` for Russian
@@ -77,15 +89,3 @@ also available when you are queried for the source language: simply
 leave this parameter blank by pressing `RET`.  (If you have enabled
 the ido-style completion, "Detect language" is going to be the
 first option, which you can select simply by hitting RET.)
-
-If you have both the default source and target languages specified,
-you may like to bind functions `google-translate-at-point-reverse`
-and `google-translate-query-translate-reverse` to some keys, e.g.:
-
-    (global-set-key (kbd "C-c r") 'google-translate-at-point-reverse)
-    (global-set-key (kbd "C-c R") 'google-translate-query-translate-reverse)
-
-This will allow you to quickly translate in the reverse direction.
-When the default source (resp. target) language is not set, the
-target (resp. source) language of the reverse translation will be
-queried interactively.
