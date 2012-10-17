@@ -480,28 +480,29 @@ in the reverse direction."
   (interactive "P")
   (%google-translate-query-translate override-p t))
 
-(defun %google-translate-at-point (beg end override-p reverse-p)
+(defun %google-translate-at-point (override-p reverse-p)
   (let* ((langs (google-translate-read-args override-p reverse-p))
          (source-language (car langs))
          (target-language (cadr langs)))
     (google-translate-translate
      source-language target-language
      (if (use-region-p)
-         (buffer-substring-no-properties beg end)
-       (current-word)))))
+         (buffer-substring-no-properties (region-beginning) (region-end))
+       (or (current-word t)
+           (error "No word at point."))))))
 
-(defun google-translate-at-point (beg end &optional override-p)
+(defun google-translate-at-point (&optional override-p)
   "Translate the word at point or the words in the active region.
 
 For the meaning of OVERRIDE-P, see `google-translate-query-translate'."
-  (interactive "r\nP")
-  (%google-translate-at-point beg end override-p nil))
+  (interactive "P")
+  (%google-translate-at-point override-p nil))
 
-(defun google-translate-at-point-reverse (beg end &optional override-p)
+(defun google-translate-at-point-reverse (&optional override-p)
   "Like `google-translate-at-point', but performs translation in the
 reverse direction."
-  (interactive "r\nP")
-  (%google-translate-at-point beg end override-p t))
+  (interactive "P")
+  (%google-translate-at-point override-p t))
 
 (provide 'google-translate)
 
