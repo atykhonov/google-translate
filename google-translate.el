@@ -3,11 +3,12 @@
 ;; Copyright (C) 2012 Oleksandr Manzyuk <manzyuk@gmail.com>
 
 ;; Author: Oleksandr Manzyuk <manzyuk@gmail.com>
-;; Version: 0.2.0
+;; Version: 0.3.0
 ;; Keywords: convenience
 
 ;; Contributors:
 ;;   Tassilo Horn <tsdh@gnu.org>
+;;   Bernard Hurley <bernard@marcade.biz>
 
 ;; This file is NOT part of GNU Emacs.
 
@@ -41,7 +42,7 @@
 ;;   (global-set-key "\C-ct" 'google-translate-at-point)
 ;;   (global-set-key "\C-cT" 'google-translate-query-translate)
 ;;
-;; Change the key binding to your liking.
+;; Change the key bindings to your liking.
 
 
 ;; Customization:
@@ -101,6 +102,20 @@
 ;; leave this parameter blank by pressing RET.  (If you have enabled
 ;; the ido-style completion, "Detect language" is going to be the
 ;; first option, which you can select simply by hitting RET.)
+;;
+;; If you have both the default source and target languages specified,
+;; you may like to bind functions `google-translate-at-point-reverse'
+;; and `google-translate-query-translate-reverse' to some keys, e.g.:
+;;
+;;   (global-set-key (kbd "C-c r") 'google-translate-at-point-reverse)
+;;   (global-set-key (kbd "C-c R") 'google-translate-query-translate-reverse)
+;;
+;; This will allow you to quickly translate in the reverse direction.
+;; When the default source (resp. target) language is not set, the
+;; target (resp. source) language of the reverse translation will be
+;; queried interactively.
+
+
 
 ;;; Code:
 
@@ -378,29 +393,51 @@ abbreviation is ABBREVIATION."
       "unspecified language"
     (car (rassoc abbreviation google-translate-supported-languages-alist))))
 
-(defun google-translate-read-args (override-p)
+(defun google-translate-read-args (override-p reverse-p)
   "Query and return the language arguments of `google-translate-translate'.
 
 When OVERRIDE-P is NIL, the source (resp. target) language is queried
 only if the variable `google-translate-default-source-language' (resp.
 `google-translate-default-target-language') is NIL.  If OVERRIDE-P is
 non-NIL, both the source and target languages are queried, allowing
-one to override the defaults if they are specified."
-  (let* ((source-language
-          (if (and google-translate-default-source-language
+one to override the defaults if they are specified.
+
+REVERSE-P is used to reverse the default direction of translation: if
+it's non-NIL, the value of `google-translate-default-source-language'
+becomes the default target language and vice versa."
+  (let* ((default-source-language
+           (if reverse-p
+               google-translate-default-target-language
+             google-translate-default-source-language))
+         (default-target-language
+           (if reverse-p
+               google-translate-default-source-language
+             google-translate-default-target-language))
+         (source-language
+          (if (and default-source-language
                    (not override-p))
-              google-translate-default-source-language
+              default-source-language
             (google-translate-read-source-language
              "Translate from: ")))
          (target-language
-          (if (and google-translate-default-target-language
+          (if (and default-target-language
                    (not override-p))
-              google-translate-default-target-language
+              default-target-language
             (google-translate-read-target-language
              (format "Translate from %s to: "
                      (google-translate-language-display-name
                       source-language))))))
     (list source-language target-language)))
+
+(defun %google-translate-query-translate (override-p reverse-p)
+  (let* ((langs (google-translate-read-args override-p reverse-p))
+         (source-language (car langs))
+         (target-language (cadr langs)))
+    (google-translate-translate source-language target-language
+     (read-from-minibuffer
+      (format "Translate from %s to %s: "
+              (google-translate-language-display-name source-language)
+              (google-translate-language-display-name target-language))))))
 
 (defun google-translate-query-translate (&optional override-p)
   "Interactively translate text with Google Translate.
@@ -427,28 +464,44 @@ The languages are queried with completion, and the null input at the
 source language prompt is considered as an instruction for Google
 Translate to detect the source language."
   (interactive "P")
-  (let* ((langs (google-translate-read-args override-p))
-	 (source-language (car langs))
-	 (target-language (cadr langs)))
-    (google-translate-translate source-language target-language
-     (read-from-minibuffer
-      (format "Translate from %s to %s: "
-	      (google-translate-language-display-name source-language)
-	      (google-translate-language-display-name target-language))))))
+  (%google-translate-query-translate override-p nil))
+
+(defun google-translate-query-translate-reverse (&optional override-p)
+  "Like `google-translate-query-translate', but performs translation
+in the reverse direction.
+
+The value of the variable `google-translate-default-source-language'
+\(if set) becomes the target language, and the value of the variable
+`google-translate-default-target-language' (if also set) becomes the
+source language.
+
+In particular, when both variables are set, translation is performed
+in the reverse direction."
+  (interactive "P")
+  (%google-translate-query-translate override-p t))
+
+(defun %google-translate-at-point (beg end override-p reverse-p)
+  (let* ((langs (google-translate-read-args override-p reverse-p))
+         (source-language (car langs))
+         (target-language (cadr langs)))
+    (google-translate-translate
+     source-language target-language
+     (if (use-region-p)
+         (buffer-substring-no-properties beg end)
+       (current-word)))))
 
 (defun google-translate-at-point (beg end &optional override-p)
   "Translate the word at point or the words in the active region.
 
 For the meaning of OVERRIDE-P, see `google-translate-query-translate'."
   (interactive "r\nP")
-  (let* ((langs (google-translate-read-args override-p))
-	 (source-language (car langs))
-	 (target-language (cadr langs)))
-    (google-translate-translate
-     source-language target-language
-     (if (use-region-p)
-	 (buffer-substring-no-properties beg end)
-       (current-word)))))
+  (%google-translate-at-point beg end override-p nil))
+
+(defun google-translate-at-point-reverse (beg end &optional override-p)
+  "Like `google-translate-at-point', but performs translation in the
+reverse direction."
+  (interactive "r\nP")
+  (%google-translate-at-point beg end override-p t))
 
 (provide 'google-translate)
 
