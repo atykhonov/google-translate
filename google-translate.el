@@ -3,7 +3,7 @@
 ;; Copyright (C) 2012 Oleksandr Manzyuk <manzyuk@gmail.com>
 
 ;; Author: Oleksandr Manzyuk <manzyuk@gmail.com>
-;; Version: 0.3.0
+;; Version: 0.3.1
 ;; Keywords: convenience
 
 ;; Contributors:
