@@ -302,58 +302,69 @@ QUERY-PARAMS must be an alist of field-value pairs."
   "Translate TEXT from SOURCE-LANGUAGE to TARGET-LANGUAGE.
 
 Pops up a buffer named *Google Translate* with available translations
-of TEXT."
-  (let* ((json
-          (json-read-from-string
-           (google-translate-insert-nulls
-            ;; Google Translate won't let us make a request unless we
-            ;; send a "User-Agent" header it recognizes.
-            ;; "Mozilla/5.0" seems to work.
-            (let ((url-request-extra-headers
-                   '(("User-Agent" . "Mozilla/5.0"))))
-              (google-translate-http-response-body
-               (google-translate-format-request-url
-                `(("client" . "t")
-                  ("ie"     . "UTF-8")
-                  ("oe"     . "UTF-8")
-                  ("sl"     . ,source-language)
-                  ("tl"     . ,target-language)
-                  ("text"   . ,text))))))))
-         (dict (aref json 1)))
-    (with-output-to-temp-buffer "*Google Translate*"
-      (set-buffer "*Google Translate*")
-      (insert text)
-      (facemenu-set-face 'bold (point-min) (point-max))
-      (insert "\n")
-      (goto-char (point-min))
-      (insert
-       (format "Translate from %s to %s:\n\n"
-               (if (string-equal source-language "auto")
-                   (format "%s (detected)"
-                           (google-translate-language-display-name
-                            (aref json 2)))
-                 (google-translate-language-display-name
-                  source-language))
-               (google-translate-language-display-name
-                target-language)))
-      (goto-char (point-max))
-      (if dict
-          ;; DICT is, if non-nil, a dictionary article represented by
-          ;; a vector of items, where each item is a 2-element vector
-          ;; whose zeroth element is the name of a part of speech and
-          ;; whose first element is a vector of translations for that
-          ;; part of speech.
-          (loop for item across dict do
-                (let ((index 0))
-                  (unless (string-equal (aref item 0) "")
-                    (insert (format "\n%s\n" (aref item 0)))
-                    (loop for translation across (aref item 1) do
-                          (insert (format "%2d. %s\n"
-                                          (incf index) translation))))))
-        ;; If DICT is nil, which occurs, for example, if we ask for a
-        ;; translation of a whole phrase, then show the most probable
-        ;; translation, found as the leftmost string in the JSON.
-        (insert (format "\n%s\n" (aref (aref (aref json 0) 0) 0)))))))
+of TEXT.  To deal with multi-line regions, sequences of white space
+are replaced with a single space.  If the region contains not text, a
+message is printed."
+  (let ((text-stripped
+         (replace-regexp-in-string "[[:space:]\n\r]+" " " text)))
+    (if (or (= (length text-stripped) 0)
+            (string= text-stripped " "))
+        (message "Nothing to translate.")
+      (let* ((json
+              (json-read-from-string
+               (google-translate-insert-nulls
+                ;; Google Translate won't let us make a request unless we
+                ;; send a "User-Agent" header it recognizes.
+                ;; "Mozilla/5.0" seems to work.
+                (let ((url-request-extra-headers
+                       '(("User-Agent" . "Mozilla/5.0"))))
+                  (google-translate-http-response-body
+                   (google-translate-format-request-url
+                    `(("client" . "t")
+                      ("ie"     . "UTF-8")
+                      ("oe"     . "UTF-8")
+                      ("sl"     . ,source-language)
+                      ("tl"     . ,target-language)
+                      ("text"   . ,text-stripped))))))))
+             (dict (aref json 1)))
+        (with-output-to-temp-buffer "*Google Translate*"
+          (set-buffer "*Google Translate*")
+          (insert text)
+          (facemenu-set-face 'bold (point-min) (point-max))
+          (insert "\n")
+          (goto-char (point-min))
+          (insert
+           (format "Translate from %s to %s:\n\n"
+                   (if (string-equal source-language "auto")
+                       (format "%s (detected)"
+                               (google-translate-language-display-name
+                                (aref json 2)))
+                     (google-translate-language-display-name
+                      source-language))
+                   (google-translate-language-display-name
+                    target-language)))
+          (goto-char (point-max))
+          (if dict
+              ;; DICT is, if non-nil, a dictionary article represented by
+              ;; a vector of items, where each item is a 2-element vector
+              ;; whose zeroth element is the name of a part of speech and
+              ;; whose first element is a vector of translations for that
+              ;; part of speech.
+              (loop for item across dict do
+                    (let ((index 0))
+                      (unless (string-equal (aref item 0) "")
+                        (insert (format "\n%s\n" (aref item 0)))
+                        (loop for translation across (aref item 1) do
+                              (insert (format "%2d. %s\n"
+                                              (incf index) translation))))))
+            ;; If DICT is nil, which occurs, for example, if we ask for a
+            ;; translation of a whole phrase, then show the most probable
+            ;; translation.
+            (let ((beg (point)))
+              (insert (format "\n%s\n"
+                              (mapconcat #'(lambda (item) (aref item 0))
+                                         (aref json 0) "")))
+              (fill-region beg (point)))))))))
 
 (defun google-translate-read-source-language (prompt)
   "Read a source language, with completion, and return its abbreviation.
