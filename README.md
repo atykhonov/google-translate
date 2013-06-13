@@ -105,7 +105,7 @@ There are also three faces you can customize:
 
 - `google-translate-translation-face`, used to display the highest
   ranking translation (defaults to `default` with the `weight`
-  attribute set to `bold')
+  attribute set to `bold`)
 
 For example, to show the translation in a larger font change the
 `height` attribute of the face `google-translate-translation-face`
