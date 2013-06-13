@@ -3,12 +3,13 @@
 ;; Copyright (C) 2012 Oleksandr Manzyuk <manzyuk@gmail.com>
 
 ;; Author: Oleksandr Manzyuk <manzyuk@gmail.com>
-;; Version: 0.3.2
+;; Version: 0.4
 ;; Keywords: convenience
 
 ;; Contributors:
 ;;   Tassilo Horn <tsdh@gnu.org>
 ;;   Bernard Hurley <bernard@marcade.biz>
+;;   Chris Bilson <cbilson@pobox.com>
 
 ;; This file is NOT part of GNU Emacs.
 
