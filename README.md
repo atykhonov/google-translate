@@ -89,3 +89,26 @@ also available when you are queried for the source language: simply
 leave this parameter blank by pressing `RET`.  (If you have enabled
 the ido-style completion, "Detect language" is going to be the
 first option, which you can select simply by hitting RET.)
+
+The variable `google-translate-show-phonetic` controls whether the
+phonetic spelling of the original text and its translation is
+displayed if available.  If you want to see the phonetics, set this
+variable to T.
+
+There are also three faces you can customize:
+
+- `google-translate-text-face`, used to display the original text
+  (defaults to `default`)
+
+- `google-translate-phonetic-face`, used to display the phonetics
+  (defaults to `shadow`)
+
+- `google-translate-translation-face`, used to display the highest
+  ranking translation (defaults to `default` with the `weight`
+  attribute set to `bold')
+
+For example, to show the translation in a larger font change the
+`height` attribute of the face `google-translate-translation-face`
+like so:
+
+    (set-face-attribute 'google-translate-translation-face nil :height 1.4)
