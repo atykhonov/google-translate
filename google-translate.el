@@ -445,10 +445,10 @@ The null input is equivalent to \"Detect language\"."
 
 The input is guaranteed to be non-null."
   (let ((completion-ignore-case t))
-    (flet ((read-language ()
-             (google-translate-completing-read
-              prompt
-              google-translate-supported-languages)))
+    (cl-flet ((read-language ()
+               (google-translate-completing-read
+                prompt
+                google-translate-supported-languages)))
       (let ((target-language (read-language)))
         (while (string-equal target-language "")
           (setq target-language (read-language)))
