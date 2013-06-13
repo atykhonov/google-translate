@@ -244,6 +244,27 @@ the list of available languages."
   :type  '(choice (const :tag "No"  nil)
                   (other :tag "Yes" t)))
 
+(defcustom google-translate-show-phonetic nil
+  "If non-NIL, try to show the phonetic spelling."
+  :group 'google-translate
+  :type '(choice (const :tag "No"  nil)
+                 (const :tag "Yes" t)))
+
+(defface google-translate-text-face
+  '((t (:inherit default)))
+  "Face used to display the original text."
+  :group 'google-translate)
+
+(defface google-translate-phonetic-face
+  '((t (:inherit shadow)))
+  "Face used to display the phonetic spelling."
+  :group 'google-translate)
+
+(defface google-translate-translation-face
+  '((t (:weight bold)))
+  "Face used to display the probable translation."
+  :group 'googel-translate)
+
 (defun google-translate-completing-read (prompt choices &optional def)
   "Read a string in the minibuffer with completion.
 
@@ -298,6 +319,14 @@ QUERY-PARAMS must be an alist of field-value pairs."
           (insert "null")))
     (buffer-string)))
 
+(defun google-translate-paragraph (text face)
+  "Insert TEXT as a filled paragraph into the current buffer and
+apply FACE to it."
+  (let ((beg (point)))
+    (insert (format "\n%s\n" text))
+    (facemenu-set-face face beg (point))
+    (fill-region beg (point))))
+
 (defun google-translate-translate (source-language target-language text)
   "Translate TEXT from SOURCE-LANGUAGE to TARGET-LANGUAGE.
 
@@ -326,15 +355,20 @@ message is printed."
                       ("sl"     . ,source-language)
                       ("tl"     . ,target-language)
                       ("text"   . ,text-stripped))))))))
+             (text-phonetic
+              (mapconcat #'(lambda (item) (aref item 3))
+                         (aref json 0) ""))
+             (translation
+              (mapconcat #'(lambda (item) (aref item 0))
+                         (aref json 0) ""))
+             (translation-phonetic
+              (mapconcat #'(lambda (item) (aref item 2))
+                         (aref json 0) ""))
              (dict (aref json 1)))
         (with-output-to-temp-buffer "*Google Translate*"
           (set-buffer "*Google Translate*")
-          (insert text)
-          (facemenu-set-face 'bold (point-min) (point-max))
-          (insert "\n")
-          (goto-char (point-min))
           (insert
-           (format "Translate from %s to %s:\n\n"
+           (format "Translate from %s to %s:\n"
                    (if (string-equal source-language "auto")
                        (format "%s (detected)"
                                (google-translate-language-display-name
@@ -343,28 +377,35 @@ message is printed."
                       source-language))
                    (google-translate-language-display-name
                     target-language)))
-          (goto-char (point-max))
-          (if dict
-              ;; DICT is, if non-nil, a dictionary article represented by
-              ;; a vector of items, where each item is a 2-element vector
-              ;; whose zeroth element is the name of a part of speech and
-              ;; whose first element is a vector of translations for that
-              ;; part of speech.
-              (loop for item across dict do
-                    (let ((index 0))
-                      (unless (string-equal (aref item 0) "")
-                        (insert (format "\n%s\n" (aref item 0)))
-                        (loop for translation across (aref item 1) do
-                              (insert (format "%2d. %s\n"
-                                              (incf index) translation))))))
-            ;; If DICT is nil, which occurs, for example, if we ask for a
-            ;; translation of a whole phrase, then show the most probable
-            ;; translation.
-            (let ((beg (point)))
-              (insert (format "\n%s\n"
-                              (mapconcat #'(lambda (item) (aref item 0))
-                                         (aref json 0) "")))
-              (fill-region beg (point)))))))))
+          (google-translate-paragraph
+           text
+           'google-translate-text-face)
+          (when (and google-translate-show-phonetic
+                     (not (string-equal text-phonetic "")))
+            (google-translate-paragraph
+             text-phonetic
+             'google-translate-phonetic-face))
+          (google-translate-paragraph
+           translation
+           'google-translate-translation-face)
+          (when (and google-translate-show-phonetic
+                     (not (string-equal translation-phonetic "")))
+            (google-translate-paragraph
+             translation-phonetic
+             'google-translate-phonetic-face))
+          (when dict
+            ;; DICT is, if non-nil, a dictionary article represented by
+            ;; a vector of items, where each item is a 2-element vector
+            ;; whose zeroth element is the name of a part of speech and
+            ;; whose first element is a vector of translations for that
+            ;; part of speech.
+            (loop for item across dict do
+                  (let ((index 0))
+                    (unless (string-equal (aref item 0) "")
+                      (insert (format "\n%s\n" (aref item 0)))
+                      (loop for translation across (aref item 1) do
+                            (insert (format "%2d. %s\n"
+                                            (incf index) translation))))))))))))
 
 (defun google-translate-read-source-language (prompt)
   "Read a source language, with completion, and return its abbreviation.
