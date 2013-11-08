@@ -142,11 +142,12 @@
 
 ;;; Code:
 
-(require 'ido)
-(require 'url)
-(require 'json)
-
 (eval-when-compile (require 'cl))
+
+(require 'ert)
+(require 'ido)
+(require 'json)
+(require 'url)
 
 (defvar google-translate-supported-languages-alist
   '(("Afrikaans"           . "af")
@@ -330,17 +331,22 @@ QUERY-PARAMS must be an alist of field-value pairs."
 
 ;; Google Translate responses with an almost valid JSON string
 ;; respresentation except that the nulls appear to be dropped.
-;; In particular, the response may contain the substrings ",,"
-;; and ",]".  `google-translate-insert-nulls' undoes that.
+;; In particular the response may contain the substrings "[,",
+;; ",,", and ",]".  `google-translate-insert-nulls' undoes
+;; that.
 (defun google-translate-insert-nulls (string)
   (with-temp-buffer
     (insert string)
     (goto-char (point-min))
-    (while (re-search-forward "," (point-max) t)
-        (when (or (looking-at ",")
-                  (looking-at "]"))
-          (insert "null")))
+    (while (re-search-forward "\\(\\[,\\|,,\\|,\\]\\)" (point-max) t)
+      (backward-char)
+      (insert "null"))
     (buffer-string)))
+
+(ert-deftest test-insert-nulls ()
+  (should (string-equal
+           (google-translate-insert-nulls "[,[,[,,],,],,]")
+           "[null,[null,[null,null,null],null,null],null,null]")))
 
 (defun google-translate-paragraph (text face)
   "Insert TEXT as a filled paragraph into the current buffer and
