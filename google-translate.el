@@ -371,19 +371,14 @@ message is printed."
       (let* ((json
               (json-read-from-string
                (google-translate-insert-nulls
-                ;; Google Translate won't let us make a request unless we
-                ;; send a "User-Agent" header it recognizes.
-                ;; "Mozilla/5.0" seems to work.
-                (let ((url-request-extra-headers
-                       '(("User-Agent" . "Mozilla/5.0"))))
-                  (google-translate-http-response-body
-                   (google-translate-format-request-url
-                    `(("client" . "t")
-                      ("ie"     . "UTF-8")
-                      ("oe"     . "UTF-8")
-                      ("sl"     . ,source-language)
-                      ("tl"     . ,target-language)
-                      ("text"   . ,text-stripped))))))))
+                (google-translate-http-response-body
+                 (google-translate-format-request-url
+                  `(("client" . "t")
+                    ("ie"     . "UTF-8")
+                    ("oe"     . "UTF-8")
+                    ("sl"     . ,source-language)
+                    ("tl"     . ,target-language)
+                    ("text"   . ,text-stripped)))))))
              (text-phonetic
               (mapconcat #'(lambda (item) (aref item 3))
                          (aref json 0) ""))
