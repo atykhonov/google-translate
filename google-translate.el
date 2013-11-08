@@ -219,12 +219,6 @@ Each element is a cons-cell of the form (NAME . CODE), where NAME
 is a human-readable language name and CODE is its code used as a
 query parameter in HTTP requests.")
 
-;; `ido-completing-read', unlike `completing-read', expects a list of
-;; strings (`completing-read' is more flexible and accepts an alist).
-(defvar google-translate-supported-languages
-  (mapcar #'car google-translate-supported-languages-alist)
-  "List of the languages supported by Google Translate.")
-
 (defgroup google-translate nil
   "Emacs interface to Google Translate."
   :group 'processes)
@@ -288,6 +282,12 @@ the list of available languages."
   '((t (:weight bold)))
   "Face used to display the probable translation."
   :group 'googel-translate)
+
+;; `ido-completing-read', unlike `completing-read', expects a list of
+;; strings (`completing-read' is more flexible and accepts an alist).
+(defun google-translate-supported-languages ()
+  "Return a list of names of languages supported by Google Translate."
+  (mapcar #'car google-translate-supported-languages-alist))
 
 (defun google-translate-completing-read (prompt choices &optional def)
   "Read a string in the minibuffer with completion.
@@ -439,7 +439,7 @@ The null input is equivalent to \"Detect language\"."
     (google-translate-language-abbreviation
      (google-translate-completing-read
       prompt
-      google-translate-supported-languages
+      (google-translate-supported-languages)
       "Detect language"))))
 
 (defun google-translate-read-target-language (prompt)
@@ -450,7 +450,7 @@ The input is guaranteed to be non-null."
     (cl-flet ((read-language ()
                (google-translate-completing-read
                 prompt
-                google-translate-supported-languages)))
+                (google-translate-supported-languages))))
       (let ((target-language (read-language)))
         (while (string-equal target-language "")
           (setq target-language (read-language)))
