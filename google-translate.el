@@ -219,6 +219,30 @@ Each element is a cons-cell of the form (NAME . CODE), where NAME
 is a human-readable language name and CODE is its code used as a
 query parameter in HTTP requests.")
 
+(defvar google-translate-translation-directions-alist
+  '(("en" . "ru")
+    ("ru" . "en")
+    ("uk" . "ru")
+    ("ru" . "uk"))
+  "Alist of translation directions. Each of direction could be
+  selected directly in the minibuffer during translation
+
+Each element is a cons-cell of the form (SOURCE_CODE
+. TARGET_CODE), where SOURCE_CODE is a source language code and
+TARGET_CODE is a target language code.")
+
+(defvar google-translate-current-translation-direction 0
+  "Points to nth element of
+  `google-translate-translation-directions-alist' variable.")
+
+(defvar google-translate-translation-direction-query ""
+  "Temporal variable which holds query from minibuffer while
+  switching directions.")
+
+(defvar google-translate-try-other-direction nil
+  "Indicates that other translation direction is going to be
+  used.")
+
 (defgroup google-translate nil
   "Emacs interface to Google Translate."
   :group 'processes)
@@ -505,15 +529,92 @@ becomes the default target language and vice versa."
                       source-language))))))
     (list source-language target-language)))
 
+(defun google-translate-change-translation-direction (direction)
+  "Change translation direction."
+  (let ((current google-translate-current-translation-direction)
+        (length (length google-translate-translation-directions-alist)))
+    (setq current
+          (if (equal direction 'next)
+              (+ current 1)
+            (- current 1)))
+    (when (< current 0)
+      (setq current (- length 1)))
+    (when (> current (- length 1))
+      (setq current 0))
+    (setq google-translate-current-translation-direction current)
+    (setq google-translate-translation-direction-query
+          (minibuffer-contents))))
+
+(defun google-translate-next-translation-direction ()
+  "Switch to the next translation direction. If current direction
+is the last of possible directions then switch to the first
+direction."
+  (interactive)
+  (google-translate-change-translation-direction 'next)
+  (setq google-translate-try-other-direction t)
+  (exit-minibuffer))
+
+(defun google-translate-previous-translation-direction ()
+  "Switch to the previous translation direction. If current
+direction is the first of possible directions then switch to the
+last direction."
+  (interactive)
+  (google-translate-change-translation-direction 'previous)
+  (setq google-translate-try-other-direction t)
+  (exit-minibuffer))
+
+(defun google-translate-query-translate-using-directions ()
+  "Tranlate query using translation directions described by
+`google-translate-translation-directions-alist' variable.
+
+This function allows to select desired translation direction
+directly in the minibuffer while translating a word or a
+sentence.
+
+This function defines two key bindings for the minibuffer which
+allow to select direction:
+C-r - to select previous direction,
+C-n - to select next direction."
+  (interactive)
+  (setq google-translate-try-other-direction nil)
+  (let ((map (make-sparse-keymap)))
+    (define-key map "\C-r" 'google-translate-previous-translation-direction)
+    (define-key map "\C-s" 'google-translate-next-translation-direction)
+    (set-keymap-parent map minibuffer-local-map)
+    (setq minibuffer-local-map map)
+    (let ((text (read-from-minibuffer
+                 (format "Translate from %s to %s: "
+                         (google-translate-language-display-name
+                          (car (nth google-translate-current-translation-direction
+                                    google-translate-translation-directions-alist)))
+                         (google-translate-language-display-name
+                          (cdr (nth google-translate-current-translation-direction
+                                    google-translate-translation-directions-alist))))
+                 google-translate-translation-direction-query)))
+      (if google-translate-try-other-direction
+          (call-interactively 'google-translate-query-translate-using-directions)
+        text))))
+
 (defun %google-translate-query-translate (override-p reverse-p)
-  (let* ((langs (google-translate-read-args override-p reverse-p))
-         (source-language (car langs))
-         (target-language (cadr langs)))
-    (google-translate-translate source-language target-language
-     (read-from-minibuffer
-      (format "Translate from %s to %s: "
-              (google-translate-language-display-name source-language)
-              (google-translate-language-display-name target-language))))))
+  (if google-translate-translation-directions-alist
+      (progn
+        (setq google-translate-translation-direction-query "")
+        (setq google-translate-current-translation-direction 0)
+        (let* ((text (google-translate-query-translate-using-directions))
+               (direction (nth google-translate-current-translation-direction
+                               google-translate-translation-directions-alist))
+               (source-language (car direction))
+               (target-language (cdr direction)))
+          (google-translate-translate source-language target-language text)))
+    (let* ((langs (google-translate-read-args override-p reverse-p))
+           (source-language (car langs))
+           (target-language (cadr langs)))
+
+      (google-translate-translate source-language target-language
+                                  (read-from-minibuffer
+                                   (format "Translate from %s to %s: "
+                                           (google-translate-language-display-name source-language)
+                                           (google-translate-language-display-name target-language)))))))
 
 (defun google-translate-query-translate (&optional override-p)
   "Interactively translate text with Google Translate.
