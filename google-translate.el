@@ -524,7 +524,7 @@ becomes the default target language and vice versa."
               (google-translate-language-display-name source-language)
               (google-translate-language-display-name target-language))
       (%google-translate-word-completion-list)
-      nil nil nil))))
+      nil nil nil nil nil t))))
 
 (defun google-translate-query-translate (&optional override-p)
   "Interactively translate text with Google Translate.
