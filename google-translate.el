@@ -505,15 +505,26 @@ becomes the default target language and vice versa."
                       source-language))))))
     (list source-language target-language)))
 
+(defun %google-translate-word-completion-list ()
+  "Prepare and return a list with words for auto
+  completion. Words retrieves from the current buffer from its
+  visible part."
+  (let ((buffer-contents
+         (buffer-substring-no-properties (window-start) (window-end))))
+    (mapcar (lambda (w) (when (> (length w) 1) (downcase w)))
+            (split-string buffer-contents "[ [:punct:]0-9\f\t\n\r\v]+" t))))
+
 (defun %google-translate-query-translate (override-p reverse-p)
   (let* ((langs (google-translate-read-args override-p reverse-p))
          (source-language (car langs))
          (target-language (cadr langs)))
     (google-translate-translate source-language target-language
-     (read-from-minibuffer
+     (completing-read
       (format "Translate from %s to %s: "
               (google-translate-language-display-name source-language)
-              (google-translate-language-display-name target-language))))))
+              (google-translate-language-display-name target-language))
+      (%google-translate-word-completion-list)
+      nil nil nil))))
 
 (defun google-translate-query-translate (&optional override-p)
   "Interactively translate text with Google Translate.
