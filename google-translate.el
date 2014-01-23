@@ -343,11 +343,6 @@ QUERY-PARAMS must be an alist of field-value pairs."
       (insert "null"))
     (buffer-string)))
 
-(ert-deftest test-insert-nulls ()
-  (should (string-equal
-           (google-translate-insert-nulls "[,[,[,,],,],,]")
-           "[null,[null,[null,null,null],null,null],null,null]")))
-
 (defun google-translate-paragraph (text face)
   "Insert TEXT as a filled paragraph into the current buffer and
 apply FACE to it."
