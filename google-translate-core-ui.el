@@ -1,3 +1,5 @@
+(require 'google-translate)
+
 (defvar google-translate-supported-languages-alist
   '(("Afrikaans"           . "af")
     ("Albanian"            . "sq")
