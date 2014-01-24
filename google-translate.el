@@ -350,6 +350,70 @@ apply FACE to it."
     (facemenu-set-face face beg (point))
     (fill-region beg (point))))
 
+(defun google-translate--trim-string (string)
+  "Remove whitespaces in beginning and ending of STRING.
+  White space here is any of: space, tab, emacs newline (line feed, ASCII 10)."
+  (replace-regexp-in-string "\\`[ \t\n\r]*" ""
+                            (replace-regexp-in-string "[ \t\n\r]*\\'" "" string)))
+
+(defun google-translate--strip-string (string)
+  "Replace spaces, tabs, line feeds (ASCII 10) and carridge
+returns (ASCII 13) by a single space symbol."
+  (replace-regexp-in-string "[[:space:]\n\r]+" " " string))
+
+(defun google-translate-prepare-text-for-request (text)
+  "Make TEXT as clean as possible berofe sending it in the
+request."
+  (google-translate--trim-string
+   (google-translate--strip-string text)))
+
+(defun google-translate-request (source-language target-language text)
+  "Send to the Google Translate http request which consigned to
+translate TEXT from SOURCE-LANGUAGE to TARGET-LANGUAGE. Returns
+response in json format."
+  (json-read-from-string
+   (google-translate--insert-nulls
+    (google-translate-http-response-body
+     (google-translate-format-request-url
+      `(("client" . "t")
+        ("ie"     . "UTF-8")
+        ("oe"     . "UTF-8")
+        ("sl"     . ,source-language)
+        ("tl"     . ,target-language)
+        ("text"   . ,text)))))))
+
+(defun google-translate-json-text-phonetic (json)
+  "Retrieve from the JSON (which returns by the
+`google-translate-request' function) phonetic transcription of
+the translating text."
+  (mapconcat (lambda (item) (aref item 3))
+             (aref json 0) ""))
+
+(defun google-translate-json-translation (json)
+  "Retrieve from the JSON (which returns by the
+`google-translate-request' function) translation of the
+translating text."
+  (mapconcat #'(lambda (item) (aref item 0))
+             (aref json 0) ""))
+
+(defun google-translate-json-translation-phonetic (json)
+  "Retrieve from the JSON (which returns by the
+`google-translate-request' function) phonetic transcription of
+the translating text."
+  (mapconcat #'(lambda (item) (aref item 2))
+             (aref json 0) ""))
+
+(defun google-translate-json-detailed-translation (json)
+  "Retrieve from the JSON (which returns by the
+`google-translate-request' function) a dictionary article
+represented by a vector of items, where each item is a 2-element
+vector whose zeroth element is the name of a part of speech and
+whose first element is a vector of translations for that part of
+speech."
+  (aref json 1))
+
+
+
 (defun google-translate-translate (source-language target-language text)
   "Translate TEXT from SOURCE-LANGUAGE to TARGET-LANGUAGE.
 
