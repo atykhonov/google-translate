@@ -1,4 +1,6 @@
 (require 'google-translate)
+(require 'ido)
+
 
 (defvar google-translate-supported-languages-alist
   '(("Afrikaans"           . "af")
@@ -70,7 +72,6 @@ Each element is a cons-cell of the form (NAME . CODE), where NAME
 is a human-readable language name and CODE is its code used as a
 query parameter in HTTP requests.")
 
-
 (defgroup google-translate-base-ui nil
   "Emacs base UI interface to Google Translate Core."
   :group 'processes)
@@ -134,9 +135,6 @@ the list of available languages."
   '((t (:weight bold)))
   "Face used to display the probable translation."
   :group 'googel-translate)
-
-
-(require 'ido)
 
 
 ;; `ido-completing-read', unlike `completing-read', expects a list of
