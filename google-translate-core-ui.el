@@ -356,7 +356,6 @@ apply FACE to it."
                   (insert (format "%2d. %s\n"
                                   (incf index) translation)))))))
 
-
 (defun google-translate-translate (source-language target-language text)
   "Translate TEXT from SOURCE-LANGUAGE to TARGET-LANGUAGE.
 
@@ -379,7 +378,7 @@ message is printed."
           (google-translate--buffer-output-translation-title source-language
                                                              target-language
                                                              auto-detected-language)
-          (google-translate--buffer-output-translating-text)
+          (google-translate--buffer-output-translating-text text)
           (google-translate--buffer-output-text-phonetic text-phonetic)
           (google-translate--buffer-output-translation translation)
           (google-translate--buffer-output-translation-phonetic translation-phonetic)
