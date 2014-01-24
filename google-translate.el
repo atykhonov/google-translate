@@ -144,7 +144,6 @@
 
 (eval-when-compile (require 'cl))
 
-(require 'ert)
 (require 'ido)
 (require 'json)
 (require 'url)
