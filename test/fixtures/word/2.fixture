@@ -1,0 +1,41 @@
+belongs
+
+
+HTTP/1.1 200 OK
+Pragma: no-cache
+Date: Thu, 23 Jan 2014 23:42:33 GMT
+Expires: Thu, 23 Jan 2014 23:42:33 GMT
+Cache-Control: private, max-age=600
+Content-Type: text/javascript; charset=UTF-8
+Content-Language: ru
+X-Content-Type-Options: nosniff
+Content-Disposition: attachment
+Server: HTTP server (unknown)
+X-XSS-Protection: 1; mode=block
+Alternate-Protocol: 80:quic
+Transfer-Encoding: chunked
+
+[[["принадлежит","belongs","prinadlezhit",""]],[["verb",["принадлежать","относиться","находиться","происходить","быть связанным","быть родом из","помещаться","быть одним из группы","быть 'своим'"],[["принадлежать",["belong","pertain","reside","appertain","inhere"],,0.26914635],["относиться",["treat","refer","belong","relate","concern","apply"],,0.10376516],["находиться",["be","locate","be found","reside","lie","belong"],,0.0010172778],["происходить",["occur","happen","take place","be","come","belong"],,2.5467052e-05],["быть связанным",["relate","belong","link"],,1.4510689e-05],["быть родом из",["belong"],,1.2607105e-05],["помещаться",["place","house","stand","belong"],,1.241165e-05],["быть одним из группы",["be of a group","belong"],,6.4390792e-06],["быть 'своим'",["belong"]]],"belong",2]],"en",,[["принадлежит",[1],true,false,1000,0,1,0]],[["belongs",1,[["принадлежит",1000,true,false],["относится",0,true,false],["состоит",0,true,false],["входящий",0,true,false],["принадлежат",0,true,false]],[[0,7]],"belongs"]],,,[],69]
+
+text-phonetic:
+
+
+translation-phonetic:
+prinadlezhit
+
+translation:
+принадлежит
+
+detailed-translation:
+verb
+принадлежать
+относиться
+находиться
+происходить
+быть связанным
+быть родом из
+помещаться
+быть одним из группы
+быть 'своим'
+
+

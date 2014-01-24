@@ -1,0 +1,30 @@
+return
+
+
+HTTP/1.1 200 OK
+Pragma: no-cache
+Date: Thu, 23 Jan 2014 23:40:52 GMT
+Expires: Thu, 23 Jan 2014 23:40:52 GMT
+Cache-Control: private, max-age=600
+Content-Type: text/javascript; charset=UTF-8
+Content-Language: ru
+X-Content-Type-Options: nosniff
+Content-Disposition: attachment
+Server: HTTP server (unknown)
+X-XSS-Protection: 1; mode=block
+Alternate-Protocol: 80:quic
+Transfer-Encoding: chunked
+
+[[["возвращение","return","vozvrashcheniye",""]],[["noun",["возвращение","возврат","ответ","доход","прибыль","отдача","обратный путь","возмещение","отчет","возвращенный товар","оборот","результат выборов","избрание","официальный отчет","рапорт","ответная подача","обратная сеть","обратный провод","непроданный товар","возражение","вентиляционный просек","вентиляционный ходок"],[["возвращение",["return","comeback","restitution","repatriation","repayment","retrieval"],,0.26914635],["возврат",["return","refund","recovery","recurrence","reclamation"],,0.12516467],["ответ",["answer","reply","response","return","replication","rejoinder"],,0.000721358],["доход",["income","revenue","earnings","profit","yield","return"],,0.00018238787],["прибыль",["profit","income","earnings","gain","return","margin"],,0.00017403573],["отдача",["return","recoil","output","efficiency","kickback","rebound"],,0.00016606605],["обратный путь",["return","homing"],,7.1424118e-05],["возмещение",["compensation","offset","reimbursement","recovery","redress","return"],,3.0719129e-05],["отчет",["report","record","account","return","reply"],,2.0785603e-05],["возвращенный товар",["return"],,1.5689797e-05],["оборот",["turnover","turn","revolution","rev","turnaround","return"],,9.368805e-06],["результат выборов",["return"],,4.5659908e-06],["избрание",["election","return"],,2.857324e-06],["официальный отчет",["statement","record","return"],,2.8130255e-06],["рапорт",["report","return"],,2.8130255e-06],["ответная подача",["return"],,2.7694134e-06],["обратная сеть",["return"],,2.7694134e-06],["обратный провод",["return"],,2.7694134e-06],["непроданный товар",["return"],,1.7880677e-06],["возражение",["objection","retort","rejoinder","answer","exception","return"],,1.7880677e-06],["вентиляционный просек",["return"],,1.7880677e-06],["вентиляционный ходок",["return"],,1.7880677e-06]],"return",1],["verb",["возвращать","возвращаться","отдавать","отвечать","приносить","давать ответ","вновь обращаться","возражать","отплачивать","идти обратно","избирать","официально заявлять","докладывать"],[["возвращать",["return","repay","restore","bring back","give back","reimburse"],,0.11396374],["возвращаться",["return","come back","go back","get back","revert","be back"],,0.11045744],["отдавать",["give","give away","return","give back","render","contribute"],,0.00035156182],["отвечать",["answer","respond","reply","account","return","account for"],,0.00020031388],["приносить",["bring","yield","bring in","offer up","carry","return"],,5.6501125e-05],["давать ответ",["return"],,7.2964326e-06],["вновь обращаться",["return"],,6.4390792e-06],["возражать",["mind","object","object to","protest","contradict","return"],,4.4255103e-06],["отплачивать",["repay","pay","retaliate","pay back","return","pay out"],,3.8449498e-06],["идти обратно",["return","cut back"],,2.9480252e-06],["избирать",["elect","choose","embrace","return"],,2.9023204e-06],["официально заявлять",["return"],,2.7694134e-06],["докладывать",["report","announce","render an account","return","tell"],,8.990969e-07]],"return",2],["adjective",["обратный","вернувшийся"],[["обратный",["back","return","reverse","inverse","converse","opposite"],,0.00077997398],["вернувшийся",["return"],,3.3738364e-05]],"return",3]],"en",,[["возвращение",[1],true,false,1000,0,1,0]],[["return",1,[["возвращение",1000,true,false],["возврат",0,true,false],["возвращения",0,true,false],["обратный",0,true,false],["доход",0,true,false]],[[0,6]],"return"]],,,[],52]
+
+text-phonetic:
+
+
+translation-phonetic:
+vozvrashcheniye
+
+translation:
+возвращение
+
+detailed-translation:
+
