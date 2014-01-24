@@ -217,16 +217,18 @@ request."
 translate TEXT from SOURCE-LANGUAGE to TARGET-LANGUAGE. Returns
 response in json format."
   (let ((cleaned-text (google-translate-prepare-text-for-request text)))
-    (json-read-from-string
-     (google-translate--insert-nulls
-      (google-translate--http-response-body
-       (google-translate--format-request-url
-        `(("client" . "t")
-          ("ie"     . "UTF-8")
-          ("oe"     . "UTF-8")
-          ("sl"     . ,source-language)
-          ("tl"     . ,target-language)
-          ("text"   . ,cleaned-text))))))))
+    (if (= (length cleaned-text) 0)
+        (message "Nothing to translate.")
+      (json-read-from-string
+       (google-translate--insert-nulls
+        (google-translate--http-response-body
+         (google-translate--format-request-url
+          `(("client" . "t")
+            ("ie"     . "UTF-8")
+            ("oe"     . "UTF-8")
+            ("sl"     . ,source-language)
+            ("tl"     . ,target-language)
+            ("text"   . ,cleaned-text)))))))))
 
 (defun google-translate-json-text-phonetic (json)
   "Retrieve from the JSON (which returns by the
