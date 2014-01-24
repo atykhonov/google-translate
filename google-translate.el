@@ -319,7 +319,7 @@ QUERY-PARAMS must be an alist of field-value pairs."
           "?"
           (google-translate--format-query-string query-params)))
 
-(defun google-translate-http-response-body (url)
+(defun google-translate--http-response-body (url)
   "Retrieve URL and return the response body as a string."
   (with-current-buffer (url-retrieve-synchronously url)
     (set-buffer-multibyte t)
@@ -373,7 +373,7 @@ translate TEXT from SOURCE-LANGUAGE to TARGET-LANGUAGE. Returns
 response in json format."
   (json-read-from-string
    (google-translate--insert-nulls
-    (google-translate-http-response-body
+    (google-translate--http-response-body
      (google-translate--format-request-url
       `(("client" . "t")
         ("ie"     . "UTF-8")
@@ -429,7 +429,7 @@ message is printed."
       (let* ((json
               (json-read-from-string
                (google-translate--insert-nulls
-                (google-translate-http-response-body
+                (google-translate--http-response-body
                  (google-translate--format-request-url
                   `(("client" . "t")
                     ("ie"     . "UTF-8")
