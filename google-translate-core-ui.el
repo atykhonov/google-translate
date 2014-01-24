@@ -388,3 +388,5 @@ message is printed."
                                             (incf index) translation))))))))))))
 
 (provide 'google-translate-core-ui)
+
+;;; google-translate-core-ui.el ends here
