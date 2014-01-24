@@ -328,13 +328,13 @@ QUERY-PARAMS must be an alist of field-value pairs."
     (delete-region (point-min) (point))
     (prog1 (buffer-string) (kill-buffer))))
 
-;; Google Translate responses with an almost valid JSON string
-;; respresentation except that the nulls appear to be dropped.
-;; In particular the response may contain the substrings "[,",
-;; ",,", and ",]".  `google-translate-insert-nulls' undoes
-;; that.
-(defun google-translate-insert-nulls (string)
+(defun google-translate--insert-nulls (string)
+  "Google Translate responses with an almost valid JSON string
+respresentation except that the nulls appear to be dropped. In
+particular the response may contain the substrings \"[,\",
+\",,\", and \",]\". This function undoes that."
   (with-temp-buffer
+    (set-buffer-multibyte t)
     (insert string)
     (goto-char (point-min))
     (while (re-search-forward "\\(\\[,\\|,,\\|,\\]\\)" (point-max) t)
@@ -364,7 +364,7 @@ message is printed."
         (message "Nothing to translate.")
       (let* ((json
               (json-read-from-string
-               (google-translate-insert-nulls
+               (google-translate--insert-nulls
                 (google-translate-http-response-body
                  (google-translate-format-request-url
                   `(("client" . "t")
