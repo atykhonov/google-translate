@@ -301,7 +301,7 @@ ido-style completion."
 (defvar google-translate-base-url
   "http://translate.google.com/translate_a/t")
 
-(defun google-translate-format-query-string (query-params)
+(defun google-translate--format-query-string (query-params)
   "Format QUERY-PARAMS as a query string.
 
 QUERY-PARAMS must be an alist of field-value pairs."
@@ -311,13 +311,13 @@ QUERY-PARAMS must be an alist of field-value pairs."
                          (url-hexify-string (cdr p))))
              query-params "&"))
 
-(defun google-translate-format-request-url (query-params)
+(defun google-translate--format-request-url (query-params)
   "Format QUERY-PARAMS as a Google Translate HTTP request URL.
 
 QUERY-PARAMS must be an alist of field-value pairs."
   (concat google-translate-base-url
           "?"
-          (google-translate-format-query-string query-params)))
+          (google-translate--format-query-string query-params)))
 
 (defun google-translate-http-response-body (url)
   "Retrieve URL and return the response body as a string."
@@ -374,7 +374,7 @@ response in json format."
   (json-read-from-string
    (google-translate--insert-nulls
     (google-translate-http-response-body
-     (google-translate-format-request-url
+     (google-translate--format-request-url
       `(("client" . "t")
         ("ie"     . "UTF-8")
         ("oe"     . "UTF-8")
@@ -430,7 +430,7 @@ message is printed."
               (json-read-from-string
                (google-translate--insert-nulls
                 (google-translate-http-response-body
-                 (google-translate-format-request-url
+                 (google-translate--format-request-url
                   `(("client" . "t")
                     ("ie"     . "UTF-8")
                     ("oe"     . "UTF-8")
