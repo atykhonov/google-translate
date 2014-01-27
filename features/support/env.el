@@ -12,6 +12,8 @@
 (add-to-list 'load-path google-translate-root-path)
 
 (require 'google-translate)
+(require 'google-translate-default-ui)
+(require 'google-translate-smooth-ui)
 (require 'espuds)
 (require 'ert)
 

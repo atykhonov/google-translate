@@ -22,4 +22,4 @@ $(PKG_DIR):
 	touch $@
 
 ecukes:
-	$(CASK) exec ecukes --script $(FEATURES)
+	$(CASK) exec ecukes --reporter magnars --script $(FEATURES) --no-win
