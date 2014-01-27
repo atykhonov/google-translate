@@ -1,4 +1,94 @@
-(require 'google-translate)
+;;; google-translate-core-ui.el --- google translate core UI
+
+;; Copyright (C) 2012 Oleksandr Manzyuk <manzyuk@gmail.com>
+
+;; Author: Oleksandr Manzyuk <manzyuk@gmail.com>
+;; Version: 0.6.0
+;; Keywords: convenience
+
+;; Contributors:
+;;   Tassilo Horn <tsdh@gnu.org>
+;;   Bernard Hurley <bernard@marcade.biz>
+;;   Chris Bilson <cbilson@pobox.com>
+
+;; This file is NOT part of GNU Emacs.
+
+;; This is free software; you can redistribute it and/or modify it
+;; under the terms of the GNU General Public License as published by
+;; the Free Software Foundation; either version 2, or (at your option)
+;; any later version.
+
+;; This file is distributed in the hope that it will be useful, but
+;; WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+;; General Public License for more details.
+
+;; You should have received a copy of the GNU General Public License
+;; along with GNU Emacs.  If not, see <http://www.gnu.org/licenses/>.
+
+;;; Commentary:
+
+;; This script provides the most common functions and variables for
+;; UI. It does not contain any interactive functions and overall is
+;; not going to be used directly by means of
+;; `execute-extended-command' (M-x). Its purpose to provide the most
+;; valuable and useful functionality for packages and scripts which
+;; provide UI.
+;;
+;; The most important functions are the following:
+;;
+;; - `google-translate-translate'
+;;
+;; - `google-translate-read-source-language'
+;;
+;; - `google-translate-read-target-language'
+;;
+;; `google-translate-translate' queries the source and target
+;; languages and text to translate, and shows a buffer with available
+;; translations of the text. `google-translate-read-source-language'
+;; reads source language from minibuffer and
+;; `google-translate-read-target-language' reads target language from
+;; minibuffer.
+;; 
+;; Customization:
+
+;; You can customize the following variables:
+;;
+;; - `google-translate-enable-ido-completion'
+;;
+;; - `google-translate-show-phonetic'
+;;
+;; If `google-translate-enable-ido-completion' is non-NIL, the input
+;; will be read with ido-style completion.
+;;
+;; The variable `google-translate-show-phonetic' controls whether the
+;; phonetic spelling of the original text and its translation is
+;; displayed if available.  If you want to see the phonetics, set this
+;; variable to t.
+;;
+;; There are also three faces you can customize:
+;;
+;; - `google-translate-text-face', used to display the original text
+;;   (defaults to `default')
+;;
+;; - `google-translate-phonetic-face', used to display the phonetics
+;;   (defaults to `shadow')
+;;
+;; - `google-translate-translation-face', used to display the highest
+;;   ranking translation (defaults to `default' with the `weight'
+;;   attribute set to `bold')
+;;
+;; For example, to show the translation in a larger font change the
+;; `height' attribute of the face `google-translate-translation-face'
+;; like so:
+;;
+;;   (set-face-attribute 'google-translate-translation-face nil :height 1.4)
+;;
+;;
+;;; Code:
+;;
+
+;; (require 'google-translate)
 (require 'ido)
 
 
@@ -73,110 +163,41 @@ is a human-readable language name and CODE is its code used as a
 query parameter in HTTP requests.")
 
 (defgroup google-translate-core-ui nil
-  "Emacs base UI interface to Google Translate Core."
+  "Emacs core UI script for the Google Translate package."
   :group 'processes)
-
-(defcustom google-translate-default-source-language nil
-  "Default source language.
-
-A string designating a language supported by Google Translate.
-Set this variable to NIL (the default value) if you want to
-always be queried for the source language, or to \"auto\" if you
-want Google Translate to always detect the source language.
-
-See the variable `google-translate-supported-languages-alist' for
-the list of available languages."
-  :group 'google-translate
-  :type  `(radio ,@(mapcar #'(lambda (lang)
-                               `(const :tag ,(car lang) ,(cdr lang)))
-                           google-translate-supported-languages-alist)
-                 (const :tag "Detect language" "auto")
-                 (other :tag "Always ask" nil)))
-
-(defcustom google-translate-default-target-language nil
-  "Default target language.
-
-A string designating a language supported by Google Translate.
-Set this variable to NIL (the default value) if you want to
-always be queried for the target language.
-
-See the variable `google-translate-supported-languages-alist' for
-the list of available languages."
-  :group 'google-translate
-  :type  `(radio ,@(mapcar #'(lambda (lang)
-                               `(const :tag ,(car lang) ,(cdr lang)))
-                           google-translate-supported-languages-alist)
-                 (other :tag "Always ask" nil)))
 
 (defcustom google-translate-enable-ido-completion nil
   "If non-NIL, use `ido-completing-read' rather than
   `completing-read' for reading input."
-  :group 'google-translate
+  :group 'google-translate-core-ui
   :type  '(choice (const :tag "No"  nil)
                   (other :tag "Yes" t)))
 
 (defcustom google-translate-show-phonetic nil
   "If non-NIL, try to show the phonetic spelling."
-  :group 'google-translate
+  :group 'google-translate-core-ui
   :type '(choice (const :tag "No"  nil)
                  (const :tag "Yes" t)))
 
 (defface google-translate-text-face
   '((t (:inherit default)))
   "Face used to display the original text."
-  :group 'google-translate)
+  :group 'google-translate-core-ui)
 
 (defface google-translate-phonetic-face
   '((t (:inherit shadow)))
   "Face used to display the phonetic spelling."
-  :group 'google-translate)
+  :group 'google-translate-core-ui)
 
 (defface google-translate-translation-face
   '((t (:weight bold)))
   "Face used to display the probable translation."
-  :group 'googel-translate)
+  :group 'googel-translate-core-ui)
 
 
-;; `ido-completing-read', unlike `completing-read', expects a list of
-;; strings (`completing-read' is more flexible and accepts an alist).
 (defun google-translate-supported-languages ()
   "Return a list of names of languages supported by Google Translate."
   (mapcar #'car google-translate-supported-languages-alist))
-
-(defun google-translate-completing-read (prompt choices &optional def)
-  "Read a string in the minibuffer with completion.
-
-If `google-translate-enable-ido-completion' is non-NIL, use
-ido-style completion."
-  (funcall (if google-translate-enable-ido-completion
-               #'ido-completing-read
-             #'completing-read)
-           prompt choices nil t nil nil def))
-
-(defun google-translate-read-source-language (prompt)
-  "Read a source language, with completion, and return its abbreviation.
-
-The null input is equivalent to \"Detect language\"."
-  (let ((completion-ignore-case t))
-    (google-translate-language-abbreviation
-     (google-translate-completing-read
-      prompt
-      (google-translate-supported-languages)
-      "Detect language"))))
-
-(defun google-translate-read-target-language (prompt)
-  "Read a target language, with completion, and return its abbreviation.
-
-The input is guaranteed to be non-null."
-  (let ((completion-ignore-case t))
-    (cl-flet ((read-language ()
-               (google-translate-completing-read
-                prompt
-                (google-translate-supported-languages))))
-      (let ((target-language (read-language)))
-        (while (string-equal target-language "")
-          (setq target-language (read-language)))
-        (google-translate-language-abbreviation target-language)))))
 
 (defun google-translate-language-abbreviation (language)
   "Return the abbreviation of LANGUAGE."
@@ -191,117 +212,6 @@ abbreviation is ABBREVIATION."
       "unspecified language"
     (car (rassoc abbreviation google-translate-supported-languages-alist))))
 
-(defun google-translate-read-args (override-p reverse-p)
-  "Query and return the language arguments of `google-translate-translate'.
-
-When OVERRIDE-P is NIL, the source (resp. target) language is queried
-only if the variable `google-translate-default-source-language' (resp.
-`google-translate-default-target-language') is NIL.  If OVERRIDE-P is
-non-NIL, both the source and target languages are queried, allowing
-one to override the defaults if they are specified.
-
-REVERSE-P is used to reverse the default direction of translation: if
-it's non-NIL, the value of `google-translate-default-source-language'
-becomes the default target language and vice versa."
-  (let* ((default-source-language
-           (if reverse-p
-               google-translate-default-target-language
-             google-translate-default-source-language))
-         (default-target-language
-           (if reverse-p
-               google-translate-default-source-language
-             google-translate-default-target-language))
-         (source-language
-          (if (and default-source-language
-                   (not override-p))
-              default-source-language
-            (google-translate-read-source-language
-             "Translate from: ")))
-         (target-language
-          (if (and default-target-language
-                   (not override-p))
-              default-target-language
-            (google-translate-read-target-language
-             (format "Translate from %s to: "
-                     (google-translate-language-display-name
-                      source-language))))))
-    (list source-language target-language)))
-
-(defun %google-translate-query-translate (override-p reverse-p)
-  (let* ((langs (google-translate-read-args override-p reverse-p))
-         (source-language (car langs))
-         (target-language (cadr langs)))
-    (google-translate-translate source-language target-language
-     (read-from-minibuffer
-      (format "Translate from %s to %s: "
-              (google-translate-language-display-name source-language)
-              (google-translate-language-display-name target-language))))))
-
-(defun google-translate-query-translate (&optional override-p)
-  "Interactively translate text with Google Translate.
-
-Query a text (a word or a phrase), and pop up a buffer named *Google
-Translate* displaying available translations of the text.
-
-If no defaults for the source and target languages are specified (by
-setting the variables `google-translate-default-source-language' and
-`google-translate-default-target-language'), interactively query the
-missing parts.  For example, a reasonable option may be to specify a
-default for the target language and always be queried for the source
-language.
-
-With a `C-u' prefix argument, query the source and target languages,
-even if any defaults are specified.  For example, you may frequently
-need to translate from English to Russian, and you may choose to set
-the default source and target languages to \"en\" and  \"ru\", resp.
-However, occasionally you may also need to translate from Russian to
-English.  With a `C-u' prefix argument you can override the defaults
-and specify the source and target languages explicitly.
-
-The languages are queried with completion, and the null input at the
-source language prompt is considered as an instruction for Google
-Translate to detect the source language."
-  (interactive "P")
-  (%google-translate-query-translate override-p nil))
-
-(defun google-translate-query-translate-reverse (&optional override-p)
-  "Like `google-translate-query-translate', but performs translation
-in the reverse direction.
-
-The value of the variable `google-translate-default-source-language'
-\(if set) becomes the target language, and the value of the variable
-`google-translate-default-target-language' (if also set) becomes the
-source language.
-
-In particular, when both variables are set, translation is performed
-in the reverse direction."
-  (interactive "P")
-  (%google-translate-query-translate override-p t))
-
-(defun %google-translate-at-point (override-p reverse-p)
-  (let* ((langs (google-translate-read-args override-p reverse-p))
-         (source-language (car langs))
-         (target-language (cadr langs)))
-    (google-translate-translate
-     source-language target-language
-     (if (use-region-p)
-         (buffer-substring-no-properties (region-beginning) (region-end))
-       (or (current-word t)
-           (error "No word at point."))))))
-
-(defun google-translate-at-point (&optional override-p)
-  "Translate the word at point or the words in the active region.
-
-For the meaning of OVERRIDE-P, see `google-translate-query-translate'."
-  (interactive "P")
-  (%google-translate-at-point override-p nil))
-
-(defun google-translate-at-point-reverse (&optional override-p)
-  "Like `google-translate-at-point', but performs translation in the
-reverse direction."
-  (interactive "P")
-  (%google-translate-at-point override-p t))
-
 (defun google-translate-paragraph (text face)
   "Insert TEXT as a filled paragraph into the current buffer and
 apply FACE to it."
@@ -313,6 +223,9 @@ apply FACE to it."
 (defun google-translate--buffer-output-translation-title (source-language 
                                                           target-language 
                                                           auto-detected-language)
+  "Outputs in buffer translation title which contains
+information about used while translating source and target
+languages."
   (insert (format "Translate from %s to %s:\n"
                   (if (string-equal source-language "auto")
                       (format "%s (detected)"
@@ -324,11 +237,14 @@ apply FACE to it."
                    target-language))))
 
 (defun google-translate--buffer-output-translating-text (text)
+  "Outputs in buffer translating text."
   (google-translate-paragraph
    text
    'google-translate-text-face))
 
 (defun google-translate--buffer-output-text-phonetic (text-phonetic)
+  "Outputs in buffer TEXT-PHONETIC in case of
+`google-translate-show-phonetic' is set to t."
   (when (and google-translate-show-phonetic
              (not (string-equal text-phonetic "")))
     (google-translate-paragraph
@@ -336,11 +252,14 @@ apply FACE to it."
      'google-translate-phonetic-face)))
 
 (defun google-translate--buffer-output-translation (translation)
+  "Output in buffer TRANSLATION."
   (google-translate-paragraph
    translation
    'google-translate-translation-face))
 
 (defun google-translate--buffer-output-translation-phonetic (translation-phonetic)
+  "Output in buffer TRANSLATION-PHONETIC in case of
+`google-translate-show-phonetic' is set to t."
   (when (and google-translate-show-phonetic
              (not (string-equal translation-phonetic "")))
     (google-translate-paragraph
@@ -348,6 +267,7 @@ apply FACE to it."
      'google-translate-phonetic-face)))
 
 (defun google-translate--buffer-output-detailed-translation (detailed-translation translation)
+  "Output in buffer DETAILED-TRANSLATION for the given TRANSLATION."
   (loop for item across detailed-translation do
         (let ((index 0))
           (unless (string-equal (aref item 0) "")
@@ -360,18 +280,21 @@ apply FACE to it."
   "Translate TEXT from SOURCE-LANGUAGE to TARGET-LANGUAGE.
 
 Pops up a buffer named *Google Translate* with available translations
-of TEXT.  To deal with multi-line regions, sequences of white space
-are replaced with a single space.  If the region contains not text, a
+of TEXT. To deal with multi-line regions, sequences of white space
+are replaced with a single space. If the region contains not text, a
 message is printed."
-      (let* ((buffer-name "*Google Translate*")
-             (json (google-translate-request source-language
-                                             target-language
-                                             text))
-             (auto-detected-language (aref json 2))
-             (text-phonetic (google-translate-json-text-phonetic json))
-             (translation (google-translate-json-translation json))
-             (translation-phonetic (google-translate-json-translation-phonetic json))
-             (detailed-translation (google-translate-json-detailed-translation json)))
+  (let* ((buffer-name "*Google Translate*")
+         (json (google-translate-request source-language
+                                         target-language
+                                         text)))
+    (if (null json)
+        (message "Nothing to translate.")
+      (let (
+            (auto-detected-language (aref json 2))
+            (text-phonetic (google-translate-json-text-phonetic json))
+            (translation (google-translate-json-translation json))
+            (translation-phonetic (google-translate-json-translation-phonetic json))
+            (detailed-translation (google-translate-json-detailed-translation json)))
 
         (with-output-to-temp-buffer buffer-name
           (set-buffer buffer-name)
@@ -385,7 +308,50 @@ message is printed."
           (when detailed-translation
             (google-translate--buffer-output-detailed-translation
              detailed-translation
-             translation)))))
+             translation)))))))
+
+(defun google-translate-read-source-language (&optional prompt)
+  "Read a source language, with completion, and return its abbreviation.
+
+The null input is equivalent to \"Detect language\"."
+  (let ((completion-ignore-case t)
+        (prompt
+         (if (null prompt)
+             "Translate from: "
+           prompt)))
+    (google-translate-language-abbreviation
+     (google-translate-completing-read
+      prompt
+      (google-translate-supported-languages)
+      "Detect language"))))
+
+(defun google-translate-read-target-language (&optional prompt)
+  "Read a target language, with completion, and return its abbreviation.
+
+The input is guaranteed to be non-null."
+  (let ((completion-ignore-case t)
+        (prompt
+         (if (null prompt)
+             "Translate to: "
+           prompt)))
+    (cl-flet ((read-language ()
+                             (google-translate-completing-read
+                              prompt
+                              (google-translate-supported-languages))))
+      (let ((target-language (read-language)))
+        (while (string-equal target-language "")
+          (setq target-language (read-language)))
+        (google-translate-language-abbreviation target-language)))))
+
+(defun google-translate-completing-read (prompt choices &optional def)
+  "Read a string in the minibuffer with completion.
+
+If `google-translate-enable-ido-completion' is non-NIL, use
+ido-style completion."
+  (funcall (if google-translate-enable-ido-completion
+               #'ido-completing-read
+             #'completing-read)
+           prompt choices nil t nil nil def))
 
 
 (provide 'google-translate-core-ui)
