@@ -1,0 +1,30 @@
+колобок
+
+
+HTTP/1.1 200 OK
+Pragma: no-cache
+Date: Sun, 26 Jan 2014 00:18:22 GMT
+Expires: Sun, 26 Jan 2014 00:18:22 GMT
+Cache-Control: private, max-age=600
+Content-Type: text/javascript; charset=UTF-8
+Content-Language: ru
+X-Content-Type-Options: nosniff
+Content-Disposition: attachment
+Server: HTTP server (unknown)
+X-XSS-Protection: 1; mode=block
+Alternate-Protocol: 80:quic
+Transfer-Encoding: chunked
+
+[[["колобок","колобок","kolobok","kolobok"]],,"uk",,[["колобок",[1],true,false,1000,0,1,0]],[["колобок",1,[["колобок",1000,true,false]],[[0,7]],"колобок"]],,,[],96]
+
+text-phonetic:
+kolobok
+
+translation-phonetic:
+kolobok
+
+translation:
+колобок
+
+detailed-translation:
+

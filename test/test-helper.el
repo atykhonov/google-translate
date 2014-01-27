@@ -4,7 +4,9 @@
 (require 'el-mock)
 
 (defvar google-translate-test/test-path
-  (f-dirname load-file-name))
+  (if (null load-file-name)
+      (f-dirname (buffer-file-name))
+    (f-dirname load-file-name)))
 
 (defvar google-translate-test/fixture-path
   (f-expand "fixtures" google-translate-test/test-path))
@@ -28,6 +30,10 @@
 
 (require 'google-translate
          (f-expand "google-translate"
+                   google-translate-test/root-path))
+
+(require 'google-translate-default-ui
+         (f-expand "google-translate-default-ui"
                    google-translate-test/root-path))
 
 (defun th-google-translate-load-fixture (file)
@@ -96,4 +102,90 @@
         (forward-line 1)
         (setq line (buffer-substring-no-properties (line-beginning-position)
                                                    (line-end-position)))
-        (setq result (append result '(,line)))))))
+        (setq result (append result `(,line))))
+      result)))
+
+(defun th-google-translate-detailed-translation-to-string (detailed-translation)
+  (unless (null detailed-translation)
+    (loop for item across detailed-translation do
+          (unless (string-equal (aref item 0) "")
+            (insert (format "%s\n" (aref item 0)))
+            (loop for translation across (aref item 1) do
+                  (insert (format "%s\n" translation)))))))
+
+(defun th-google-translate-generate-word-fixture (word
+                                                  source-language
+                                                  target-language
+                                                  fixture-num)
+  (interactive "sWord: \nsFrom: \nsTo: \nsFixture-num: ")
+  (th-google-translate-generate-fixture
+   word
+   source-language
+   target-language
+   fixture-num
+   google-translate-test/word-fixture-path))
+
+(defun th-google-translate-generate-sentence-fixture (word
+                                                  source-language
+                                                  target-language
+                                                  fixture-num)
+  (interactive "sSentence: \nsFrom: \nsTo: \nsFixture-num: ")
+  (th-google-translate-generate-fixture
+   word
+   source-language
+   target-language
+   fixture-num
+   google-translate-test/sentence-fixture-path))
+
+(defun th-google-translate-generate-fixture (word 
+                                             source-language
+                                             target-language
+                                             fixture-num
+                                             fixture-dir-path)
+  (interactive "sWord: \nsFrom: \nsTo: \nsFixture-num: ")
+  (let* ((response (with-current-buffer 
+                       (google-translate--request
+                        source-language
+                        target-language
+                        word
+                        t)
+                     (buffer-string)))
+         (json (json-read-from-string
+                (google-translate--insert-nulls 
+                 (with-temp-buffer
+                   (insert response)
+                   (goto-char (point-min))
+                   (re-search-forward (format "\n\n"))
+                   (delete-region (point-min) (point))
+                   (buffer-string))))))
+    (with-temp-buffer
+      (insert (format "%s\n\n\n" word))
+      (insert response)
+      (insert (format "\n\n%s\n" "text-phonetic:"))
+      (let ((text-phonetic (google-translate-json-text-phonetic json)))
+        (when (null text-phonetic)
+          (setq text-phonetic ""))
+        (insert (format "%s\n" text-phonetic)))
+      (insert (format "\n%s\n" "translation-phonetic:"))
+      (let ((translation-phonetic (google-translate-json-translation-phonetic json)))
+        (when (null translation-phonetic)
+          (setq translation-phonetic ""))
+        (insert (format "%s\n" translation-phonetic)))
+      (insert (format "\n%s\n" "translation:"))
+      (let ((translation (google-translate-json-translation json)))
+        (when (null translation)
+          (setq translation ""))
+        (insert (format "%s\n" translation)))
+      (insert (format "\n%s\n" "detailed-translation:"))
+      (let ((detailed-translation (google-translate-json-detailed-translation json)))
+        (unless (null detailed-translation)
+          (loop for item across detailed-translation do
+                (unless (string-equal (aref item 0) "")
+                  (insert (format "%s\n" (aref item 0)))
+                  (loop for translation across (aref item 1) do
+                        (insert (format "%s\n" translation)))))))
+      (write-file
+       (concat 
+        fixture-dir-path
+        "/"
+        (format "%s.fixture" fixture-num))))))

@@ -3,8 +3,8 @@ first
 
 HTTP/1.1 200 OK
 Pragma: no-cache
-Date: Thu, 23 Jan 2014 23:44:11 GMT
-Expires: Thu, 23 Jan 2014 23:44:11 GMT
+Date: Sun, 26 Jan 2014 00:57:04 GMT
+Expires: Sun, 26 Jan 2014 00:57:04 GMT
 Cache-Control: private, max-age=600
 Content-Type: text/javascript; charset=UTF-8
 Content-Language: ru
@@ -15,7 +15,7 @@ X-XSS-Protection: 1; mode=block
 Alternate-Protocol: 80:quic
 Transfer-Encoding: chunked
 
-[[["первый","first","pervyy",""]],[["adjective",["первый","ранний","ведущий","выдающийся","значительный"],[["первый",["first","former","maiden","opening","top","premier"],,0.65581602],["ранний",["early","first","forward","rathe","youthful","rareripe"],,7.4851829e-05],["ведущий",["leading","master","principal","key","guiding","first"],,1.4823602e-06],["выдающийся",["outstanding","prominent","eminent","distinguished","remarkable","first"],,1.3287791e-06],["значительный",["significant","great","considerable","large","substantial","first"],,1.0738182e-07]],"first",3],["",["первый"],[["первый",["first"],,0.65581602]],"first",15],["adverb",["сначала","впервые","сперва","в первую очередь","предпочтительно","скорее"],[["сначала",["first","initially","at first","primarily","at the beginning","in the first instance"],,0.046770621],["впервые",["first"],,0.020432571],["сперва",["first","at first","primarily","in the first place","in the first instance"],,0.0039610346],["в первую очередь",["primarily","first of all","first","in the first place","first and foremost","in the first instance"],,0.0031334364],["предпочтительно",["preferably","for preference","first"],,1.0030151e-06],["скорее",["rather","sooner","rater","first"],,2.1355423e-07]],"first",4],["noun",["начало","первое число","высшая оценка","товары высшего качества","самый высокий голос в ансамбле","самая высокая партия в музыкальной пьесе","человек, получивший высшую оценку"],[["начало",["start","starting","beginning","outbreak","origin","first"],,0.00039837172],["первое число",["first"],,4.0696235e-05],["высшая оценка",["first"],,1.4005229e-07],["товары высшего качества",["first"],,1.0407803e-07],["самый высокий голос в ансамбле",["first"],,6.9330909e-08],["самая высокая партия в музыкальной пьесе",["first"],,6.9330909e-08],["человек, получивший высшую оценку",["first"]]],"first",1]],"en",,[["первый",[17],true,false,831,0,1,1]],[["first",17,[["первый",831,true,false],["сначала",168,true,false],["первым",0,true,false],["первая",0,true,false],["первой",0,true,false]],[[0,5]],"first"]],,[,"First",[10],,true],[],51]
+[[["первый","first","pervyy",""]],[["adjective",["первый","ранний","ведущий","выдающийся","значительный"],[["первый",["first","former","maiden","opening","top","premier"],,0.65581602],["ранний",["early","first","forward","rathe","youthful","rareripe"],,7.4851829e-05],["ведущий",["leading","master","principal","key","guiding","first"],,1.4823602e-06],["выдающийся",["outstanding","prominent","eminent","distinguished","remarkable","first"],,1.3287791e-06],["значительный",["significant","great","considerable","large","substantial","first"],,1.0738182e-07]],"first",3],["",["первый"],[["первый",["first"],,0.65581602]],"first",15],["adverb",["сначала","впервые","сперва","в первую очередь","предпочтительно","скорее"],[["сначала",["first","initially","at first","primarily","at the beginning","in the first instance"],,0.046770621],["впервые",["first"],,0.020432571],["сперва",["first","at first","primarily","in the first place","in the first instance"],,0.0039610346],["в первую очередь",["primarily","first of all","first","in the first place","first and foremost","in the first instance"],,0.0031334364],["предпочтительно",["preferably","for preference","first"],,1.0030151e-06],["скорее",["rather","sooner","rater","first"],,2.1355423e-07]],"first",4],["noun",["начало","первое число","высшая оценка","товары высшего качества","самый высокий голос в ансамбле","самая высокая партия в музыкальной пьесе","человек, получивший высшую оценку"],[["начало",["start","starting","beginning","outbreak","origin","first"],,0.00039837172],["первое число",["first"],,4.0696235e-05],["высшая оценка",["first"],,1.4005229e-07],["товары высшего качества",["first"],,1.0407803e-07],["самый высокий голос в ансамбле",["first"],,6.9330909e-08],["самая высокая партия в музыкальной пьесе",["first"],,6.9330909e-08],["человек, получивший высшую оценку",["first"]]],"first",1]],"en",,[["первый",[1],true,false,831,0,1,0]],[["first",1,[["первый",831,true,false],["сначала",168,true,false],["первым",0,true,false],["первая",0,true,false],["первой",0,true,false]],[[0,5]],"first"]],,[,"First",[10],,true],[],64]
 
 text-phonetic:
 
@@ -27,5 +27,24 @@ translation:
 первый
 
 detailed-translation:
-
-
+adjective
+первый
+ранний
+ведущий
+выдающийся
+значительный
+adverb
+сначала
+впервые
+сперва
+в первую очередь
+предпочтительно
+скорее
+noun
+начало
+первое число
+высшая оценка
+товары высшего качества
+самый высокий голос в ансамбле
+самая высокая партия в музыкальной пьесе
+человек, получивший высшую оценку
