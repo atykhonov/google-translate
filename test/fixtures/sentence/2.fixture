@@ -1,0 +1,29 @@
+век живи, век учись
+
+
+HTTP/1.1 200 OK
+Pragma: no-cache
+Date: Sun, 26 Jan 2014 01:13:48 GMT
+Expires: Sun, 26 Jan 2014 01:13:48 GMT
+Cache-Control: private, max-age=600
+Content-Type: text/javascript; charset=UTF-8
+Content-Language: uk
+X-Content-Type-Options: nosniff
+Content-Disposition: attachment
+Server: HTTP server (unknown)
+X-XSS-Protection: 1; mode=block
+Alternate-Protocol: 80:quic
+Transfer-Encoding: chunked
+
+[[["вік живи , вік учись","век живи, век учись","vik zhyvy , vik uchysʹ","vek zhivi, vek uchis'"]],,"ru",,[["вік живи",[1],true,false,986,0,2,0],[",",[2],false,false,986,2,3,0],["вік учись",[3],true,false,986,3,5,0]],[["век живи",1,[["вік живи",986,true,false]],[[0,8]],"век живи, век учись"],[",",2,[[",",986,false,false]],[[8,9]],""],["век учись",3,[["вік учись",986,true,false],["век учись",0,true,false],["століття вчися",0,true,false],["вік учися",0,true,false],["вік навчайся",0,true,false]],[[10,19]],""]],,,[],51]
+
+text-phonetic:
+vek zhivi, vek uchis'
+
+translation-phonetic:
+vik zhyvy , vik uchysʹ
+
+translation:
+вік живи , вік учись
+
+detailed-translation:
