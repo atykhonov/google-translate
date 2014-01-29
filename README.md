@@ -121,6 +121,8 @@ It is reasonable to define the following variable:
 
 - `google-translate-translation-directions-alist`
 
+- `google-translate-preferable-input-methods-alist`
+
 `google-translate-translation-directions-alist` alist is intended
 to contain translation directions.
 
@@ -187,10 +189,23 @@ you would like to always use and to avoid repetitive language
 quering it is reasonable to define them in the mentioned
 `google-translate-translation-directions-alist` variable.
 
-Customization:
+###### Input method auto toggling
 
-Smooth UI is not customizable, but it inherits properties from its
-parent feature (see the next section).
+You may also define the value of variable
+`google-translate-preferable-input-methods-alist'. That might be
+useful in case when you are using several input methods (several
+languages) and needs often change a language (input method) while
+translating in the minibuffer. This variable may be defined as
+follow (just for example):
+
+(setq google-translate-preferable-input-methods-alist '((nil . ("en"))
+                                                        (ukrainian-programmer-dvorak . ("ru" "uk"))))
+
+In this way, input method disables (because of nil) for the
+minibuffer when source language is English. And
+"ukrainian-programmer-dvorak" input method enables when source
+language is Russian or Ukrainian.
+
 
 ## Common UI Customization
 
