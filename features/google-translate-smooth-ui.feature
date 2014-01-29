@@ -51,6 +51,4 @@ Feature: Smooth UI for Google Translate
     And I go to word "but"
     And I translate ""
     Then there is no region selected
-    Then I should see translation "Это не только успешно пережил пять веков"
-
-
+    Then I should see translation "Это не только успешно пережил пять веков"    

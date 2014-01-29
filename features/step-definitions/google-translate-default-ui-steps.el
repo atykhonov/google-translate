@@ -70,12 +70,6 @@
         (And "I press \"RET\"")
         (And "I execute the action chain")))
 
-;; (When "^I translate word at point from \"\\([^\"]*\\)\" to \"\\([^\"]*\\)\"$"
-;;   (lambda (source-language target-language)
-;;     (When (format "I translate thing at point from \"%s\" to \"%s\"" 
-;;                   source-language
-;;                   target-language))))
-
 (When "^I translate word at point from \"\\([^\"]*\\)\"$"
   (lambda (source-language)
     (When (format "I translate thing at point from \"%s\" to \"\"" 
