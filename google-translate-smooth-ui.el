@@ -54,9 +54,11 @@
 ;;
 ;; Configuration:
 ;;
-;; It is reasonable to define the following variable:
+;; It is reasonable to define the following variables:
 ;;
 ;; - `google-translate-translation-directions-alist'
+;;
+;; - `google-translate-preferable-input-methods-alist'
 ;;
 ;; `google-translate-translation-directions-alist' alist is intended
 ;; to contain translation directions.
@@ -112,6 +114,23 @@
 ;; quering it is reasonable to define them in the mentioned
 ;; `google-translate-translation-directions-alist' variable.
 ;;
+;; Input method auto toggling
+
+;; You may also define the value of variable
+;; `google-translate-preferable-input-methods-alist'. That might be
+;; useful in case when you are using several input methods (several
+;; languages) and needs often change a language (input method) while
+;; translating in the minibuffer. This variable may be defined as
+;; follow (just for example):
+
+;; (setq google-translate-preferable-input-methods-alist '((nil . ("en"))
+;;                                                         (ukrainian-programmer-dvorak . ("ru" "uk"))))
+
+;; In this way, input method disables (because of nil) for the
+;; minibuffer when source language is English. And
+;; "ukrainian-programmer-dvorak" input method enables when source
+;; language is Russian or Ukrainian.
+;;
 ;; Customization:
 ;;
 ;; `google-translate-smooth-ui' doesn't contain any customizable
@@ -131,10 +150,18 @@
   "Just Another UI for Google Translate package."
   :group 'processes)
 
+(defvar google-translate-input-method-auto-toggling nil
+  "When t compare current source language (from current
+translation direction) with the values from
+`google-translate-preferable-input-methods-alist' and enables
+appropriate input method for the minibuffer. So this feature may
+allow to avoid switching between input methods while translating
+using different languages.")
+
 (defvar google-translate-translation-directions-alist
   '()
   "Alist of translation directions. Each of direction could be
-  selected directly in the minibuffer during translation.
+selected directly in the minibuffer during translation.
 
 Each element is a cons-cell of the form (SOURCE_CODE
 . TARGET_CODE), where SOURCE_CODE is a source language code and
@@ -151,17 +178,45 @@ As example, this alist could looks like the following:
     (\"ru\" . \"uk\"))
 ")
 
+(defvar google-translate-preferable-input-methods-alist
+  '((nil . nil))
+  "Alist of preferable input methods for certain languages.
+
+Each element is a cons-cell of the form (INPUT-METHOD
+. LANGUAGES-LIST), where INPUT-METHOD is the input method which
+will be switched on when translation source language equals to
+one of the language from the LANGUAGE-LIST while changing
+translation direction.
+
+INPUT-METHOD could be specified as nil. In such case input method
+disables.
+
+As example, this alist could looks like the following:
+
+  '((nil . \"en\")
+    (ukrainian-programmer-dvorak . (\"ru\" \"uk\")))
+
+In this way, `ukrainian-programmer-dvorak' will be auto enabled
+for the minibuffer when Russian or Ukrainian (as source language)
+is active while changing translation direction.
+")
+
 (defvar google-translate-current-translation-direction 0
   "Points to nth element of
-  `google-translate-translation-directions-alist' variable.")
+`google-translate-translation-directions-alist' variable and
+keeps current translation direction while changing translation
+directions.")
 
 (defvar google-translate-translation-direction-query ""
   "Temporal variable which keeps a minibuffer text while
-  switching translation directions.")
+switching translation directions.")
 
 (defvar google-translate-try-other-direction nil
   "Indicates that other translation direction is going to be
-  used.")
+used.")
+
+(defvar google-translate-minibuffer-keymap nil
+  "Keymap for minibuffer for changing translation directions.")
 
 (defun google-translate-change-translation-direction (direction)
   "Change translation direction. If DIRECTION is 'next then
@@ -199,6 +254,28 @@ switch to the last one."
   (setq google-translate-try-other-direction t)
   (exit-minibuffer))
 
+(defun google-translate-find-preferable-input-method (source-language)
+  "Look for the SOURCE-LANGUAGE in the
+`google-translate-preferable-input-methods-alist' and return
+input method for it."
+  (let ((input-method nil))
+    (dolist (item google-translate-preferable-input-methods-alist)
+      (dolist (language (cdr item))
+        (when (string-equal source-language language)
+          (setq input-method (car item)))))
+    input-method))
+
+(defun google-translate-setup-preferable-input-method ()
+  "Set input method which takes from the value of
+`google-translate-preferable-input-methods-alist' variable."
+  (interactive)
+  (let* ((source-language
+          (google-translate--current-direction-source-language))
+         (preferable-input-method
+          (google-translate-find-preferable-input-method
+           source-language)))
+    (set-input-method preferable-input-method)))
+
 (defun google-translate-query-translate-using-directions ()
   "Tranlate query using translation directions described by
 `google-translate-translation-directions-alist' variable.
@@ -212,19 +289,27 @@ allow to select direction:
 C-p - to select previous direction,
 C-n - to select next direction."
   (interactive)
-  (setq google-translate-try-other-direction nil)
-  (let ((text (google-translate--read-from-minibuffer)))
+  (let ((text ""))
+    (setq google-translate-try-other-direction nil)
+    (setq text 
+          (if google-translate-input-method-auto-toggling
+              (minibuffer-with-setup-hook
+                  'google-translate-setup-preferable-input-method
+                (google-translate--read-from-minibuffer))
+            (google-translate--read-from-minibuffer)))
     (if google-translate-try-other-direction
         (call-interactively 'google-translate-query-translate-using-directions)
       text)))
 
-(defun google-translate--minibuffer-keymap ()
+(defun google-translate--setup-minibuffer-keymap ()
   "Setup additional key bindings for minibuffer."
-  (let ((map (make-sparse-keymap)))
-    (define-key map "\C-p" 'google-translate-previous-translation-direction)
-    (define-key map "\C-n" 'google-translate-next-translation-direction)
-    (set-keymap-parent map minibuffer-local-map)
-    map))
+  (unless google-translate-minibuffer-keymap
+    (setq google-translate-minibuffer-keymap
+          (let ((map (make-sparse-keymap)))
+            (define-key map "\C-p" 'google-translate-previous-translation-direction)
+            (define-key map "\C-n" 'google-translate-next-translation-direction)
+            (set-keymap-parent map minibuffer-local-map)
+            map))))
 
 (defun google-translate--read-from-minibuffer ()
   "Read string from minibuffer."
@@ -238,10 +323,11 @@ C-n - to select next direction."
                    (format "[%s > %s] Translate: "
                            (google-translate-language-display-name source-language)
                            (google-translate-language-display-name target-language)))))
+    (google-translate--setup-minibuffer-keymap)
     (read-from-minibuffer
      prompt
      google-translate-translation-direction-query
-     (google-translate--minibuffer-keymap) nil nil
+     google-translate-minibuffer-keymap nil nil
      google-translate-translation-direction-query t)))
 
 (defun google-translate--current-direction-source-language ()
@@ -275,14 +361,15 @@ A current translation direction could be changed directly in the
 minibuffer by means of key bindings such as C-n and C-p for
 changing to the next translation direction and to the previous
 one respectively."
-  (interactive)
+  (interactive)  
 
   (setq google-translate-translation-direction-query
         (if (use-region-p)
             (buffer-substring-no-properties (region-beginning) (region-end))
           (current-word t)))
-  
+
   (setq google-translate-current-translation-direction 0)
+
   (let* ((text (google-translate-query-translate-using-directions))
          (source-language (google-translate--current-direction-source-language))
          (target-language (google-translate--current-direction-target-language)))
