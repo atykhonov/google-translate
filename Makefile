@@ -35,4 +35,5 @@ marmalade:
 	cp google-translate-smooth-ui.el $(TARGET_DIR)
 	cp google-translate.el $(TARGET_DIR)
 	cp README.md $(TARGET_DIR)
+	cp google-translate-pkg.el $(TARGET_DIR)
 	tar -cf google-translate-$(VERSION).tar $(TARGET_DIR)
