@@ -6,7 +6,7 @@ ELC = $(SRC:.el=.elc)
 CASK ?= cask
 PKG_DIR := $(shell $(CASK) package-directory)
 FEATURES = $(wildcard features/*.feature)
-VERSION = 0.7.0
+VERSION = 0.7.1
 TARGET_DIR = google-translate-$(VERSION)
 
 all: test
