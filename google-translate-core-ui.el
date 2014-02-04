@@ -90,7 +90,7 @@
 ;;; Code:
 ;;
 
-;; (require 'google-translate)
+(require 'google-translate-core)
 (require 'ido)
 
 
