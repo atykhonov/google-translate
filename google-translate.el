@@ -69,7 +69,6 @@
 
 ;;; Code:
 
-(require 'google-translate-core)
 (require 'google-translate-default-ui)
 
 (provide 'google-translate)

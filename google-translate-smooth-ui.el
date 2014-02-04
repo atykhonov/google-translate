@@ -344,6 +344,7 @@ direction."
   (cdr (nth google-translate-current-translation-direction
             google-translate-translation-directions-alist)))
 
+;;;###autoload
 (defun google-translate-smooth-translate ()
   "Translate a text using translation directions.
 

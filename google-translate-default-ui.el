@@ -199,6 +199,7 @@ becomes the default target language and vice versa."
               (google-translate-language-display-name source-language)
               (google-translate-language-display-name target-language))))))
 
+;;;###autoload
 (defun google-translate-query-translate (&optional override-p)
   "Interactively translate text with Google Translate.
 
@@ -226,6 +227,7 @@ Translate to detect the source language."
   (interactive "P")
   (%google-translate-query-translate override-p nil))
 
+;;;###autoload
 (defun google-translate-query-translate-reverse (&optional override-p)
   "Like `google-translate-query-translate', but performs translation
 in the reverse direction.
@@ -251,6 +253,7 @@ in the reverse direction."
        (or (current-word t)
            (error "No word at point."))))))
 
+;;;###autoload
 (defun google-translate-at-point (&optional override-p)
   "Translate the word at point or the words in the active region.
 
@@ -258,6 +261,7 @@ For the meaning of OVERRIDE-P, see `google-translate-query-translate'."
   (interactive "P")
   (%google-translate-at-point override-p nil))
 
+;;;###autoload
 (defun google-translate-at-point-reverse (&optional override-p)
   "Like `google-translate-at-point', but performs translation in the
 reverse direction."
