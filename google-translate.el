@@ -62,7 +62,7 @@
 ;; package. google-translate-default-ui - is UI which is selected by
 ;; default. It loads by default and is available right after
 ;; google-translate installation and its initialization. Please read
-;; documentation for the `google-tranlate-core-ui.el' and
+;; documentation for the `google-translate-core-ui.el' and
 ;; `google-translate-default-ui.el' packages for more info about
 ;; customization.
 ;;  
