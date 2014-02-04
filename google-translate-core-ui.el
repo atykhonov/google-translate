@@ -194,7 +194,7 @@ query parameter in HTTP requests.")
 (defface google-translate-translation-face
   '((t (:weight bold)))
   "Face used to display the probable translation."
-  :group 'googel-translate-core-ui)
+  :group 'google-translate-core-ui)
 
 
 (defun google-translate-supported-languages ()
