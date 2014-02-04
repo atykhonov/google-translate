@@ -4,7 +4,7 @@
 
 ;; Author: Oleksandr Manzyuk <manzyuk@gmail.com>
 ;; URL: https://github.com/atykhonov/google-translate
-;; Version: 0.7.0
+;; Version: 0.7.1
 ;; Keywords: convenience
 
 ;; Contributors:
