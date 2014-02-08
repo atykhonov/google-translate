@@ -118,12 +118,15 @@
 ;;
 ;; Input method auto toggling
 
-;; You may also define the value of variable
-;; `google-translate-preferable-input-methods-alist'. That might be
-;; useful in case when you are using several input methods (several
-;; languages) and needs often change a language (input method) while
-;; translating in the minibuffer. This variable may be defined as
-;; follow (just for example):
+;; While switching within directions I noticed that I change input
+;; method quite often. Input method auto toggling allows switch on
+;; appropriate input method while switching within directions. Auto
+;; toggling will work in case of
+;; `google-translate-input-method-auto-toggling' is set to `t' and
+;; `google-translate-preferable-input-methods-alist' is defined
+;; properly.
+
+;; This variable may be defined as follow (just for example):
 
 ;; (setq google-translate-preferable-input-methods-alist '((nil . ("en"))
 ;;                                                         (ukrainian-programmer-dvorak . ("ru" "uk"))))
@@ -132,6 +135,7 @@
 ;; minibuffer when source language is English. And
 ;; "ukrainian-programmer-dvorak" input method enables when source
 ;; language is Russian or Ukrainian.
+
 ;;
 ;; Customization:
 ;;

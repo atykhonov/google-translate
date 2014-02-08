@@ -191,11 +191,14 @@ quering it is reasonable to define them in the mentioned
 
 ##### Input method auto toggling
 
-You may also define the value of variable
-`google-translate-preferable-input-methods-alist'. That might be
-useful in case when you are using several input methods (several
-languages) and needs often change a language (input method) while
-translating in the minibuffer. This variable may be defined as
+While switching within directions I noticed that I change input method
+quite often. Input method auto toggling allows switch on appropriate
+input method while switching within directions. Auto toggling will
+work in case of `google-translate-input-method-auto-toggling` is set
+to `t` and `google-translate-preferable-input-methods-alist` is
+defined properly.
+
+This variable may be defined as
 follow (just for example):
 
 ```
