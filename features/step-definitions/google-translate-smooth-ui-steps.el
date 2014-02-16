@@ -1,4 +1,4 @@
-(When "^I translate (via smooth UI) \"\\([^\"]*\\)\" from \"\\([^\"]*\\)\" to \"\\([^\"]*\\)\"$"
+(When "I translate (via smooth UI) :arg-1 from :arg-2 to :arg-3"
       (lambda (text source-language target-language)
         (And "I start an action chain")
         (And "I press \"M-x\"")
@@ -7,7 +7,7 @@
         (when (and (stringp text)
                    (> (length text) 0))
           (delete-minibuffer-contents)
-          (And "I type \"%s\"" text))
+          (And "I type :arg-1" text))
         (And "I press \"RET\"")
         (when (and (stringp source-language)
                    (> (length source-language) 0))
@@ -22,13 +22,13 @@
           (And "I press \"RET\""))
         (And "I execute the action chain")))
 
-(When "^I translate (via smooth UI) thing at point from \"\\([^\"]*\\)\" to \"\\([^\"]*\\)\"$"
+(When "I translate (via smooth UI) thing at point from :arg-1 to :arg-2"
       (lambda (source-language target-language)
         (When (format "I translate \"\" from \"%s\" to \"%s\"" 
                       source-language
                       target-language))))
 
-(When "^I translate \"\\([^\"]*\\)\" using \\(.+\\) direction$"
+(When "I translate :arg-1 using :arg-2 direction"
       (lambda (text nth-direction)
         (And "I start an action chain")
         (And "I press \"M-x\"")
@@ -37,7 +37,7 @@
         (when (and (stringp text)
                    (> (length text) 0))
           (delete-minibuffer-contents)
-          (And "I type \"%s\"" text))
+          (And "I type :arg-1" text))
         (let ((index 0)
               (nth-direction (string-to-int nth-direction)))
           (if (> nth-direction 0)

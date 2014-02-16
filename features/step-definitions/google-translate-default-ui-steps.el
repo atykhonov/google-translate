@@ -1,4 +1,10 @@
-(When "^I translate (via default UI) \"\\([^\"]*\\)\" from \"\\([^\"]*\\)\" to \"\\([^\"]*\\)\"$"
+;; (define-step "I translate (via default UI) `text' from `source-language' to `target-language'"
+;;   (And "I start an action chain")
+;;   (And "I press \"M-x\"")
+;;   (And "I type \"google-translate-query-translate\"")
+;;   ...)
+
+(When "I translate (via default UI) :arg-1 from :arg-2 to :arg-3"
       (lambda (text source-language target-language)
         (And "I start an action chain")
         (And "I press \"M-x\"")
@@ -19,19 +25,19 @@
         (And "I press \"RET\"")
         (And "I execute the action chain")))
 
-(When "^I translate \"\\([^\"]*\\)\"$"
+(When "I translate :arg-1"
   (lambda (text)
     (Given (format "I translate \"%s\" from \"\" to \"\"" text))))
 
-(When "^I translate \"\\([^\"]*\\)\" to \"\\([^\"]*\\)\"$"
+(When "I translate :arg-1 to :arg-2"
   (lambda (text target-language)
     (Given (format "I translate \"%s\" from \"\" to \"%s\"" text target-language))))
 
-(When "^I translate \"\\([^\"]*\\)\" from \"\\([^\"]*\\)\"$"
+(When "I translate :arg-1 from :arg-2"
   (lambda (text source-language)
     (Given (format "I translate \"%s\" from \"%s\" to \"\"" text source-language))))
 
-(When "^I translate (via default UI) thing at point from \"\\([^\"]*\\)\" to \"\\([^\"]*\\)\"$"
+(When "I translate (via default UI) thing at point from :arg-1 to :arg-2"
       (lambda (source-language target-language)
         (And "I start an action chain")
         (And "I press \"M-x\"")
@@ -52,7 +58,7 @@
           (And "I press \"RET\""))
         (And "I execute the action chain")))
 
-(When "^I reverse translate \"\\([^\"]*\\)\"$"
+(When "I reverse translate :arg-1"
       (lambda (text)
         (And "I start an action chain")
         (And "I press \"M-x\"")
@@ -62,7 +68,7 @@
         (And "I press \"RET\"")
         (And "I execute the action chain")))
 
-(When "^I reverse translate word at point$"
+(When "I reverse translate word at point"
       (lambda ()
         (And "I start an action chain")
         (And "I press \"M-x\"")
@@ -70,27 +76,28 @@
         (And "I press \"RET\"")
         (And "I execute the action chain")))
 
-(When "^I translate word at point from \"\\([^\"]*\\)\"$"
+(When "I translate word at point from :arg-1"
   (lambda (source-language)
     (When (format "I translate thing at point from \"%s\" to \"\"" 
                   source-language))))
 
-(When "^I translate word at point to \"\\([^\"]*\\)\"$"
+(When "I translate word at point to :arg-1"
   (lambda (target-language)
     (When (format "I translate thing at point from \"\" to \"%s\"" 
                   target-language))))
 
-(When "^I translate word at point$"
+(When "I translate word at point"
   (lambda ()
     (When (format "I translate thing at point from \"\" to \"\""))))
 
-(When "^I translate selected region from \"\\(.+\\)\" to \"\\(.+\\)\"$"
+(When "I translate selected region from :arg-1 to :arg-2"
   (lambda (source-language target-language)
     (When (format "I translate thing at point from \"%s\" to \"%s\"" 
                   source-language
                   target-language))))
 
-(Then "^I should see translation \"\\(.+\\)\"$"
+(Then "I should see translation :arg-1"
   (lambda (translation)
     (Given "I am in buffer \"*Google Translate*\"")
     (Then (format "I should see \"%s\"" translation))))
+
