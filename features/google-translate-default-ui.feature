@@ -49,14 +49,14 @@ Feature: Default UI for Google Translate
     Then I should see translation "книга"
     
   Scenario: Translate a word at point using default target language
-    Given I set 'google-translate-default-source-language to '()
+    Given I set 'google-translate-default-source-language to 'nil
     Given I set 'google-translate-default-target-language to "ru"
     Given I go to word "dummy"
     When I translate word at point from "en"
     Then I should see translation "манекен"
 
   Scenario: Translate a word using query translate and default target language
-    Given I set 'google-translate-default-source-language to '()
+    Given I set 'google-translate-default-source-language to 'nil
     Given I set 'google-translate-default-target-language to "ru"
     When I translate "book" from "en"
     Then I should see translation "книга"

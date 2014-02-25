@@ -1,34 +1,38 @@
 (defvar it-google-translate-current-ui "")
 
-(Given ":arg-1 UI"
-       (lambda (ui)
-         (setq it-google-translate-current-ui ui)))
+(define-step "`ui' UI"
+  (setq it-google-translate-current-ui ui))
 
-(When "I translate :arg-1 from :arg-2 to :arg-3"
-      (lambda (text source-language target-language)
-        (When (format "I translate (via %s UI) \"%s\" from \"%s\" to \"%s\""
-                      it-google-translate-current-ui
-                      text
-                      source-language
-                      target-language))))
+(define-step "I translate `text' from `source-language' to `target-language'"
+  (When
+   (format
+    "I translate (via %s UI) `text' from `source-language' to `target-language'"
+    it-google-translate-current-ui)
+   text
+   source-language
+   target-language))
 
-(When "I translate thing at point from :arg-1 to :arg-2"
-      (lambda (source-language target-language)
-        (When 
-         (format
-          "I translate (via %s UI) thing at point from \"%s\" to \"%s\""
-          it-google-translate-current-ui
-          source-language
-          target-language))))
+(define-step "I translate thing at point from `source-language' to `target-language'"
+  (When
+   (format
+    "I translate (via %s UI) thing at point from `source-language' to `target-language'"
+    it-google-translate-current-ui)
+   source-language
+   target-language))
 
-(When "I translate word at point from :arg-1 to :arg-2"
-      (lambda (source-language target-language)
-        (When (format "I translate (via %s UI) thing at point from \"%s\" to \"%s\"" 
-                      it-google-translate-current-ui
-                      source-language
-                      target-language))))
+(define-step "I translate word at point from `source-language' to `target-language'"
+  (When
+   (format
+    "I translate (via %s UI) thing at point from `source-language' to `target-language'"
+    it-google-translate-current-ui)
+   source-language
+   target-language))
 
-(Then "I should see translation :arg-1"
-      (lambda (translation)
-        (Given "I am in buffer \"*Google Translate*\"")
-        (Then (format "I should see \"%s\"" translation))))
+(define-step "I should see translation `translation'"
+  (Given "I am in buffer `buffer'" "*Google Translate*")
+  (Then "I should see `translation'" translation))
+
+(define-step "I translate `text'"
+  (Then (format "I translate (via %s UI) `text'"
+                it-google-translate-current-ui)
+        text))
