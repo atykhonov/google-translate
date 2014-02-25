@@ -12,3 +12,4 @@ env:
 script:
   - emacs --version
   - make test
+
