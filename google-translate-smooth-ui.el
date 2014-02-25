@@ -314,8 +314,14 @@ C-n - to select next direction."
           (let ((map (make-sparse-keymap)))
             (define-key map "\C-p" 'google-translate-previous-translation-direction)
             (define-key map "\C-n" 'google-translate-next-translation-direction)
+            (define-key map "\C-l" 'google-translate-clear-minibuffer)
             (set-keymap-parent map minibuffer-local-map)
             map))))
+
+(defun google-translate-clear-minibuffer ()
+  "Delete minibuffer contents."
+  (interactive)
+  (delete-minibuffer-contents))
 
 (defun google-translate--read-from-minibuffer ()
   "Read string from minibuffer."
