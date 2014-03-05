@@ -107,3 +107,8 @@ Feature: Default UI for Google Translate
     When I translate "book"
     Then I should see translation "книга"
 
+  Scenario: Suggestion when word is misspelled
+    Given I set google-translate-default-source-language to "en"
+    Given I set google-translate-default-target-language to "ru"
+    When I translate "sudgest"
+    Then I should see suggestion "suggest"

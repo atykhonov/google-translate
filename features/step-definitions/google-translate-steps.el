@@ -34,3 +34,8 @@
       (lambda (translation)
         (Given "I am in buffer \"*Google Translate*\"")
         (Then (format "I should see \"%s\"" translation))))
+
+(Then "^I should see suggestion \"\\(.+\\)\"$"
+      (lambda (translation)
+        (Given "I am in buffer \"*Google Translate*\"")
+        (Then (format "I should see \"%s\"" translation))))

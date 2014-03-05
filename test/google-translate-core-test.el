@@ -61,6 +61,14 @@
                (google-translate-json-translation
                 (th-google-translate-request-fixture fixture)))))))
 
+(ert-deftest test-google-translate-json-suggestion ()
+  (dolist (file (f-files google-translate-test/word-fixture-path))
+    (let ((fixture (th-google-translate-load-fixture file)))
+      (should (string-equal
+               (th-google-translate-fixture-suggestion fixture)
+               (google-translate-json-suggestion
+                (th-google-translate-request-fixture fixture)))))))
+
 (ert-deftest test-google-translate-json-detailed-translation ()
   (dolist (file (f-files google-translate-test/word-fixture-path))
     (let* ((fixture (th-google-translate-load-fixture file))
@@ -74,34 +82,23 @@
         (with-temp-buffer
           (th-google-translate-detailed-translation-to-string detailed-translation)
           (setq detailed-translation-str (buffer-substring-no-properties (point-min) (point-max))))
-        ;; (with-temp-buffer
-        ;;   (th-google-translate-detailed-translation-to-string fixture-dt)
-        ;;   (setq fixture-dt-str (buffer-substring-no-properties (point-min) (point-max))))
         (setq fixture-dt-str (mapconcat (lambda (w) w) fixture-dt "\n"))
         (should (string-equal
                  detailed-translation-str
                  fixture-dt-str))))))
-        ;; (loop for item across detailed-translation do
-        ;;       (let ((index 0))
-        ;;         (unless (string-equal (aref item 0) "")
-        ;;           (should (string-equal (aref fixture-dt index)
-        ;;                                 (aref item 0)))
-        ;;           (loop for translation across (aref item 1) do
-        ;;                 (incf index)
-        ;;                 (should (string-equal (aref fixture-dt index)
-        ;;                                       translation))))))))))
 
 (ert-deftest test-google-translate-request-empty-text ()
   (should (null
            (google-translate-request "en" "ru" ""))))
 
-(defvar test-example-query "client=t&ie=UTF-8&oe=UTF-8&sl=en&tl=ru&text=first")
+(defvar test-example-query "client=t&ie=UTF-8&oe=UTF-8&sl=en&tl=ru&sc=2&text=first")
 
 (defvar test-example-query-params '(("client" . "t")
                                     ("ie"     . "UTF-8")
                                     ("oe"     . "UTF-8")
                                     ("sl"     . "en")
                                     ("tl"     . "ru")
+                                    ("sc"     . "2")
                                     ("text"   . "first")))
 
 (ert-deftest test-google-translate--format-query-string ()
@@ -114,22 +111,3 @@
   (should (string-equal
            (concat google-translate-base-url "?" test-example-query)
            (google-translate--format-request-url test-example-query-params))))
-
-;; (ert-deftest test-google-translate--http-response-body ()
-;;   (with-mock
-;;    (let* ((fixture-response (th-google-translate-fixture-response
-;;                              (th-google-translate-load-fixture 
-;;                               (f-expand 
-;;                                "1.fixture" ;; any fixture
-;;                                google-translate-test/word-fixture-path))))
-;;           (json-response (with-temp-buffer
-;;                            (insert fixture-response)
-;;                            (let ((beg (goto-char (point-min))))
-;;                              (re-search-forward (format "\n\n"))
-;;                              (buffer-substring-no-properties beg (point))))))
-
-;;      (stub url-retrieve-synchronously =>
-;;            (th-google-translate-temp-buffer fixture-response))
-;;      (should (string-equal
-;;               json-response
-;;               (google-translate-request "en" "ru" "return"))))))

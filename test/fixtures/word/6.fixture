@@ -3,8 +3,8 @@
 
 HTTP/1.1 200 OK
 Pragma: no-cache
-Date: Sun, 26 Jan 2014 00:16:45 GMT
-Expires: Sun, 26 Jan 2014 00:16:45 GMT
+Date: Wed, 05 Mar 2014 20:58:31 GMT
+Expires: Wed, 05 Mar 2014 20:58:31 GMT
 Cache-Control: private, max-age=600
 Content-Type: text/javascript; charset=UTF-8
 Content-Language: en
@@ -15,7 +15,7 @@ X-XSS-Protection: 1; mode=block
 Alternate-Protocol: 80:quic
 Transfer-Encoding: chunked
 
-[[["diluted","развести","","razvesti"]],,"ru",,[["diluted",[1],true,false,480,0,1,0]],[["развести",1,[["diluted",480,true,false],["dilute",290,true,false],["dissolve",161,true,false],["breed",36,true,false],["divorce",29,true,false]],[[0,8]],"развести"]],,[,"разводить",[10],,true],[["ru"]],39]
+[[["diluted","развести","","razvesti"]],,"ru",,[["diluted",[1],true,false,480,0,1,0]],[["развести",1,[["diluted",480,true,false],["dilute",290,true,false],["dissolve",161,true,false],["breed",36,true,false],["divorce",29,true,false]],[[0,8]],"развести"]],,,[["ru"]],30]
 
 text-phonetic:
 razvesti
@@ -26,5 +26,7 @@ translation-phonetic:
 translation:
 diluted
 
-detailed-translation:
+suggestion:
 
+
+detailed-translation:

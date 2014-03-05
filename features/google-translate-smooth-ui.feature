@@ -52,3 +52,8 @@ Feature: Smooth UI for Google Translate
     And I translate ""
     Then there is no region selected
     Then I should see translation "Это не только успешно пережил пять веков"    
+
+  Scenario: Suggestion when word is misspelled
+    Given I set google-translate-translation-directions-alist to (("en" . "ru"))
+    When I translate "sudgest"
+    Then I should see suggestion "suggest"
