@@ -304,7 +304,6 @@ languages."
     (insert "Did you mean: ")
     (facemenu-set-face 'google-translate-suggestion-label-face
                        beg (point)))
-  ;; (forward-char)
   (goto-char (+ (point) 1))
   (let ((beg (point)))
     (insert suggestion)
