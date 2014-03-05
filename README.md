@@ -243,6 +243,14 @@ There are also three faces you can customize:
   ranking translation (defaults to `default` with the `weight`
   attribute set to `bold`)
 
+- `google-translate-suggestion-label-face` used to display the label
+  for suggestion (defaults to `default` with the `foreground`
+  attribute set to `red`)
+
+- `google-translate-suggestion-face` used to display the suggestion in
+  case of word is misspelled (defaults to `default` with the `slant`
+  attribute set to `italic` and `underline` attribute set to `t`)
+
 For example, to show the translation in a larger font change the
 `height` attribute of the face `google-translate-translation-face`
 like so:
