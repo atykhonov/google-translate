@@ -203,8 +203,6 @@ translation it is possible to get suggestion."
   (let ((info (aref json 7)))
     (when info
       (aref info 1))))
-  ;; (print (format "Arr2: %s" (aref (aref json 7) 1)))
-  ;; (aref (aref json 7) 1))
 
 
 (provide 'google-translate-core)
