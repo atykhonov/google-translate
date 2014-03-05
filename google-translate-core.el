@@ -5,7 +5,7 @@
 ;; Author: Oleksandr Manzyuk <manzyuk@gmail.com>
 ;; Maintainer: Andrey Tykhonov <atykhonov@gmail.com>
 ;; URL: https://github.com/atykhonov/google-translate
-;; Version: 0.7.1
+;; Version: 0.8.0
 ;; Keywords: convenience
 
 ;; Contributors:
@@ -161,6 +161,7 @@ translate TEXT from SOURCE-LANGUAGE to TARGET-LANGUAGE."
       ("oe"     . "UTF-8")
       ("sl"     . ,source-language)
       ("tl"     . ,target-language)
+      ("sc"     . "2")
       ("text"   . ,text)))
    for-test-purposes))
 
@@ -193,6 +194,17 @@ vector whose zeroth element is the name of a part of speech and
 whose first element is a vector of translations for that part of
 speech."
   (aref json 1))
+
+(defun google-translate-json-suggestion (json)
+  "Retrieve from JSON (which returns by the
+`google-translate-request' function) suggestion. This function
+does matter when translating misspelled world. So instead of
+translation it is possible to get suggestion."
+  (let ((info (aref json 7)))
+    (when info
+      (aref info 1))))
+  ;; (print (format "Arr2: %s" (aref (aref json 7) 1)))
+  ;; (aref (aref json 7) 1))
 
 
 (provide 'google-translate-core)

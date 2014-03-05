@@ -5,7 +5,7 @@
 ;; Author: Oleksandr Manzyuk <manzyuk@gmail.com>
 ;; Maintainer: Andrey Tykhonov <atykhonov@gmail.com>
 ;; URL: https://github.com/atykhonov/google-translate
-;; Version: 0.7.1
+;; Version: 0.8.0
 ;; Keywords: convenience
 
 ;; Contributors:
@@ -80,6 +80,15 @@
 ;;   ranking translation (defaults to `default' with the `weight'
 ;;   attribute set to `bold')
 ;;
+;; - `google-translate-suggestion-label-face' used to display the
+;;   label for suggestion (defaults to `default' with the `foreground'
+;;   attribute set to `red')
+;;
+;; - `google-translate-suggestion-face' used to display the suggestion
+;;   in case of word is misspelled (defaults to `default' with the
+;;   `slant' attribute set to `italic' and `underline' attribute set
+;;   to `t')
+;;
 ;; For example, to show the translation in a larger font change the
 ;; `height' attribute of the face `google-translate-translation-face'
 ;; like so:
@@ -90,6 +99,7 @@
 ;;; Code:
 ;;
 
+(require 'cl)
 (require 'google-translate-core)
 (require 'ido)
 
@@ -196,6 +206,15 @@ query parameter in HTTP requests.")
   "Face used to display the probable translation."
   :group 'google-translate-core-ui)
 
+(defface google-translate-suggestion-label-face
+  '((t (:foreground "red")))
+  "Face used to display the suggestion label."
+  :group 'google-translate-core-ui)
+
+(defface google-translate-suggestion-face
+  '((t (:slant italic :underline t)))
+  "Face used to display the suggestion."
+  :group 'google-translate-core-ui)
 
 (defun google-translate-supported-languages ()
   "Return a list of names of languages supported by Google Translate."
@@ -278,6 +297,21 @@ languages."
                   (insert (format "%2d. %s\n"
                                   (incf index) translation)))))))
 
+(defun google-translate--buffer-output-suggestion (suggestion)
+  "Output in buffer SUGGESTION."
+  (insert "\n")
+  (let ((beg (point)))
+    (insert "Did you mean: ")
+    (facemenu-set-face 'google-translate-suggestion-label-face
+                       beg (point)))
+  ;; (forward-char)
+  (goto-char (+ (point) 1))
+  (let ((beg (point)))
+    (insert suggestion)
+    (facemenu-set-face 'google-translate-suggestion-face
+                       beg (point))
+    (insert "\n")))
+
 (defun google-translate-translate (source-language target-language text)
   "Translate TEXT from SOURCE-LANGUAGE to TARGET-LANGUAGE.
 
@@ -291,12 +325,13 @@ message is printed."
                                          text)))
     (if (null json)
         (message "Nothing to translate.")
-      (let (
-            (auto-detected-language (aref json 2))
-            (text-phonetic (google-translate-json-text-phonetic json))
-            (translation (google-translate-json-translation json))
-            (translation-phonetic (google-translate-json-translation-phonetic json))
-            (detailed-translation (google-translate-json-detailed-translation json)))
+      (let* ((auto-detected-language (aref json 2))
+             (text-phonetic (google-translate-json-text-phonetic json))
+             (translation (google-translate-json-translation json))
+             (translation-phonetic (google-translate-json-translation-phonetic json))
+             (detailed-translation (google-translate-json-detailed-translation json))
+             (suggestion (when (null detailed-translation)
+                           (google-translate-json-suggestion json))))
 
         (with-output-to-temp-buffer buffer-name
           (set-buffer buffer-name)
@@ -304,13 +339,17 @@ message is printed."
                                                              target-language
                                                              auto-detected-language)
           (google-translate--buffer-output-translating-text text)
-          (google-translate--buffer-output-text-phonetic text-phonetic)
-          (google-translate--buffer-output-translation translation)
-          (google-translate--buffer-output-translation-phonetic translation-phonetic)
           (when detailed-translation
-            (google-translate--buffer-output-detailed-translation
-             detailed-translation
-             translation)))))))
+            (google-translate--buffer-output-text-phonetic text-phonetic))
+          (google-translate--buffer-output-translation translation)
+          (when detailed-translation
+            (google-translate--buffer-output-translation-phonetic translation-phonetic))
+          (if detailed-translation
+              (google-translate--buffer-output-detailed-translation
+               detailed-translation
+               translation)
+            (when suggestion
+              (google-translate--buffer-output-suggestion suggestion))))))))
 
 (defun google-translate-read-source-language (&optional prompt)
   "Read a source language, with completion, and return its abbreviation.
