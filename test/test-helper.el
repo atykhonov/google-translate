@@ -93,6 +93,18 @@
     (buffer-substring-no-properties (line-beginning-position)
                                     (line-end-position))))
 
+(defun th-google-translate-fixture-suggestion (fixture)
+  (with-current-buffer (th-google-translate-temp-buffer fixture)
+    (goto-char (point-min))
+    (search-forward "suggestion:")
+    (forward-line 1)
+    (let ((result (buffer-substring-no-properties
+                   (line-beginning-position)
+                   (line-end-position))))
+      (if (equal result "")
+          nil
+        result))))
+
 (defun th-google-translate-fixture-detailed-translation (fixture)
   (with-current-buffer (th-google-translate-temp-buffer fixture)
     (goto-char (point-min))
@@ -112,6 +124,28 @@
             (insert (format "%s\n" (aref item 0)))
             (loop for translation across (aref item 1) do
                   (insert (format "%s\n" translation)))))))
+
+
+
+(defun th-google-translate-generate-fixtures ()
+  (interactive)
+  (th-google-translate-generate-word-fixtures)
+  (th-google-translate-generate-sentence-fixtures))
+
+(defun th-google-translate-generate-word-fixtures ()
+  (interactive)
+  (th-google-translate-generate-word-fixture "return" "en" "ru" 1)
+  (th-google-translate-generate-word-fixture "belongs" "en" "ru" 2)
+  (th-google-translate-generate-word-fixture "first" "en" "ru" 3)
+  (th-google-translate-generate-word-fixture "колобок" "ru" "uk" 4)
+  (th-google-translate-generate-word-fixture "sucesful" "en" "ru" 5)
+  (th-google-translate-generate-word-fixture "развести" "ru" "en" 6)
+  (th-google-translate-generate-word-fixture "разочарование" "ru" "uk" 7))
+
+(defun th-google-translate-generate-sentence-fixtures ()
+  (interactive)
+  (th-google-translate-generate-sentence-fixture "спочатку було слово" "uk" "en" 1)
+  (th-google-translate-generate-sentence-fixture "век живи, век учись" "ru" "uk" 2))
 
 (defun th-google-translate-generate-word-fixture (word
                                                   source-language
@@ -176,6 +210,11 @@
         (when (null translation)
           (setq translation ""))
         (insert (format "%s\n" translation)))
+      (insert (format "\n%s\n" "suggestion:"))
+      (let ((suggestion (google-translate-json-suggestion json)))
+        (when (null suggestion)
+          (setq suggestion ""))
+        (insert (format "%s\n" suggestion)))
       (insert (format "\n%s\n" "detailed-translation:"))
       (let ((detailed-translation (google-translate-json-detailed-translation json)))
         (unless (null detailed-translation)

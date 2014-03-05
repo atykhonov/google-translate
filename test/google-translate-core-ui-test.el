@@ -81,6 +81,14 @@
       (google-translate--buffer-output-translation "translation")
       (buffer-substring-no-properties (point-min) (point-max))))))
 
+(ert-deftest test-google-translate--buffer-output-suggestion ()
+  (should
+   (string-equal
+    "\nDid you mean: suggest\n"
+    (with-temp-buffer
+      (google-translate--buffer-output-suggestion "suggest")
+      (buffer-substring-no-properties (point-min) (point-max))))))
+
 (ert-deftest test-google-translate--buffer-output-translation-phonetic/do-not-show-phonetic ()
   (should
    (string-equal
