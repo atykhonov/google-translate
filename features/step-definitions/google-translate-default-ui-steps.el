@@ -89,8 +89,3 @@
     (When (format "I translate thing at point from \"%s\" to \"%s\"" 
                   source-language
                   target-language))))
-
-(Then "^I should see translation \"\\(.+\\)\"$"
-  (lambda (translation)
-    (Given "I am in buffer \"*Google Translate*\"")
-    (Then (format "I should see \"%s\"" translation))))
