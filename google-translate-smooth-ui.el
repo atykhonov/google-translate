@@ -378,7 +378,8 @@ one respectively."
 
   (setq google-translate-translation-direction-query
         (if (use-region-p)
-            (buffer-substring-no-properties (region-beginning) (region-end))
+            (google-translate--strip-string
+             (buffer-substring-no-properties (region-beginning) (region-end)))
           (current-word t)))
 
   (setq google-translate-current-translation-direction 0)
