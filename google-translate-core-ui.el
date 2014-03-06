@@ -5,7 +5,7 @@
 ;; Author: Oleksandr Manzyuk <manzyuk@gmail.com>
 ;; Maintainer: Andrey Tykhonov <atykhonov@gmail.com>
 ;; URL: https://github.com/atykhonov/google-translate
-;; Version: 0.8.0
+;; Version: 0.8.2
 ;; Keywords: convenience
 
 ;; Contributors:
@@ -297,7 +297,9 @@ languages."
                   (insert (format "%2d. %s\n"
                                   (incf index) translation)))))))
 
-(defun google-translate--buffer-output-suggestion (suggestion)
+(defun google-translate--buffer-output-suggestion (suggestion
+                                                   source-language
+                                                   target-language)
   "Output in buffer SUGGESTION."
   (insert "\n")
   (let ((beg (point)))
@@ -306,10 +308,23 @@ languages."
                        beg (point)))
   (goto-char (+ (point) 1))
   (let ((beg (point)))
-    (insert suggestion)
+    (insert-text-button suggestion
+                   'action 'google-translate--suggestion-action
+                   'suggestion suggestion
+                   'source-language source-language
+                   'target-language target-language)
     (facemenu-set-face 'google-translate-suggestion-face
                        beg (point))
     (insert "\n")))
+
+(defun google-translate--suggestion-action (button)
+  (interactive)
+  (let ((suggestion (button-get button 'suggestion))
+        (source-language (button-get button 'source-language))
+        (target-language (button-get button 'target-language)))
+    (google-translate-translate source-language
+                                target-language
+                                suggestion)))
 
 (defun google-translate-translate (source-language target-language text)
   "Translate TEXT from SOURCE-LANGUAGE to TARGET-LANGUAGE.
@@ -348,7 +363,9 @@ message is printed."
                detailed-translation
                translation)
             (when suggestion
-              (google-translate--buffer-output-suggestion suggestion))))))))
+              (google-translate--buffer-output-suggestion suggestion
+                                                          source-language
+                                                          target-language))))))))
 
 (defun google-translate-read-source-language (&optional prompt)
   "Read a source language, with completion, and return its abbreviation.
