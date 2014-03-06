@@ -112,3 +112,13 @@ Feature: Default UI for Google Translate
     Given I set google-translate-default-target-language to "ru"
     When I translate "sudgest"
     Then I should see suggestion "suggest"
+
+  Scenario: Linked suggestion: click on suggestion
+    Given I set google-translate-default-source-language to "en"
+    Given I set google-translate-default-target-language to "ru"
+    When I translate "sudgest"
+    Then I should see suggestion "suggest"
+    And I press "TAB"
+    And I press "RET"
+    Then I should see translation "предлагать"
+    
