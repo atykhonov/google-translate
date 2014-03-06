@@ -297,7 +297,7 @@ languages."
                   (insert (format "%2d. %s\n"
                                   (incf index) translation)))))))
 
-(defun google-translate--buffer-output-suggestion (suggestion 
+(defun google-translate--buffer-output-suggestion (suggestion
                                                    source-language
                                                    target-language)
   "Output in buffer SUGGESTION."
