@@ -86,8 +86,24 @@
    (string-equal
     "\nDid you mean: suggest\n"
     (with-temp-buffer
-      (google-translate--buffer-output-suggestion "suggest")
+      (google-translate--buffer-output-suggestion "suggest" "en" "ru")
       (buffer-substring-no-properties (point-min) (point-max))))))
+
+(ert-deftest test-google-translate--suggestion-action ()
+  (with-temp-buffer
+    (let* ((suggestion "suggestion")
+           (source-language "en")
+           (target-language "ru")
+           (button (insert-text-button "Foo"
+                                       'action 'test
+                                       'suggestion suggestion
+                                       'source-language source-language
+                                       'target-language target-language)))
+      (with-mock
+       (mock (google-translate-translate source-language
+                                         target-language
+                                         suggestion))
+       (google-translate--suggestion-action button)))))
 
 (ert-deftest test-google-translate--buffer-output-translation-phonetic/do-not-show-phonetic ()
   (should
