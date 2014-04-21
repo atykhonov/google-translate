@@ -353,11 +353,9 @@ message is printed."
                                                              target-language
                                                              auto-detected-language)
           (google-translate--buffer-output-translating-text text)
-          (when detailed-translation
-            (google-translate--buffer-output-text-phonetic text-phonetic))
+          (google-translate--buffer-output-text-phonetic text-phonetic)
           (google-translate--buffer-output-translation translation)
-          (when detailed-translation
-            (google-translate--buffer-output-translation-phonetic translation-phonetic))
+          (google-translate--buffer-output-translation-phonetic translation-phonetic)
           (if detailed-translation
               (google-translate--buffer-output-detailed-translation
                detailed-translation
