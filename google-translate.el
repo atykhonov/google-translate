@@ -32,6 +32,12 @@
 
 ;; Installation:
 
+;; From MELPA or Marmalade.
+
+;; Just run `M-x package-install RET google-translate RET`
+
+;; Manual installation.
+
 ;; Assuming that the file `google-translate.el' and other files which
 ;; relates to this package is somewhere on the load path, add the
 ;; following lines to your `.emacs' file:
