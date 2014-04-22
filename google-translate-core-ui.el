@@ -191,6 +191,12 @@ query parameter in HTTP requests.")
   :type '(choice (const :tag "No"  nil)
                  (const :tag "Yes" t)))
 
+(defcustom google-translate-show-listen-button t
+  "If non-NIL, show the listen button."
+  :group 'google-translate-core-ui
+  :type '(choice (const :tag "No"  nil)
+                 (const :tag "Yes" t)))
+
 (defface google-translate-text-face
   '((t (:inherit default)))
   "Face used to display the original text."
@@ -216,6 +222,11 @@ query parameter in HTTP requests.")
   "Face used to display the suggestion."
   :group 'google-translate-core-ui)
 
+(defface google-translate-listen-button-face
+  '((t (:height 0.8)))
+  "Face used to display the suggestion."
+  :group 'google-translate-core-ui)
+
 (defun google-translate-supported-languages ()
   "Return a list of names of languages supported by Google Translate."
   (mapcar #'car google-translate-supported-languages-alist))
@@ -233,11 +244,13 @@ abbreviation is ABBREVIATION."
       "unspecified language"
     (car (rassoc abbreviation google-translate-supported-languages-alist))))
 
-(defun google-translate-paragraph (text face)
+(defun google-translate-paragraph (text face &optional output-format)
   "Insert TEXT as a filled paragraph into the current buffer and
 apply FACE to it."
-  (let ((beg (point)))
-    (insert (format "\n%s\n" text))
+  (let ((beg (point))
+        (output-format
+         (if output-format output-format "\n%s\n")))
+    (insert (format output-format text))
     (facemenu-set-face face beg (point))
     (fill-region beg (point))))
 
@@ -257,11 +270,14 @@ languages."
                   (google-translate-language-display-name
                    target-language))))
 
-(defun google-translate--buffer-output-translating-text (text)
+(defun google-translate--buffer-output-translating-text (text &optional new-line)
   "Outputs in buffer translating text."
-  (google-translate-paragraph
-   text
-   'google-translate-text-face))
+  (let ((output-format
+         (unless new-line "\n%s")))
+    (google-translate-paragraph
+     text
+     'google-translate-text-face
+     output-format)))
 
 (defun google-translate--buffer-output-text-phonetic (text-phonetic)
   "Outputs in buffer TEXT-PHONETIC in case of
@@ -326,6 +342,28 @@ languages."
                                 target-language
                                 suggestion)))
 
+(defun google-translate--buffer-output-listen-button (text language)
+  "Output listen button."
+  (insert " ")
+  (let ((beg (point)))
+    (insert-text-button "[Listen]"
+                        'action 'google-translate--listen-action
+                        'text text
+                        'language language)
+    (facemenu-set-face 'google-translate-listen-button-face
+                       beg (point))
+    (insert "\n")))
+
+(defun google-translate--listen-action (button)
+  (interactive)
+  (let ((text (button-get button 'text))
+        (language (button-get button 'language)))
+    ;; (message "Retrieving audio message...")
+    (message "%s" (format "Url: %s" (google-translate-format-listen-url text language)))
+    (call-process "mplayer" nil nil nil
+                  "-prefer-ipv4"
+                  (google-translate-format-listen-url text language))))
+
 (defun google-translate-translate (source-language target-language text)
   "Translate TEXT from SOURCE-LANGUAGE to TARGET-LANGUAGE.
 
@@ -345,14 +383,17 @@ message is printed."
              (translation-phonetic (google-translate-json-translation-phonetic json))
              (detailed-translation (google-translate-json-detailed-translation json))
              (suggestion (when (null detailed-translation)
-                           (google-translate-json-suggestion json))))
+                           (google-translate-json-suggestion json)))
+             (translation-text-new-line (when google-translate-show-listen-button nil)))
 
         (with-output-to-temp-buffer buffer-name
           (set-buffer buffer-name)
           (google-translate--buffer-output-translation-title source-language
                                                              target-language
                                                              auto-detected-language)
-          (google-translate--buffer-output-translating-text text)
+          (google-translate--buffer-output-translating-text text translation-text-new-line)
+          (when google-translate-show-listen-button
+            (google-translate--buffer-output-listen-button text source-language))
           (google-translate--buffer-output-text-phonetic text-phonetic)
           (google-translate--buffer-output-translation translation)
           (google-translate--buffer-output-translation-phonetic translation-phonetic)
