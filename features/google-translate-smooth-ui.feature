@@ -63,5 +63,6 @@ Feature: Smooth UI for Google Translate
     When I translate "sudgest"
     Then I should see suggestion "suggest"
     And I press "TAB"
+    And I press "TAB"
     And I press "RET"
     Then I should see translation "предлагать"
