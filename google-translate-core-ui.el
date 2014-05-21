@@ -242,7 +242,7 @@ of Windows put full path to the mplayer.exe."
 
 (defface google-translate-listen-button-face
   '((t (:height 0.8)))
-  "Face used to display the suggestion."
+  "Face used to display button \"Listen\"."
   :group 'google-translate-core-ui)
 
 (defun google-translate-supported-languages ()
