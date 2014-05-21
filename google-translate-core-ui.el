@@ -102,7 +102,7 @@
 ;;   to `t')
 ;;
 ;; - `google-translate-listen-button-face' used to display the "Listen"
-;;   button. Defaults to `height' 0.8.
+;;   button (defaults to `height' 0.8).
 ;;
 ;; For example, to show the translation in a larger font change the
 ;; `height' attribute of the face `google-translate-translation-face'
