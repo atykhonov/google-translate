@@ -68,7 +68,7 @@
 ;; displayed if available.  If you want to see the phonetics, set this
 ;; variable to t.
 ;;
-;; There are also three faces you can customize:
+;; There are also six faces you can customize:
 ;;
 ;; - `google-translate-text-face', used to display the original text
 ;;   (defaults to `default')
@@ -88,6 +88,9 @@
 ;;   in case of word is misspelled (defaults to `default' with the
 ;;   `slant' attribute set to `italic' and `underline' attribute set
 ;;   to `t')
+;;
+;; - `google-translate-listen-button-face' used to display the "Listen"
+;;   button. Defaults to `height' 0.8.
 ;;
 ;; For example, to show the translation in a larger font change the
 ;; `height' attribute of the face `google-translate-translation-face'
