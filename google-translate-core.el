@@ -73,6 +73,9 @@
 (defvar google-translate-base-url
   "http://translate.google.com/translate_a/t")
 
+(defvar google-translate-listen-url
+  "http://translate.google.com/translate_tts")
+
 (defun google-translate--format-query-string (query-params)
   "Format QUERY-PARAMS as a query string.
 
@@ -90,6 +93,25 @@ QUERY-PARAMS must be an alist of field-value pairs."
   (concat google-translate-base-url
           "?"
           (google-translate--format-query-string query-params)))
+
+(defun google-translate--format-listen-url (query-params)
+  "Format QUERY-PARAMS as a Google Translate HTTP request URL for listen translation.
+
+QUERY-PARAMS must be an alist of field-value pairs."
+  (concat google-translate-listen-url
+          "?"
+          (google-translate--format-query-string query-params)))
+
+(defun google-translate-format-listen-url (text language)
+  "Format listen url for TEXT and TARGET-LANGUAGE."
+  (google-translate--format-listen-url `(("ie"      . "UTF-8")
+                                         ("q"       . ,text)
+                                         ("tl"      . ,language)
+                                         ("total"   . "1")
+                                         ("idx"     . "0")
+                                         ("textlen" . ,(number-to-string (length text)))
+                                         ("client"  . "t")
+                                         ("prev"    . "input"))))
 
 (defun google-translate--http-response-body (url &optional for-test-purposes)
   "Retrieve URL and return the response body as a string."

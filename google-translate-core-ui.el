@@ -60,6 +60,8 @@
 ;;
 ;; - `google-translate-show-phonetic'
 ;;
+;; - `google-translate-listen-program'
+;;
 ;; If `google-translate-enable-ido-completion' is non-NIL, the input
 ;; will be read with ido-style completion.
 ;;
@@ -68,7 +70,17 @@
 ;; displayed if available.  If you want to see the phonetics, set this
 ;; variable to t.
 ;;
-;; There are also three faces you can customize:
+;; The variable `google-translate-listen-program' determines the program to use to
+;; listen translations. By default it is `nil' and listening function is
+;; disabled. You must define it first then listening function will be available and
+;; you can see "Listen" button in the buffer with translation. For example, you can
+;; use mplayer. Make sure it is installed. For Linux/Unix just change it to
+;; "mplayer". In case of Windows put "mplayer.exe". Of course mplayer (or
+;; mplayer.exe) needs to be located somewhere in the PATH. If not then you need to
+;; put full path to the program. In case of Windows and full path make sure that you
+;; use double slashs, for example: "C:\\mplayer\\mplayer.exe".
+;;
+;; There are also six faces you can customize:
 ;;
 ;; - `google-translate-text-face', used to display the original text
 ;;   (defaults to `default')
@@ -88,6 +100,9 @@
 ;;   in case of word is misspelled (defaults to `default' with the
 ;;   `slant' attribute set to `italic' and `underline' attribute set
 ;;   to `t')
+;;
+;; - `google-translate-listen-button-face' used to display the "Listen"
+;;   button (defaults to `height' 0.8).
 ;;
 ;; For example, to show the translation in a larger font change the
 ;; `height' attribute of the face `google-translate-translation-face'
@@ -191,6 +206,15 @@ query parameter in HTTP requests.")
   :type '(choice (const :tag "No"  nil)
                  (const :tag "Yes" t)))
 
+(defcustom google-translate-listen-program nil
+  "The program to use to listen translations. By default it is
+nil so you must define it first then listening function will be
+available. For example, you can use mplayer. Make sure it is
+installed. For Linux/Unix just change it to \"mplayer\". In case
+of Windows put full path to the mplayer.exe."
+  :group 'google-translate-core-ui
+  :type '(string))
+
 (defface google-translate-text-face
   '((t (:inherit default)))
   "Face used to display the original text."
@@ -216,6 +240,11 @@ query parameter in HTTP requests.")
   "Face used to display the suggestion."
   :group 'google-translate-core-ui)
 
+(defface google-translate-listen-button-face
+  '((t (:height 0.8)))
+  "Face used to display button \"Listen\"."
+  :group 'google-translate-core-ui)
+
 (defun google-translate-supported-languages ()
   "Return a list of names of languages supported by Google Translate."
   (mapcar #'car google-translate-supported-languages-alist))
@@ -233,11 +262,13 @@ abbreviation is ABBREVIATION."
       "unspecified language"
     (car (rassoc abbreviation google-translate-supported-languages-alist))))
 
-(defun google-translate-paragraph (text face)
+(defun google-translate-paragraph (text face &optional output-format)
   "Insert TEXT as a filled paragraph into the current buffer and
 apply FACE to it."
-  (let ((beg (point)))
-    (insert (format "\n%s\n" text))
+  (let ((beg (point))
+        (output-format
+         (if output-format output-format "\n%s\n")))
+    (insert (format output-format text))
     (facemenu-set-face face beg (point))
     (fill-region beg (point))))
 
@@ -257,11 +288,14 @@ languages."
                   (google-translate-language-display-name
                    target-language))))
 
-(defun google-translate--buffer-output-translating-text (text)
+(defun google-translate--buffer-output-translating-text (text &optional new-line)
   "Outputs in buffer translating text."
-  (google-translate-paragraph
-   text
-   'google-translate-text-face))
+  (let ((output-format
+         (unless new-line "\n%s")))
+    (google-translate-paragraph
+     text
+     'google-translate-text-face
+     output-format)))
 
 (defun google-translate--buffer-output-text-phonetic (text-phonetic)
   "Outputs in buffer TEXT-PHONETIC in case of
@@ -326,6 +360,26 @@ languages."
                                 target-language
                                 suggestion)))
 
+(defun google-translate--buffer-output-listen-button (text language)
+  "Output listen button."
+  (insert " ")
+  (let ((beg (point)))
+    (insert-text-button "[Listen]"
+                        'action 'google-translate--listen-action
+                        'text text
+                        'language language)
+    (facemenu-set-face 'google-translate-listen-button-face
+                       beg (point))
+    (insert "\n")))
+
+(defun google-translate--listen-action (button)
+  (interactive)
+  (let ((text (button-get button 'text))
+        (language (button-get button 'language)))
+    (message "Retrieving audio message...")
+    (call-process google-translate-listen-program nil nil nil
+                  (google-translate-format-listen-url text language))))
+
 (defun google-translate-translate (source-language target-language text)
   "Translate TEXT from SOURCE-LANGUAGE to TARGET-LANGUAGE.
 
@@ -345,14 +399,17 @@ message is printed."
              (translation-phonetic (google-translate-json-translation-phonetic json))
              (detailed-translation (google-translate-json-detailed-translation json))
              (suggestion (when (null detailed-translation)
-                           (google-translate-json-suggestion json))))
+                           (google-translate-json-suggestion json)))
+             (translation-text-new-line (when (null google-translate-listen-program) t)))
 
         (with-output-to-temp-buffer buffer-name
           (set-buffer buffer-name)
           (google-translate--buffer-output-translation-title source-language
                                                              target-language
                                                              auto-detected-language)
-          (google-translate--buffer-output-translating-text text)
+          (google-translate--buffer-output-translating-text text translation-text-new-line)
+          (when google-translate-listen-program
+            (google-translate--buffer-output-listen-button text source-language))
           (google-translate--buffer-output-text-phonetic text-phonetic)
           (google-translate--buffer-output-translation translation)
           (google-translate--buffer-output-translation-phonetic translation-phonetic)

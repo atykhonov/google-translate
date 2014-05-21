@@ -229,6 +229,8 @@ You can customize the following variables:
 
 - `google-translate-show-phonetic`
 
+- `google-translate-listen-program`
+
 If `google-translate-enable-ido-completion` is non-NIL, the input
 will be read with ido-style completion.
 
@@ -237,7 +239,17 @@ phonetic spelling of the original text and its translation is
 displayed if available. If you want to see the phonetics, set this
 variable to t.
 
-There are also three faces you can customize:
+The variable `google-translate-listen-program` determines the program to use to
+listen translations. By default it is `nil` and listening function is disabled. You
+must define it first then listening function will be available and you can see
+"Listen" button in the buffer with translation. For example, you can use
+mplayer. Make sure it is installed. For Linux/Unix just change it to "mplayer". In
+case of Windows put "mplayer.exe". Of course mplayer (or mplayer.exe) needs to be
+located somewhere in the PATH. If not then you need to put full path to the
+program. In case of Windows (and full path) make sure that you use double slashs, for
+example: "C:\\mplayer\\mplayer.exe".
+
+There are also six faces you can customize:
 
 - `google-translate-text-face`, used to display the original text
   (defaults to `default`)
@@ -256,6 +268,9 @@ There are also three faces you can customize:
 - `google-translate-suggestion-face` used to display the suggestion in
   case of word is misspelled (defaults to `default` with the `slant`
   attribute set to `italic` and `underline` attribute set to `t`)
+
+- `google-translate-listen-button-face` used to display the "Listen" button (defaults
+  to `height' 0.8).
 
 For example, to show the translation in a larger font change the
 `height` attribute of the face `google-translate-translation-face`
