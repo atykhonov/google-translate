@@ -191,11 +191,14 @@ query parameter in HTTP requests.")
   :type '(choice (const :tag "No"  nil)
                  (const :tag "Yes" t)))
 
-(defcustom google-translate-show-listen-button t
-  "If non-NIL, show the listen button."
+(defcustom google-translate-listen-program nil
+  "The program to use to listen translations. By default it is
+nil so you must define it first then listening function will be
+available. For example, you can use mplayer. Make sure it is
+installed. For Linux/Unix just change it to \"mplayer\". In case
+of Windows put full path to the mplayer.exe."
   :group 'google-translate-core-ui
-  :type '(choice (const :tag "No"  nil)
-                 (const :tag "Yes" t)))
+  :type '(string))
 
 (defface google-translate-text-face
   '((t (:inherit default)))
@@ -358,10 +361,8 @@ languages."
   (interactive)
   (let ((text (button-get button 'text))
         (language (button-get button 'language)))
-    ;; (message "Retrieving audio message...")
-    (message "%s" (format "Url: %s" (google-translate-format-listen-url text language)))
-    (call-process "mplayer" nil nil nil
-                  "-prefer-ipv4"
+    (message "Retrieving audio message...")
+    (call-process google-translate-listen-program nil nil nil
                   (google-translate-format-listen-url text language))))
 
 (defun google-translate-translate (source-language target-language text)
@@ -384,7 +385,7 @@ message is printed."
              (detailed-translation (google-translate-json-detailed-translation json))
              (suggestion (when (null detailed-translation)
                            (google-translate-json-suggestion json)))
-             (translation-text-new-line (when google-translate-show-listen-button nil)))
+             (translation-text-new-line (when (null google-translate-listen-program) t)))
 
         (with-output-to-temp-buffer buffer-name
           (set-buffer buffer-name)
@@ -392,7 +393,7 @@ message is printed."
                                                              target-language
                                                              auto-detected-language)
           (google-translate--buffer-output-translating-text text translation-text-new-line)
-          (when google-translate-show-listen-button
+          (when google-translate-listen-program
             (google-translate--buffer-output-listen-button text source-language))
           (google-translate--buffer-output-text-phonetic text-phonetic)
           (google-translate--buffer-output-translation translation)
