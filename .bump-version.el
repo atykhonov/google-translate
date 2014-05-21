@@ -5,4 +5,4 @@
    "google-translate-default-ui.el"
    "google-translate-pkg.el"
    "google-translate-smooth-ui.el"))
- (:current-version "0.8.3"))
+ (:current-version "0.9.0"))
