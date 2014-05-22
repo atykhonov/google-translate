@@ -240,14 +240,11 @@ displayed if available. If you want to see the phonetics, set this
 variable to t.
 
 The variable `google-translate-listen-program` determines the program to use to
-listen translations. By default it is `nil` and listening function is disabled. You
-must define it first then listening function will be available and you can see
-"Listen" button in the buffer with translation. For example, you can use
-mplayer. Make sure it is installed. For Linux/Unix just change it to "mplayer". In
-case of Windows put "mplayer.exe". Of course mplayer (or mplayer.exe) needs to be
-located somewhere in the PATH. If not then you need to put full path to the
-program. In case of Windows (and full path) make sure that you use double slashs, for
-example: "C:\\mplayer\\mplayer.exe".
+listen translations. By default the program looks for `mplayer` in the PATH, if
+`mplayer` is found then listening function will be available and you'll see `Listen`
+button in the buffer with the translation. You can use any other suitable program. If
+you use Windows please download and unpack `mplayer` and add its path (directory) to
+to the system PATH variable.
 
 There are also six faces you can customize:
 
