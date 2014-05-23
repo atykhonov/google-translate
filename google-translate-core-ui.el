@@ -342,6 +342,7 @@ languages."
   (let ((beg (point)))
     (insert-text-button suggestion
                    'action 'google-translate--suggestion-action
+                   'follow-link t
                    'suggestion suggestion
                    'source-language source-language
                    'target-language target-language)
@@ -364,6 +365,7 @@ languages."
   (let ((beg (point)))
     (insert-text-button "[Listen]"
                         'action 'google-translate--listen-action
+                        'follow-link t
                         'text text
                         'language language)
     (facemenu-set-face 'google-translate-listen-button-face
