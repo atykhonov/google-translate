@@ -186,6 +186,9 @@ Each element is a cons-cell of the form (NAME . CODE), where NAME
 is a human-readable language name and CODE is its code used as a
 query parameter in HTTP requests.")
 
+(defvar google-translate-translation-listening-debug nil
+  "For debug translation listening purposes.")
+
 (defgroup google-translate-core-ui nil
   "Emacs core UI script for the Google Translate package."
   :group 'processes)
@@ -375,10 +378,17 @@ languages."
 (defun google-translate--listen-action (button)
   (interactive)
   (let ((text (button-get button 'text))
-        (language (button-get button 'language)))
+        (language (button-get button 'language))
+        (buf "*mplayer output*"))
     (message "Retrieving audio message...")
-    (call-process google-translate-listen-program nil nil nil
-                  (google-translate-format-listen-url text language))))
+    (if google-translate-translation-listening-debug
+        (with-current-buffer (get-buffer-create buf)
+          (insert (format "Listen program: %s\r\n" google-translate-listen-program))
+          (insert (format "Listen URL: %s\r\n" (google-translate-format-listen-url text language)))
+          (call-process google-translate-listen-program nil t nil (google-translate-format-listen-url text language))
+          (switch-to-buffer buf))
+      (call-process google-translate-listen-program nil nil nil
+                    (google-translate-format-listen-url text language)))))
 
 (defun google-translate-translate (source-language target-language text)
   "Translate TEXT from SOURCE-LANGUAGE to TARGET-LANGUAGE.
