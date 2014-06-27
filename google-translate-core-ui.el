@@ -385,10 +385,11 @@ languages."
         (with-current-buffer (get-buffer-create buf)
           (insert (format "Listen program: %s\r\n" google-translate-listen-program))
           (insert (format "Listen URL: %s\r\n" (google-translate-format-listen-url text language)))
-          (call-process google-translate-listen-program nil t nil (google-translate-format-listen-url text language))
+          (call-process google-translate-listen-program nil t nil
+                        (format "\"%s\"" (google-translate-format-listen-url text language)))
           (switch-to-buffer buf))
       (call-process google-translate-listen-program nil nil nil
-                    (google-translate-format-listen-url text language)))))
+                    (format "\"%s\"" (google-translate-format-listen-url text language))))))
 
 (defun google-translate-translate (source-language target-language text)
   "Translate TEXT from SOURCE-LANGUAGE to TARGET-LANGUAGE.
@@ -397,8 +398,7 @@ Pops up a buffer named *Google Translate* with available translations
 of TEXT. To deal with multi-line regions, sequences of white space
 are replaced with a single space. If the region contains not text, a
 message is printed."
-  (let* ((buffer-name "*Google Translate*")
-         (json (google-translate-request source-language
+  (let* ((json (google-translate-request source-language
                                          target-language
                                          text)))
     (if (null json)
@@ -409,28 +409,47 @@ message is printed."
              (translation-phonetic (google-translate-json-translation-phonetic json))
              (detailed-translation (google-translate-json-detailed-translation json))
              (suggestion (when (null detailed-translation)
-                           (google-translate-json-suggestion json)))
-             (translation-text-new-line (when (null google-translate-listen-program) t)))
+                           (google-translate-json-suggestion json))))
+        (google-translate-buffer-output-translation source-language
+                                                    target-language
+                                                    auto-detected-language
+                                                    text
+                                                    text-phonetic
+                                                    translation
+                                                    translation-phonetic
+                                                    detailed-translation
+                                                    suggestion)))))
 
-        (with-output-to-temp-buffer buffer-name
-          (set-buffer buffer-name)
-          (google-translate--buffer-output-translation-title source-language
-                                                             target-language
-                                                             auto-detected-language)
-          (google-translate--buffer-output-translating-text text translation-text-new-line)
-          (when google-translate-listen-program
-            (google-translate--buffer-output-listen-button text source-language))
-          (google-translate--buffer-output-text-phonetic text-phonetic)
-          (google-translate--buffer-output-translation translation)
-          (google-translate--buffer-output-translation-phonetic translation-phonetic)
-          (if detailed-translation
-              (google-translate--buffer-output-detailed-translation
-               detailed-translation
-               translation)
-            (when suggestion
-              (google-translate--buffer-output-suggestion suggestion
-                                                          source-language
-                                                          target-language))))))))
+(defun google-translate-buffer-output-translation (source-language
+                                                   target-language
+                                                   auto-detected-language
+                                                   text
+                                                   text-phonetic
+                                                   translation
+                                                   translation-phonetic
+                                                   detailed-translation
+                                                   suggestion)
+  (let ((buffer-name "*Google Translate*")
+        (translation-text-new-line (when (null google-translate-listen-program) t)))
+    (with-output-to-temp-buffer buffer-name
+      (set-buffer buffer-name)
+      (google-translate--buffer-output-translation-title source-language
+                                                         target-language
+                                                         auto-detected-language)
+      (google-translate--buffer-output-translating-text text translation-text-new-line)
+      (when google-translate-listen-program
+        (google-translate--buffer-output-listen-button text source-language))
+      (google-translate--buffer-output-text-phonetic text-phonetic)
+      (google-translate--buffer-output-translation translation)
+      (google-translate--buffer-output-translation-phonetic translation-phonetic)
+      (if detailed-translation
+          (google-translate--buffer-output-detailed-translation
+           detailed-translation
+           translation)
+        (when suggestion
+          (google-translate--buffer-output-suggestion suggestion
+                                                      source-language
+                                                      target-language))))))
 
 (defun google-translate-read-source-language (&optional prompt)
   "Read a source language, with completion, and return its abbreviation.
