@@ -282,8 +282,8 @@ apply FACE to it."
     (facemenu-set-face face beg (point))
     (fill-region beg (point))))
 
-(defun google-translate--translation-title (source-language 
-                                            target-language 
+(defun google-translate--translation-title (source-language
+                                            target-language
                                             auto-detected-language
                                             break-line)
   "Return translation title which contains information about used
