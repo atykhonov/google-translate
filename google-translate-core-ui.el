@@ -216,6 +216,15 @@ suitable program."
   :group 'google-translate-core-ui
   :type '(string))
 
+(defcustom google-translate-output-destination
+  nil
+  "Determines where translation output will be displayed. If
+`nil' the translation output will be displayed in the pop up
+buffer. If value equal to `echo-area' then translation outputs in
+the Echo Area."
+  :group 'google-translate-core-ui
+  :type '(symbol))
+
 (defface google-translate-text-face
   '((t (:inherit default)))
   "Face used to display the original text."
@@ -273,21 +282,31 @@ apply FACE to it."
     (facemenu-set-face face beg (point))
     (fill-region beg (point))))
 
+(defun google-translate--translation-title (source-language 
+                                            target-language 
+                                            auto-detected-language
+                                            break-line)
+  "Return translation title which contains information about used
+source and target languages while translating."
+  (format "Translate from %s to %s:%s"
+          (if (string-equal source-language "auto")
+              (format "%s (detected)"
+                      (google-translate-language-display-name
+                       auto-detected-language))
+            (google-translate-language-display-name
+             source-language))
+          (google-translate-language-display-name
+           target-language)
+          (if break-line "\n" "")))
+
 (defun google-translate--buffer-output-translation-title (source-language 
                                                           target-language 
                                                           auto-detected-language)
-  "Outputs in buffer translation title which contains
-information about used while translating source and target
-languages."
-  (insert (format "Translate from %s to %s:\n"
-                  (if (string-equal source-language "auto")
-                      (format "%s (detected)"
-                              (google-translate-language-display-name
-                               auto-detected-language))
-                    (google-translate-language-display-name
-                     source-language))
-                  (google-translate-language-display-name
-                   target-language))))
+  "Outputs in buffer translation title which contains information
+about used source and target languages while translating."
+  (insert (google-translate--translation-title source-language
+                                               target-language
+                                               auto-detected-language t)))
 
 (defun google-translate--buffer-output-translating-text (text &optional new-line)
   "Outputs in buffer translating text."
@@ -321,6 +340,21 @@ languages."
     (google-translate-paragraph
      translation-phonetic
      'google-translate-phonetic-face)))
+
+(defun google-translate--detailed-translation (detailed-translation translation)
+  "Return DETAILED-TRANSLATION for the given TRANSLATION."
+  (let ((result ""))
+    (loop for item across detailed-translation do
+          (let ((index 0))
+            (unless (string-equal (aref item 0) "")
+              (setq result (concat result (format "\n* %s " (aref item 0))))
+              (loop for translation across (aref item 1) do
+                    (setq result
+                          (concat result
+                                  (format "%d. %s; "
+                                          (incf index)
+                                          (google-translate--trim-string translation))))))))
+    result))
 
 (defun google-translate--buffer-output-detailed-translation (detailed-translation translation)
   "Output in buffer DETAILED-TRANSLATION for the given TRANSLATION."
@@ -410,15 +444,56 @@ message is printed."
              (detailed-translation (google-translate-json-detailed-translation json))
              (suggestion (when (null detailed-translation)
                            (google-translate-json-suggestion json))))
-        (google-translate-buffer-output-translation source-language
-                                                    target-language
-                                                    auto-detected-language
-                                                    text
-                                                    text-phonetic
-                                                    translation
-                                                    translation-phonetic
-                                                    detailed-translation
-                                                    suggestion)))))
+        (if (null google-translate-output-destination)
+            (google-translate-buffer-output-translation source-language
+                                                        target-language
+                                                        auto-detected-language
+                                                        text
+                                                        text-phonetic
+                                                        translation
+                                                        translation-phonetic
+                                                        detailed-translation
+                                                        suggestion)
+          (when (equal google-translate-output-destination 'echo-area)
+            (google-translate-echo-area-output-translation
+             source-language
+             target-language
+             auto-detected-language
+             text
+             text-phonetic
+             translation
+             translation-phonetic
+             detailed-translation
+             suggestion)))))))
+
+(defun google-translate-echo-area-output-translation (source-language
+                                                      target-language
+                                                      auto-detected-language
+                                                      text
+                                                      text-phonetic
+                                                      translation
+                                                      translation-phonetic
+                                                      detailed-translation
+                                                      suggestion)
+  (message "%s %s%s - %s%s %s"
+           (google-translate--translation-title source-language
+                                                target-language
+                                                auto-detected-language nil)
+           text
+           (if (and google-translate-show-phonetic
+                    (not (string-equal text-phonetic "")))
+               (format " [%s]" text-phonetic)
+             "")
+           translation
+           (if (and google-translate-show-phonetic
+                    (not (string-equal translation-phonetic "")))
+               (format " [%s]" translation-phonetic)
+             "")
+           (if detailed-translation
+               (google-translate--detailed-translation detailed-translation
+                                                       translation)
+             (when suggestion
+               (format "\n* Did you mean: %s" suggestion)))))
 
 (defun google-translate-buffer-output-translation (source-language
                                                    target-language
