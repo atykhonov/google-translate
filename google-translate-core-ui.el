@@ -221,7 +221,8 @@ suitable program."
   "Determines where translation output will be displayed. If
 `nil' the translation output will be displayed in the pop up
 buffer. If value equal to `echo-area' then translation outputs in
-the Echo Area."
+the Echo Area. If the value equal to `pop-up' then translation outputs
+in a pop up tooltip."
   :group 'google-translate-core-ui
   :type '(symbol))
 
@@ -444,27 +445,85 @@ message is printed."
              (detailed-translation (google-translate-json-detailed-translation json))
              (suggestion (when (null detailed-translation)
                            (google-translate-json-suggestion json))))
-        (if (null google-translate-output-destination)
-            (google-translate-buffer-output-translation source-language
-                                                        target-language
-                                                        auto-detected-language
-                                                        text
-                                                        text-phonetic
-                                                        translation
-                                                        translation-phonetic
-                                                        detailed-translation
-                                                        suggestion)
-          (when (equal google-translate-output-destination 'echo-area)
-            (google-translate-echo-area-output-translation
-             source-language
-             target-language
-             auto-detected-language
-             text
-             text-phonetic
-             translation
-             translation-phonetic
-             detailed-translation
-             suggestion)))))))
+        (cond
+         ((null google-translate-output-destination)
+          (google-translate-buffer-output-translation source-language
+                                                      target-language
+                                                      auto-detected-language
+                                                      text
+                                                      text-phonetic
+                                                      translation
+                                                      translation-phonetic
+                                                      detailed-translation
+                                                      suggestion))
+         ((equal google-translate-output-destination 'echo-area)
+          (google-translate-echo-area-output-translation
+           source-language
+           target-language
+           auto-detected-language
+           text
+           text-phonetic
+           translation
+           translation-phonetic
+           detailed-translation
+           suggestion))
+         ((equal google-translate-output-destination 'pop-up)
+          (google-translate-pop-up-output-translation
+           source-language
+           target-language
+           auto-detected-language
+           text
+           text-phonetic
+           translation
+           translation-phonetic
+           detailed-translation
+           suggestion))
+            )))))
+
+(defun google-translate-pop-up-output-translation (source-language
+                                                   target-language
+                                                   auto-detected-language
+                                                   text
+                                                   text-phonetic
+                                                   translation
+                                                   translation-phonetic
+                                                   detailed-translation
+                                                   suggestion)
+  (let ((str (google-translate-format-translation-string
+              source-language
+              target-language
+              auto-detected-language
+              text
+              text-phonetic
+              translation
+              translation-phonetic
+              detailed-translation
+              suggestion)))
+    (popup-tip str)))
+
+(defun google-translate-format-translation-string (source-language
+                                                   target-language
+                                                   auto-detected-language
+                                                   text
+                                                   text-phonetic
+                                                   translation
+                                                   translation-phonetic
+                                                   detailed-translation
+                                                   suggestion)
+  (format "%s%s - %s%s %s"
+          text
+           (if (and google-translate-show-phonetic
+                    (not (string-equal text-phonetic "")))
+               (format " [%s]" text-phonetic)
+             "")
+           translation
+           (if (and google-translate-show-phonetic
+                    (not (string-equal translation-phonetic "")))
+               (format " [%s]" translation-phonetic)
+             "")
+           (if detailed-translation
+               (google-translate--detailed-translation detailed-translation
+                                                       translation))))
 
 (defun google-translate-echo-area-output-translation (source-language
                                                       target-language
