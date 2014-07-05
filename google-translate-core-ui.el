@@ -497,12 +497,10 @@ message is printed."
         target-language
         (gtos-auto-detected-language gtos)
         "%s -> %s:")
-       (google-translate--buffer-output-translating-text text " %s")
-       (insert " - ")
+       (google-translate--buffer-output-translating-text text " %s - ")
        (google-translate--buffer-output-text-phonetic
-        (gtos-text-phonetic gtos)
-        " %s")
-       (google-translate--buffer-output-translation translation "%s")
+        (gtos-text-phonetic gtos) " %s")
+       (google-translate--buffer-output-translation translation " %s")
        (google-translate--buffer-output-translation-phonetic
         (gtos-translation-phonetic gtos)
         " [%s]")
@@ -537,10 +535,10 @@ message is printed."
         (gtos-auto-detected-language gtos)
         "%s -> %s:")
        (google-translate--buffer-output-translating-text text " %s")
-       (insert " - ")
        (google-translate--buffer-output-text-phonetic
         (gtos-text-phonetic gtos)
-        " %s")
+        " [%s]")
+       (insert " - ")
        (google-translate--buffer-output-translation translation "%s")
        (google-translate--buffer-output-translation-phonetic
         (gtos-translation-phonetic gtos)
