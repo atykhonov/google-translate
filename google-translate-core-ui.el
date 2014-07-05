@@ -526,9 +526,6 @@ message is printed."
 
     (message
      (with-temp-buffer
-       (setq current-fill-column 80)
-       (auto-fill-mode 1)
-       (setq current-fill-column 80)
        (google-translate--buffer-output-translation-title
         source-language
         target-language
