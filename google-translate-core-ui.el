@@ -529,46 +529,48 @@ message is printed."
          target-language)))))
 
 (defun google-translate-buffer-output-translation (gtos)
-  (let ((buffer-name "*Google Translate*")
-        (translation-text-new-line
+  (let ((buffer-name "*Google Translate*"))
+    (with-output-to-temp-buffer buffer-name
+      (set-buffer buffer-name)
+      (google-translate-buffer-insert-translation gtos))))
+
+(defun google-translate-buffer-insert-translation (gtos)
+  (let ((translation-text-new-line
          (when (null google-translate-listen-program)
            t))
         (source-language (gtos-source-language gtos))
-        ;; (source-language (gto-source-language output))
         (target-language (gtos-target-language gtos))
         (text (gtos-text gtos))
         (translation (gtos-translation gtos))
         (detailed-translation (gtos-detailed-translation gtos))
         (suggestion (gtos-suggestion gtos)))
-    (with-output-to-temp-buffer buffer-name
-      (set-buffer buffer-name)
-      (google-translate--insert-translation-title
-       source-language
-       target-language
-       (gtos-auto-detected-language gtos)
-       "Translate from %s to %s:%s")
-      (google-translate--insert-translating-text
-       (gtos-text gtos)
-       (if translation-text-new-line
-           "\n%s\n"
-         "\n%s"))
-      (when google-translate-listen-program
-        (google-translate--insert-listen-button
-         text source-language))
-      (google-translate--insert-text-phonetic
-       (gtos-text-phonetic gtos) "%s")
-      (google-translate--insert-translated-text
-       translation "%s")
-      (google-translate--insert-translation-phonetic
-       (gtos-translation-phonetic gtos) "%s")
-      (if detailed-translation
-          (google-translate--insert-detailed-translation
-           detailed-translation translation)
-        (when suggestion
-          (google-translate--insert-suggestion
-           suggestion
-           source-language
-           target-language))))))
+    (google-translate--insert-translation-title
+     source-language
+     target-language
+     (gtos-auto-detected-language gtos)
+     "Translate from %s to %s:%s")
+    (google-translate--insert-translating-text
+     (gtos-text gtos)
+     (if translation-text-new-line
+         "\n%s\n"
+       "\n%s"))
+    (when google-translate-listen-program
+      (google-translate--insert-listen-button
+       text source-language))
+    (google-translate--insert-text-phonetic
+     (gtos-text-phonetic gtos) "%s")
+    (google-translate--insert-translated-text
+     translation "%s")
+    (google-translate--insert-translation-phonetic
+     (gtos-translation-phonetic gtos) "%s")
+    (if detailed-translation
+        (google-translate--insert-detailed-translation
+         detailed-translation translation)
+      (when suggestion
+        (google-translate--insert-suggestion
+         suggestion
+         source-language
+         target-language)))))
 
 (defun google-translate-read-source-language (&optional prompt)
   "Read a source language, with completion, and return its abbreviation.
