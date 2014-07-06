@@ -73,12 +73,12 @@
       (buffer-substring-no-properties (point-min) (point-max)))))
   (setq google-translate-show-phonetic nil))
 
-(ert-deftest test-google-translate--insert-translation ()
+(ert-deftest test-google-translate--insert-translated-text ()
   (should
    (string-equal
     "translation"
     (with-temp-buffer
-      (google-translate--insert-translation "translation" "%s")
+      (google-translate--insert-translated-text "translation" "%s")
       (buffer-substring-no-properties (point-min) (point-max))))))
 
 (ert-deftest test-google-translate--insert-suggestion ()

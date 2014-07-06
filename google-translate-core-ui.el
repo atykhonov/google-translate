@@ -335,7 +335,7 @@ about used source and target languages while translating."
      'google-translate-phonetic-face
      format)))
 
-(defun google-translate--insert-translation (translation format)
+(defun google-translate--insert-translated-text (translation format)
   "Output in buffer TRANSLATION."
   (google-translate-paragraph
    translation
@@ -483,13 +483,19 @@ message is printed."
 
 (defun google-translate-pop-up-output-translation (gtos)
   (popup-tip
-   (google-translate-output-translation gtos)))
+   (with-temp-buffer
+     (google-translate-output-translation gtos)
+     (google-translate--trim-string
+      (buffer-substring (point-min) (point-max))))))
 
 (defun google-translate-echo-area-output-translation (gtos)
   (message
-   (google-translate-output-translation gtos)))
+   (with-temp-buffer
+     (google-translate-output-translation gtos)
+     (google-translate--trim-string
+      (buffer-substring (point-min) (point-max))))))
 
-(defun google-translate-output-translation (gtos)
+(defun google-translate-insert-translation (gtos)
   (let ((source-language (gtos-source-language gtos))
         (target-language (gtos-target-language gtos))
         (auto-detected-language (gtos-auto-detected-language gtos))
@@ -498,32 +504,29 @@ message is printed."
         (translation-phonetic (gtos-translation-phonetic gtos))
         (detailed-translation (gtos-detailed-translation gtos))
         (suggestion (gtos-suggestion gtos)))
-     (with-temp-buffer
-       (google-translate--insert-translation-title
-        source-language
-        target-language
-        (gtos-auto-detected-language gtos)
-        "%s -> %s:")
-       (google-translate--insert-translating-text
-        (gtos-text gtos) " %s")
-       (google-translate--insert-text-phonetic
-        (gtos-text-phonetic gtos) " [%s]")
-       (insert " - ")
-       (google-translate--insert-translation
-        translation " %s")
-       (google-translate--insert-translation-phonetic
-        (gtos-translation-phonetic gtos)
-        " [%s]")
-       (if detailed-translation
-           (google-translate--echo-area-output-detailed-translation
-            detailed-translation translation)
-         (when suggestion
-           (google-translate--insert-suggestion
-            suggestion
-            source-language
-            target-language)))
-       (google-translate--trim-string
-        (buffer-substring (point-min) (point-max))))))
+    (google-translate--insert-translation-title
+     source-language
+     target-language
+     (gtos-auto-detected-language gtos)
+     "%s -> %s:")
+    (google-translate--insert-translating-text
+     (gtos-text gtos) " %s")
+    (google-translate--insert-text-phonetic
+     (gtos-text-phonetic gtos) " [%s]")
+    (insert " - ")
+    (google-translate--insert-translated-text
+     translation " %s")
+    (google-translate--insert-translation-phonetic
+     (gtos-translation-phonetic gtos)
+     " [%s]")
+    (if detailed-translation
+        (google-translate--echo-area-output-detailed-translation
+         detailed-translation translation)
+      (when suggestion
+        (google-translate--insert-suggestion
+         suggestion
+         source-language
+         target-language)))))
 
 (defun google-translate-buffer-output-translation (gtos)
   (let ((buffer-name "*Google Translate*")
@@ -554,7 +557,7 @@ message is printed."
          text source-language))
       (google-translate--insert-text-phonetic
        (gtos-text-phonetic gtos) "%s")
-      (google-translate--insert-translation
+      (google-translate--insert-translated-text
        translation "%s")
       (google-translate--insert-translation-phonetic
        (gtos-translation-phonetic gtos) "%s")
