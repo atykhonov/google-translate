@@ -484,14 +484,14 @@ message is printed."
 (defun google-translate-pop-up-output-translation (gtos)
   (popup-tip
    (with-temp-buffer
-     (google-translate-output-translation gtos)
+     (google-translate-insert-translation gtos)
      (google-translate--trim-string
       (buffer-substring (point-min) (point-max))))))
 
 (defun google-translate-echo-area-output-translation (gtos)
   (message
    (with-temp-buffer
-     (google-translate-output-translation gtos)
+     (google-translate-insert-translation gtos)
      (google-translate--trim-string
       (buffer-substring (point-min) (point-max))))))
 
