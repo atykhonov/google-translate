@@ -45,22 +45,30 @@
 ;;
 ;; - `google-translate-read-target-language'
 ;;
-;; `google-translate-translate' queries the source and target
-;; languages and text to translate, and shows a buffer with available
-;; translations of the text. `google-translate-read-source-language'
-;; reads source language from minibuffer and
-;; `google-translate-read-target-language' reads target language from
-;; minibuffer.
+;; `google-translate-translate' translates the given text from source language to
+;; target language and shows a translation.
+
+;; `google-translate-read-source-language' reads source language from minibuffer and
+;; returns language abbreviation. `google-translate-read-target-language' reads
+;; target language from minibuffer and returns language abbreviation.
 ;; 
 ;; Customization:
 
 ;; You can customize the following variables:
+;;
+;; - `google-translate-output-destination'
 ;;
 ;; - `google-translate-enable-ido-completion'
 ;;
 ;; - `google-translate-show-phonetic'
 ;;
 ;; - `google-translate-listen-program'
+;;
+;; `google-translate-output-destination' determines translation output
+;; destination. If `nil' the translation output will be displayed in the pop up
+;; buffer. If value equal to `echo-area' then translation outputs in the Echo
+;; Area. And in case of `pop-up' the translation outputs to the pop up using `popup'
+;; package.
 ;;
 ;; If `google-translate-enable-ido-completion' is non-NIL, the input
 ;; will be read with ido-style completion.
@@ -75,7 +83,9 @@
 ;; `mplayer' is found then listening function will be available and you'll see
 ;; `Listen' button in the buffer with the translation. You can use any other suitable
 ;; program. If you use Windows please download and unpack `mplayer' and add its path
-;; (directory) to the system PATH variable.
+;; (directory) to the system PATH variable. Please note that translation listening is
+;; not available if `google-translate-output-destination' is set to `echo-area' or
+;; `pop-up'.
 ;;
 ;; There are also six faces you can customize:
 ;;
@@ -228,8 +238,9 @@ suitable program."
   nil
   "Determines where translation output will be displayed. If
 `nil' the translation output will be displayed in the pop up
-buffer. If value equal to `echo-area' then translation outputs in
-the Echo Area."
+buffer (default). If value equals to `echo-area' then translation
+outputs in the Echo Area. And in case of `pop-up' the translation
+outputs to the pop up using `popup' package."
   :group 'google-translate-core-ui
   :type '(symbol))
 
@@ -442,7 +453,7 @@ buffer named *Google Translate* with available translations of
 TEXT. In case of `google-translate-output-destination' is
 `echo-area' outputs translation in the echo area. If
 `google-translate-output-destination' is `pop-up' outputs
-translation in the pop up using `popup.el' library.
+translation in the pop up using `popup' package.
 
 To deal with multi-line regions, sequences of white space
 are replaced with a single space. If the region contains not text, a
@@ -475,7 +486,7 @@ message is printed."
           (google-translate-pop-up-output-translation gtos)))))))
 
 (defun google-translate-pop-up-output-translation (gtos)
-  "Output translation to the pop up using `popup.el' library."
+  "Output translation to the pop up using `popup' package."
   (require 'popup)
   (popup-tip
    (with-temp-buffer
