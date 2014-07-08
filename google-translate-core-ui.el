@@ -498,10 +498,8 @@ message is printed."
 (defun google-translate-insert-translation (gtos)
   (let ((source-language (gtos-source-language gtos))
         (target-language (gtos-target-language gtos))
-        (auto-detected-language (gtos-auto-detected-language gtos))
         (text-phonetic (gtos-text-phonetic gtos))
         (translation (gtos-translation gtos))
-        (translation-phonetic (gtos-translation-phonetic gtos))
         (detailed-translation (gtos-detailed-translation gtos))
         (suggestion (gtos-suggestion gtos)))
     (google-translate--insert-translation-title
@@ -540,7 +538,6 @@ message is printed."
            t))
         (source-language (gtos-source-language gtos))
         (target-language (gtos-target-language gtos))
-        (text (gtos-text gtos))
         (translation (gtos-translation gtos))
         (detailed-translation (gtos-detailed-translation gtos))
         (suggestion (gtos-suggestion gtos)))
