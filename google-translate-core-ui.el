@@ -440,10 +440,10 @@ clicked."
           (insert (format "Listen program: %s\r\n" google-translate-listen-program))
           (insert (format "Listen URL: %s\r\n" (google-translate-format-listen-url text language)))
           (call-process google-translate-listen-program nil t nil
-                        (format "\"%s\"" (google-translate-format-listen-url text language)))
+                        (format "%s" (google-translate-format-listen-url text language)))
           (switch-to-buffer buf))
       (call-process google-translate-listen-program nil nil nil
-                    (format "\"%s\"" (google-translate-format-listen-url text language))))))
+                    (format "%s" (google-translate-format-listen-url text language))))))
 
 (defun google-translate-translate (source-language target-language text)
   "Translate TEXT from SOURCE-LANGUAGE to TARGET-LANGUAGE.
