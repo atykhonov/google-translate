@@ -67,8 +67,12 @@
 ;; `google-translate-output-destination' determines translation output
 ;; destination. If `nil' the translation output will be displayed in the pop up
 ;; buffer. If value equal to `echo-area' then translation outputs in the Echo
-;; Area. And in case of `pop-up' the translation outputs to the pop up using `popup'
-;; package.
+;; Area. And in case of `popup' the translation outputs to the popup tooltip using
+;; `popup' package. If you would like output translation to the Echo Area you would
+;; probably like to increase it because only part of translation could be visible
+;; there. To increase echo area you could increase the value of
+;; `max-mini-window-height' variable, for example: `(setq max-mini-window-height
+;; 0.5)'.
 ;;
 ;; If `google-translate-enable-ido-completion' is non-NIL, the input
 ;; will be read with ido-style completion.
@@ -85,7 +89,7 @@
 ;; program. If you use Windows please download and unpack `mplayer' and add its path
 ;; (directory) to the system PATH variable. Please note that translation listening is
 ;; not available if `google-translate-output-destination' is set to `echo-area' or
-;; `pop-up'.
+;; `popup'.
 ;;
 ;; There are also six faces you can customize:
 ;;
@@ -202,7 +206,7 @@ query parameter in HTTP requests.")
 (defstruct gtos
   "google translate output structure contains miscellaneous
   information which intended to be outputed to the buffer, echo
-  area or pop-up."
+  area or popup tooltip."
   source-language target-language text
   auto-detected-language text-phonetic translation
   translation-phonetic detailed-translation suggestion)
@@ -239,8 +243,8 @@ suitable program."
   "Determines where translation output will be displayed. If
 `nil' the translation output will be displayed in the pop up
 buffer (default). If value equals to `echo-area' then translation
-outputs in the Echo Area. And in case of `pop-up' the translation
-outputs to the pop up using `popup' package."
+outputs in the Echo Area. And in case of `popup' the translation
+outputs to the popup tooltip using `popup' package."
   :group 'google-translate-core-ui
   :type '(symbol))
 
@@ -452,8 +456,8 @@ In case of `google-translate-output-destination' is nil pops up a
 buffer named *Google Translate* with available translations of
 TEXT. In case of `google-translate-output-destination' is
 `echo-area' outputs translation in the echo area. If
-`google-translate-output-destination' is `pop-up' outputs
-translation in the pop up using `popup' package.
+`google-translate-output-destination' is `popup' outputs
+translation in the popup tooltip using `popup' package.
 
 To deal with multi-line regions, sequences of white space
 are replaced with a single space. If the region contains not text, a
@@ -482,11 +486,12 @@ message is printed."
           (google-translate-buffer-output-translation gtos))
          ((equal google-translate-output-destination 'echo-area)
           (google-translate-echo-area-output-translation gtos))
-         ((equal google-translate-output-destination 'pop-up)
-          (google-translate-pop-up-output-translation gtos)))))))
+         ((equal google-translate-output-destination 'popup)
+          (google-translate-popup-output-translation gtos)))))))
 
-(defun google-translate-pop-up-output-translation (gtos)
-  "Output translation to the pop up using `popup' package."
+(defun google-translate-popup-output-translation (gtos)
+  "Output translation to the popup tooltip using `popup'
+package."
   (require 'popup)
   (popup-tip
    (with-temp-buffer
