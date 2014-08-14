@@ -436,8 +436,11 @@ clicked."
   "Do translation listening."
   (interactive)
   (let ((text (button-get button 'text))
-        (language (button-get button 'language))
-        (buf "*mplayer output*"))
+        (language (button-get button 'language)))
+    (google-translate-listen-translation language text)))
+
+(defun google-translate-listen-translation (language text)
+  (let ((buf "*mplayer output*"))
     (message "Retrieving audio message...")
     (if google-translate-translation-listening-debug
         (with-current-buffer (get-buffer-create buf)
