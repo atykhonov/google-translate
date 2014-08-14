@@ -225,11 +225,20 @@ Default UI and Smooth UI.
 
 You can customize the following variables:
 
+- `google-translate-output-destination`
+
 - `google-translate-enable-ido-completion`
 
 - `google-translate-show-phonetic`
 
 - `google-translate-listen-program`
+
+`google-translate-output-destination` determines translation output destination. If
+`nil` the translation output will be displayed in the pop up buffer. If value equal
+to `echo-area` then translation outputs in the Echo Area (see
+[Echo Area](http://www.gnu.org/software/emacs/manual/html_node/elisp/The-Echo-Area.html))
+And in case of `pop-up` the translation outputs to the pop up using `popup` package
+(see [popup-el](https://github.com/auto-complete/popup-el)).
 
 If `google-translate-enable-ido-completion` is non-NIL, the input
 will be read with ido-style completion.
@@ -244,7 +253,8 @@ listen translations. By default the program looks for `mplayer` in the PATH, if
 `mplayer` is found then listening function will be available and you'll see `Listen`
 button in the buffer with the translation. You can use any other suitable program. If
 you use Windows please download and unpack `mplayer` and add its path (directory) to
-to the system PATH variable.
+to the system PATH variable. Please note that translation listening is not available
+if `google-translate-output-destination` is set to `echo-area` or `pop-up`.
 
 There are also six faces you can customize:
 

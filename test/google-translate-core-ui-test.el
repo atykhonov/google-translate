@@ -29,65 +29,63 @@
     (google-translate-language-display-name "en")
     "English")))
 
-(ert-deftest test-google-translate--buffer-output-translation-title/source-auto/detected ()
+(ert-deftest test-google-translate--translation-title/source-auto/detected ()
   (should
    (string-equal
     "Translate from English (detected) to Russian:\n"
-    (with-temp-buffer
-      (google-translate--buffer-output-translation-title "auto" "ru" "en")
-      (buffer-substring-no-properties (point-min) (point-max))))))
+    (google-translate--translation-title (make-gtos :source-language "auto"
+                                                    :target-language "ru"
+                                                    :auto-detected-language "en")
+                                         "Translate from %s to %s:\n"))))
 
-(ert-deftest test-google-translate--buffer-output-translation-title/source-auto/detected ()
+(ert-deftest test-google-translate--translation-title/source-auto/detected-nil ()
   (should
    (string-equal
     "Translate from English to Russian:\n"
-    (with-temp-buffer
-      (google-translate--buffer-output-translation-title "en" "ru" nil)
-      (buffer-substring-no-properties (point-min) (point-max))))))
+    (google-translate--translation-title (make-gtos :source-language "en"
+                                                    :target-language "ru"
+                                                    :auto-detected-language nil)
+                                         "Translate from %s to %s:\n"))))
 
-(ert-deftest test-google-translate--buffer-output-text-phonetic/do-not-show-phonetic ()
+(ert-deftest test-google-translate--text-phonetic/do-not-show-phonetic ()
   (should
    (string-equal
     ""
-    (with-temp-buffer
-      (google-translate--buffer-output-text-phonetic "phonetic")
-      (buffer-substring-no-properties (point-min) (point-max))))))
+    (google-translate--text-phonetic
+     (make-gtos :text-phonetic "phonetic") "%s"))))
 
-(ert-deftest test-google-translate--buffer-output-text-phonetic/show-phonetic-but-empty ()
+(ert-deftest test-google-translate--text-phonetic/show-phonetic-but-empty ()
   (setq google-translate-show-phonetic t)
   (should
    (string-equal
     ""
-    (with-temp-buffer
-      (google-translate--buffer-output-text-phonetic "")
-      (buffer-substring-no-properties (point-min) (point-max)))))
+    (google-translate--text-phonetic (make-gtos :text-phonetic "") "%s")))
   (setq google-translate-show-phonetic nil))
 
-(ert-deftest test-google-translate--buffer-output-text-phonetic/show-phonetic ()
+(ert-deftest test-google-translate--text-phonetic/show-phonetic ()
   (setq google-translate-show-phonetic t)
   (should
    (string-equal
-    "\nphonetic\n"
-    (with-temp-buffer
-      (google-translate--buffer-output-text-phonetic "phonetic")
-      (buffer-substring-no-properties (point-min) (point-max)))))
+    "phonetic"
+    (google-translate--text-phonetic
+     (make-gtos :text-phonetic "phonetic") "%s")))
   (setq google-translate-show-phonetic nil))
 
-(ert-deftest test-google-translate--buffer-output-translation ()
+(ert-deftest test-google-translate--translated-text ()
   (should
    (string-equal
-    "\ntranslation\n"
-    (with-temp-buffer
-      (google-translate--buffer-output-translation "translation")
-      (buffer-substring-no-properties (point-min) (point-max))))))
+    "translation"
+    (google-translate--translated-text
+     (make-gtos :translation "translation") "%s"))))
 
-(ert-deftest test-google-translate--buffer-output-suggestion ()
+(ert-deftest test-google-translate--suggestion ()
   (should
    (string-equal
     "\nDid you mean: suggest\n"
-    (with-temp-buffer
-      (google-translate--buffer-output-suggestion "suggest" "en" "ru")
-      (buffer-substring-no-properties (point-min) (point-max))))))
+    (google-translate--suggestion (make-gtos
+                                   :suggestion "suggest"
+                                   :source-language "en"
+                                   :target-language "ru")))))
 
 (ert-deftest test-google-translate--suggestion-action ()
   (with-temp-buffer
@@ -105,32 +103,29 @@
                                          suggestion))
        (google-translate--suggestion-action button)))))
 
-(ert-deftest test-google-translate--buffer-output-translation-phonetic/do-not-show-phonetic ()
+(ert-deftest test-google-translate--translation-phonetic/do-not-show-phonetic ()
   (should
    (string-equal
     ""
-    (with-temp-buffer
-      (google-translate--buffer-output-translation-phonetic "phonetic")
-      (buffer-substring-no-properties (point-min) (point-max))))))
+    (google-translate--translation-phonetic
+     (make-gtos :translation-phonetic "phonetic") "%s"))))
 
-(ert-deftest test-google-translate--buffer-output-translation-phonetic/show-phonetic-but-empty ()
+(ert-deftest test-google-translate--translation-phonetic/show-phonetic-but-empty ()
   (setq google-translate-show-phonetic t)
   (should
    (string-equal
     ""
-    (with-temp-buffer
-      (google-translate--buffer-output-translation-phonetic "")
-      (buffer-substring-no-properties (point-min) (point-max)))))
+    (google-translate--translation-phonetic
+     (make-gtos :translation-phonetic "") "%s")))
   (setq google-translate-show-phonetic nil))
 
-(ert-deftest test-google-translate--buffer-output-translation-phonetic/show-phonetic ()
+(ert-deftest test-google-translate--translation-phonetic/show-phonetic ()
   (setq google-translate-show-phonetic t)
   (should
    (string-equal
-    "\nphonetic\n"
-    (with-temp-buffer
-      (google-translate--buffer-output-translation-phonetic "phonetic")
-      (buffer-substring-no-properties (point-min) (point-max)))))
+    "phonetic"
+    (google-translate--translation-phonetic
+     (make-gtos :translation-phonetic "phonetic") "%s")))
   (setq google-translate-show-phonetic nil))
 
 (ert-deftest test-google-translate-read-source-language/detect-language ()

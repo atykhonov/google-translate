@@ -1,4 +1,4 @@
-Feature: Default UI for Google Translate 
+Feature: Default UI for Google Translate
 
   Background:
     Given default UI
