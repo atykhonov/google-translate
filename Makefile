@@ -11,7 +11,7 @@ TARGET_DIR = google-translate-$(VERSION)
 
 all: test
 
-test: 
+test:
 	$(MAKE) unit-test
 	$(MAKE) ecukes
 
