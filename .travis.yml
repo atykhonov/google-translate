@@ -10,7 +10,7 @@ before_install:
   - export PATH="/home/travis/.cask/bin:$PATH"
   - cask
 env:
-  - EVM_EMACS=emacs-24.3
+  - EVM_EMACS=emacs-24.3-bin
 script:
   - emacs --version
   - make test
