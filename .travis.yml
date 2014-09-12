@@ -1,6 +1,9 @@
 language: emacs-lisp
 before_install:
-  - curl -fsSkL https://gist.githubusercontent.com/atykhonov/9213915/raw/1e24383279977f1c20d78007e5d1d51a6f0ac37d/travis.sh | sh
+  - sudo mkdir /usr/local/evm
+  - sudo chown travis:travis /usr/local/evm
+  - curl -fsSkL https://raw.github.com/rejeep/evm/master/go | bash
+  - curl -fsSkL https://raw.github.com/cask/cask/master/go | python
   - export PATH="/home/travis/.cask/bin:$PATH"
   - export PATH="/home/travis/.evm/bin:$PATH"
   - evm install $EVM_EMACS
