@@ -9,7 +9,7 @@ FEATURES = $(wildcard features/*.feature)
 VERSION = 0.10.2
 TARGET_DIR = google-translate-$(VERSION)
 
-all: test marmalade-upload tag
+all: test marmalade tag
 
 test:
 	$(MAKE) unit-test
@@ -26,7 +26,9 @@ $(PKG_DIR):
 ecukes:
 	$(CASK) exec ecukes --reporter magnars --script $(FEATURES) --no-win
 
-marmalade:
+marmalade: marmalade-tar marmalade-upload marmalade-rm
+
+marmalade-tar:
 	mkdir $(TARGET_DIR)
 	cp google-translate-core-ui.el $(TARGET_DIR)
 	cp google-translate-core.el $(TARGET_DIR)
@@ -38,8 +40,10 @@ marmalade:
 	cp google-translate-pkg.el $(TARGET_DIR)
 	tar -cf google-translate-$(VERSION).tar $(TARGET_DIR)
 
-marmalade-upload: marmalade
+marmalade-upload:
 	marmalade-upload atykhonov google-translate-$(VERSION).tar || true
+
+marmalade-rm:
 	rm google-translate-$(VERSION).tar
 	rm -rf $(TARGET_DIR)
 
@@ -47,5 +51,4 @@ version:
 	@echo $(VERSION)
 
 tag:
-	git tag v$(VERSION)
-	git push origin --tags
+	git tag v$(VERSION) && git push origin --tags
