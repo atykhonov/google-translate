@@ -39,7 +39,7 @@ marmalade:
 	tar -cf google-translate-$(VERSION).tar $(TARGET_DIR)
 
 marmalade-upload: marmalade
-	marmalade-upload atykhonov google-translate-$(VERSION).tar
+	marmalade-upload atykhonov google-translate-$(VERSION).tar || true
 	rm google-translate-$(VERSION).tar
 	rm -rf $(TARGET_DIR)
 
