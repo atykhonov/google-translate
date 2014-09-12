@@ -40,3 +40,7 @@ marmalade:
 
 version:
 	@echo $(VERSION)
+
+tag:
+	git tag v$(VERSION)
+	git push origin --tags
