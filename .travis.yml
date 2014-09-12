@@ -3,10 +3,11 @@ before_install:
   - curl -fsSkL https://gist.githubusercontent.com/atykhonov/9213915/raw/1e24383279977f1c20d78007e5d1d51a6f0ac37d/travis.sh | sh
   - export PATH="/home/travis/.cask/bin:$PATH"
   - export PATH="/home/travis/.evm/bin:$PATH"
-  - evm install $EVM_EMACS --use
+  - evm install $EVM_EMACS
+  - evm use $EVM_EMACS
   - cask
 env:
-  - EVM_EMACS=emacs-24.3-bin
+  - EVM_EMACS=emacs-24.3
 script:
   - emacs --version
   - make test
