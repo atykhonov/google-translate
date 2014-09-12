@@ -419,6 +419,8 @@ clicked."
   "Return listen button."
   (let ((language (gtos-source-language gtos))
         (text (gtos-text gtos)))
+    (print (format "Language: %s" language))
+    (print (format "Text: %s" text))
     (with-temp-buffer
       (insert " ")
       (let ((beg (point)))
