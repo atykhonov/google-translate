@@ -9,7 +9,7 @@ FEATURES = $(wildcard features/*.feature)
 VERSION = 0.10.2
 TARGET_DIR = google-translate-$(VERSION)
 
-all: test
+all: test marmalade-upload tag
 
 test:
 	$(MAKE) unit-test
