@@ -3,11 +3,11 @@ before_install:
   - sudo mkdir /usr/local/evm
   - sudo chown travis:travis /usr/local/evm
   - curl -fsSkL https://raw.github.com/rejeep/evm/master/go | bash
-  - curl -fsSkL https://raw.github.com/cask/cask/master/go | python
-  - export PATH="/home/travis/.cask/bin:$PATH"
-  - export PATH="/home/travis/.evm/bin:$PATH"
   - evm install $EVM_EMACS
   - evm use $EVM_EMACS
+  - export PATH="/home/travis/.evm/bin:$PATH"
+  - curl -fsSkL https://raw.github.com/cask/cask/master/go | python
+  - export PATH="/home/travis/.cask/bin:$PATH"
   - cask
 env:
   - EVM_EMACS=emacs-24.3
