@@ -548,8 +548,8 @@ http://www.gnu.org/software/emacs/manual/html_node/elisp/The-Echo-Area.html)"
       (if (null google-translate-listen-program)
           "\n%s\n"
         "\n%s"))
-     (when (not (null google-translate-listen-program))
-       (google-translate--listen-button gtos))
+     (if google-translate-listen-program
+         (google-translate--listen-button gtos) "")
      (google-translate--text-phonetic gtos "\n%s\n")
      (google-translate--translated-text gtos "\n%s\n")
      (google-translate--translation-phonetic gtos "\n%s\n")
