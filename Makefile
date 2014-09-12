@@ -24,7 +24,7 @@ $(PKG_DIR):
 	touch $@
 
 ecukes:
-	$(CASK) exec ecukes --script $(FEATURES) --no-win --debug
+	$(CASK) exec ecukes --script $(FEATURES) --no-win
 
 marmalade:
 	mkdir $(TARGET_DIR)
