@@ -38,8 +38,12 @@ marmalade:
 	cp google-translate-pkg.el $(TARGET_DIR)
 	tar -cf google-translate-$(VERSION).tar $(TARGET_DIR)
 
-marmalade-upload: marmalade
+marmalade-upload: marmalade marmalade-rm
 	marmalade-upload atykhonov google-translate-$(VERSION).tar
+
+marmalade-rm:
+	rm google-translate-$(VERSION).tar
+	rm -rf $(TARGET_DIR)
 
 version:
 	@echo $(VERSION)
