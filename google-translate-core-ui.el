@@ -541,15 +541,17 @@ http://www.gnu.org/software/emacs/manual/html_node/elisp/The-Echo-Area.html)"
         (detailed-translation (gtos-detailed-translation gtos)))
     (insert
      (google-translate--translation-title gtos "Translate from %s to %s:\n")
+     "\n"
      (google-translate--translating-text
       gtos
       (if (null google-translate-listen-program)
-          "\n%s\n"
-        "\n%s"))
+          "%s\n"
+        "%s"))
      (if google-translate-listen-program
          (google-translate--listen-button gtos) "")
      (google-translate--text-phonetic gtos "\n%s\n")
-     (google-translate--translated-text gtos "\n%s\n")
+     "\n"
+     (google-translate--translated-text gtos "%s\n")
      (google-translate--translation-phonetic gtos "\n%s\n")
      (if detailed-translation
          (google-translate--detailed-translation
