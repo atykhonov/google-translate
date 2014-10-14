@@ -248,6 +248,19 @@ outputs to the popup tooltip using `popup' package."
   :group 'google-translate-core-ui
   :type '(symbol))
 
+(defcustom google-translate-inline-edition
+  nil
+  "Determines whether inline editing will be enabled or not. This
+  feature makes possible to edit translating text in the output
+  buffer and translate it immediately without any needs to
+  select, call `google-translate-smooth-translate' (or
+  `google-translate-query-translate') function and then edit text
+  in the minibuffer to translate some modification of original
+  text. And of course it is much more easier and brings more
+  convinience to edit text as a regular text in the usual
+  buffer. This feature is only available if
+  `google-translate-output-destination' is nil.")
+
 (defface google-translate-text-face
   '((t (:inherit default)))
   "Face used to display the original text."
@@ -295,16 +308,21 @@ abbreviation is ABBREVIATION."
       "unspecified language"
     (car (rassoc abbreviation google-translate-supported-languages-alist))))
 
-(defun google-translate-paragraph (text face &optional output-format)
+(defun google-translate-paragraph (text face &optional output-format read-write)
   "Return TEXT as a filled paragraph into the current buffer and
-apply FACE to it. Optionally use OUTPUT-FORMAT."
+apply FACE to it. Optionally use OUTPUT-FORMAT. If READ-WRITE is
+t then text will be editable."
   (let ((beg (point))
         (output-format
-         (if output-format output-format "\n%s\n")))
+         (if output-format output-format "\n%s\n"))
+        (inhibit-read-only t))
     (with-temp-buffer
       (insert (format output-format text))
       (facemenu-set-face face beg (point))
       (fill-region beg (point))
+      (if read-write
+          (put-text-property beg (- (point) 1) 'read-only nil)
+        (put-text-property beg (- (point) 1) 'read-only t))
       (buffer-substring (point-min) (point-max)))))
 
 (defun google-translate--translation-title (gtos format)
@@ -322,15 +340,6 @@ source and target languages."
                source-language))
             (google-translate-language-display-name
              target-language))))
-
-(defun google-translate--translating-text (gtos format)
-  "Outputs in buffer translating text."
-  (let ((text (gtos-text gtos)))
-    (let ((output-format format))
-      (google-translate-paragraph
-       text
-       'google-translate-text-face
-       output-format))))
 
 (defun google-translate--text-phonetic (gtos format)
   "Outputs in buffer text phonetic in case of
@@ -414,6 +423,15 @@ clicked."
     (google-translate-translate source-language
                                 target-language
                                 suggestion)))
+
+(defun google-translate--translating-text (gtos format)
+  "Outputs in buffer translating text."
+  (let ((text (gtos-text gtos)))
+    (let ((output-format format))
+      (google-translate-paragraph
+       text
+       'google-translate-text-face
+       output-format t))))
 
 (defun google-translate--listen-button (gtos)
   "Return listen button."
@@ -531,22 +549,44 @@ http://www.gnu.org/software/emacs/manual/html_node/elisp/The-Echo-Area.html)"
 (defun google-translate-buffer-output-translation (gtos)
   "Output translation to the temp buffer."
   (let ((buffer-name "*Google Translate*"))
-    (with-output-to-temp-buffer buffer-name
-      (set-buffer buffer-name)
-      (google-translate-buffer-insert-translation gtos))))
+    (if google-translate-inline-edition
+        (progn
+          (when (bufferp buffer-name)
+            (kill-buffer buffer-name))
+          (get-buffer-create buffer-name)
+          (with-current-buffer buffer-name
+            (read-only-mode -1)
+            (erase-buffer)
+            (google-translate-buffer-insert-translation gtos)
+            ;; (google-translate-inline-editing-mode)
+            (goto-char (point-max)))
+          (pop-to-buffer buffer-name))
+      (with-output-to-temp-buffer buffer-name
+        (set-buffer buffer-name)
+        (google-translate-buffer-insert-translation gtos)))))
 
 (defun google-translate-buffer-insert-translation (gtos)
   "Insert translation to the current temp buffer."
   (let ((translation (gtos-translation gtos))
-        (detailed-translation (gtos-detailed-translation gtos)))
+        (detailed-translation (gtos-detailed-translation gtos))
+        (inhibit-read-only t)
+        (read-only-point nil))
     (insert
      (google-translate--translation-title gtos "Translate from %s to %s:\n")
-     "\n"
-     (google-translate--translating-text
-      gtos
-      (if (null google-translate-listen-program)
-          "%s\n"
-        "%s"))
+     "\n")
+    (put-text-property 1 2 'front-sticky '(read-only))
+    (put-text-property (point-min) (- (point) 1) 'read-only t)
+    (insert
+     (google-translate--translating-text gtos "%s"))
+    ;; (widget-create 'editable-field
+    ;;                :size 13
+    ;;                :format "Name: %v "    ; Text after the field!
+    ;;                (google-translate--translating-text gtos "%s"))
+    ;; (insert "xwidgetdemo<<< a button. another button\n") (goto-char (point-min)) (put-text-property (point) (+ 1 (point)) 'display '(xwidget :xwidget-id 1 :type 'webkit-osr :title "1" :width 40 :height 50))
+    (setq read-only-point (point))
+    (when (null google-translate-listen-program)
+      (insert "\n"))
+    (insert
      (if google-translate-listen-program
          (google-translate--listen-button gtos) "")
      (google-translate--text-phonetic gtos "\n%s\n")
@@ -557,7 +597,8 @@ http://www.gnu.org/software/emacs/manual/html_node/elisp/The-Echo-Area.html)"
          (google-translate--detailed-translation
           detailed-translation translation
           "\n%s\n" "%2d. %s\n")
-       (google-translate--suggestion gtos)))))
+       (google-translate--suggestion gtos)))
+    (put-text-property read-only-point (point-max) 'read-only t)))
 
 (defun google-translate-read-source-language (&optional prompt)
   "Read a source language, with completion, and return its abbreviation.
