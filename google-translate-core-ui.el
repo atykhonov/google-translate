@@ -5,7 +5,7 @@
 ;; Author: Oleksandr Manzyuk <manzyuk@gmail.com>
 ;; Maintainer: Andrey Tykhonov <atykhonov@gmail.com>
 ;; URL: https://github.com/atykhonov/google-translate
-;; Version: 0.10.4
+;; Version: 0.10.5
 ;; Keywords: convenience
 
 ;; Contributors:
@@ -64,6 +64,8 @@
 ;;
 ;; - `google-translate-listen-program'
 ;;
+;; - `google-translate-pop-up-buffer-set-focus'
+;;
 ;; `google-translate-output-destination' determines translation output
 ;; destination. If `nil' the translation output will be displayed in the pop up
 ;; buffer. If value equal to `echo-area' then translation outputs in the Echo
@@ -90,6 +92,12 @@
 ;; (directory) to the system PATH variable. Please note that translation listening is
 ;; not available if `google-translate-output-destination' is set to `echo-area' or
 ;; `popup'.
+;;
+;; The variable `google-translate-pop-up-buffer-set-focus' determines whether window
+;; (buffer) with translation gets focus when it pop ups. If `nil', it doesn't get
+;; focus and focus remains in the same window as was before translation. If `t',
+;; window (buffer with translation) gets focus. Please note that that setting works
+;; only for pop up buffer, i.e. when `google-translate-output-destination' is `nil'.
 ;;
 ;; There are also six faces you can customize:
 ;;
@@ -247,6 +255,13 @@ outputs in the Echo Area. And in case of `popup' the translation
 outputs to the popup tooltip using `popup' package."
   :group 'google-translate-core-ui
   :type '(symbol))
+
+(defcustom google-translate-pop-up-buffer-set-focus
+  nil
+  "Determines whether window (buffer) with translation gets focus
+when it pop ups. If `nil', it doesn't get focus and focus remains
+in the same window as was before translation. If `t',
+window (buffer with translation) gets focus.")
 
 (defface google-translate-text-face
   '((t (:inherit default)))
@@ -532,7 +547,9 @@ http://www.gnu.org/software/emacs/manual/html_node/elisp/The-Echo-Area.html)"
   "Output translation to the temp buffer."
   (let ((buffer-name "*Google Translate*"))
     (with-output-to-temp-buffer buffer-name
-      (set-buffer buffer-name)
+      (if google-translate-pop-up-buffer-set-focus
+          (select-window (display-buffer buffer-name))
+        (set-buffer buffer-name))
       (google-translate-buffer-insert-translation gtos))))
 
 (defun google-translate-buffer-insert-translation (gtos)

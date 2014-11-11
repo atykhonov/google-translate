@@ -233,6 +233,8 @@ You can customize the following variables:
 
 - `google-translate-listen-program`
 
+- `google-translate-pop-up-buffer-set-focus`
+
 `google-translate-output-destination` determines translation output destination. If
 `nil` the translation output will be displayed in the pop up buffer. If value equal
 to `echo-area` then translation outputs in the Echo Area (see
@@ -255,6 +257,12 @@ button in the buffer with the translation. You can use any other suitable progra
 you use Windows please download and unpack `mplayer` and add its path (directory) to
 to the system PATH variable. Please note that translation listening is not available
 if `google-translate-output-destination` is set to `echo-area` or `pop-up`.
+
+The variable `google-translate-pop-up-buffer-set-focus` determines whether window
+(buffer) with translation gets focus when it pop ups. If `nil`, it doesn't get focus
+and focus remains in the same window as was before translation. If `t`, window
+(buffer with translation) gets focus. Please note that that setting works only for
+pop up buffer, i.e. when `google-translate-output-destination` is `nil`.
 
 There are also six faces you can customize:
 
