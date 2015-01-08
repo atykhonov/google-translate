@@ -220,7 +220,7 @@ speech."
 (defun google-translate-json-suggestion (json)
   "Retrieve from JSON (which returns by the
 `google-translate-request' function) suggestion. This function
-does matter when translating misspelled world. So instead of
+does matter when translating misspelled word. So instead of
 translation it is possible to get suggestion."
   (let ((info (aref json 7)))
     (when info
