@@ -248,7 +248,7 @@ outputs to the popup tooltip using `popup' package."
   :group 'google-translate-core-ui
   :type '(symbol))
 
-(defcustom google-translate-inline-edition
+(defcustom google-translate-inline-editing
   nil
   "Determines whether inline editing will be enabled or not. This
   feature makes possible to edit translating text in the output
@@ -549,7 +549,7 @@ http://www.gnu.org/software/emacs/manual/html_node/elisp/The-Echo-Area.html)"
 (defun google-translate-buffer-output-translation (gtos)
   "Output translation to the temp buffer."
   (let ((buffer-name "*Google Translate*"))
-    (if google-translate-inline-edition  ;; TODO: rename variable
+    (if google-translate-inline-editing
         (progn
           (when (bufferp (get-buffer buffer-name))
             (kill-buffer buffer-name))
