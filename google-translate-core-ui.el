@@ -317,13 +317,13 @@ t then text will be editable."
          (if output-format output-format "\n%s\n"))
         (inhibit-read-only t))
     (with-temp-buffer
-      (insert (format output-format text))
-      (facemenu-set-face face beg (point))
-      (fill-region beg (point))
-      (if read-write
-          (put-text-property beg (- (point) 1) 'read-only nil)
-        (put-text-property beg (- (point) 1) 'read-only t))
-      (buffer-substring (point-min) (point-max)))))
+      (let ((beg (point)))
+        (insert (format output-format text))
+        (facemenu-set-face face beg (point))
+        (if read-write
+            (put-text-property beg (point) 'read-only nil)
+          (put-text-property beg (point) 'read-only t))
+        (buffer-substring (point-min) (point-max))))))
 
 (defun google-translate--translation-title (gtos format)
   "Return translation title which contains information about used
@@ -549,17 +549,16 @@ http://www.gnu.org/software/emacs/manual/html_node/elisp/The-Echo-Area.html)"
 (defun google-translate-buffer-output-translation (gtos)
   "Output translation to the temp buffer."
   (let ((buffer-name "*Google Translate*"))
-    (if google-translate-inline-edition
+    (if google-translate-inline-edition  ;; TODO: rename variable
         (progn
-          (when (bufferp buffer-name)
+          (when (bufferp (get-buffer buffer-name))
             (kill-buffer buffer-name))
-          (get-buffer-create buffer-name)
-          (with-current-buffer buffer-name
+          (with-current-buffer (get-buffer-create buffer-name)
             (read-only-mode -1)
             (erase-buffer)
             (google-translate-buffer-insert-translation gtos)
             ;; (google-translate-inline-editing-mode)
-            (goto-char (point-max)))
+            (goto-char (point-min)))
           (pop-to-buffer buffer-name))
       (with-output-to-temp-buffer buffer-name
         (set-buffer buffer-name)
