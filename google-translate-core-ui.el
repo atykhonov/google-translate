@@ -246,7 +246,7 @@ query parameter in HTTP requests.")
   area or popup tooltip."
   source-language target-language text
   auto-detected-language text-phonetic translation
-  translation-phonetic detailed-translation suggestion)
+  translation-phonetic detailed-translation suggestion detailed-definition)
 
 (defgroup google-translate-core-ui nil
   "Emacs core UI script for the Google Translate package."
@@ -414,12 +414,54 @@ source and target languages."
   "Return detailed translation."
   (with-temp-buffer
     (loop for item across detailed-translation do
-          (let ((index 0))
-            (unless (string-equal (aref item 0) "")
-              (insert (format format1 (aref item 0)))
-              (loop for translation across (aref item 1) do
+          (let ((index 0)
+                (label (aref item 0)))
+            (unless (string-equal label "")
+              (put-text-property 0 (length label)
+                                 'font-lock-face
+                                 'google-translate-translation-face
+                                 label)
+              (insert (format format1 label))
+              (loop for translation across (aref item 2) do
+                    (let ((content
+                           (format "%s (%s)"
+                                   (aref translation 0)
+                                   (mapconcat 'identity
+                                              (aref translation 1)
+                                              ", "))))
+                      (insert (format format2
+                                      (incf index)
+                                      content)))))))
+    (buffer-substring (point-min) (point-max))))
+
+(defun google-translate--detailed-definition (detailed-definition definition
+                                                                    format1
+                                                                    format2)
+  "Return detailed definition."
+  (with-temp-buffer
+    (loop for item across detailed-definition do
+          (let ((index 0)
+                (section "DEFINITION")
+                (label (aref item 0)))
+            (unless (string-equal label "")
+              (put-text-property 0 (length section)
+                                 'font-lock-face
+                                 'google-translate-translation-face
+                                 section)
+              (put-text-property 0 (length label)
+                                 'font-lock-face
+                                 'google-translate-translation-face
+                                 label)
+              (insert (format "\n%s\n" section))
+              (insert (format format1 label))
+              (loop for definition across (aref item 1) do
                     (insert (format format2
-                                    (incf index) translation))))))
+                                    (incf index)
+                                    (if (> (length definition) 2)
+                                        (format "%s\n    \"%s\""
+                                                (aref definition 0)
+                                                (aref definition 2))
+                                      (format "%s" (aref definition 0)))))))))
     (buffer-substring (point-min) (point-max))))
 
 (defun google-translate--suggestion (gtos)
@@ -516,6 +558,8 @@ message is printed."
         (message "Nothing to translate.")
       (let* ((detailed-translation
               (google-translate-json-detailed-translation json))
+             (detailed-definition
+              (google-translate-json-detailed-definition json))
              (gtos
               (make-gtos
                :source-language source-language
@@ -526,6 +570,7 @@ message is printed."
                :translation (google-translate-json-translation json)
                :translation-phonetic (google-translate-json-translation-phonetic json)
                :detailed-translation detailed-translation
+               :detailed-definition detailed-definition
                :suggestion (when (null detailed-translation)
                              (google-translate-json-suggestion json))))
              (output-destination (if (null output-destination)
@@ -539,7 +584,15 @@ message is printed."
          ((equal output-destination 'popup)
           (google-translate-popup-output-translation gtos))
          ((equal output-destination 'kill-ring)
-          (google-translate-kill-ring-output-translation gtos)))))))
+          (google-translate-kill-ring-output-translation gtos))
+         ((equal output-destination 'help)
+          (let ((describe-func
+                 (function
+                  (lambda (gtos)
+                    (google-translate-help-buffer-output-translation gtos)))))
+            (help-setup-xref (list 'google-translate-translate source-language target-language text) nil)
+            (with-help-window (help-buffer)
+              (funcall describe-func gtos)))))))))
 
 (defun google-translate-popup-output-translation (gtos)
   "Output translation to the popup tooltip using `popup'
@@ -596,10 +649,17 @@ http://www.gnu.org/software/emacs/manual/html_node/elisp/The-Echo-Area.html)"
         (set-buffer buffer-name))
       (google-translate-buffer-insert-translation gtos))))
 
+(defun google-translate-help-buffer-output-translation (gtos)
+  "Output translation to the help buffer."
+  (and google-translate-pop-up-buffer-set-focus
+      (select-window (display-buffer "*Help*")))
+  (google-translate-buffer-insert-translation gtos))
+
 (defun google-translate-buffer-insert-translation (gtos)
   "Insert translation to the current temp buffer."
   (let ((translation (gtos-translation gtos))
-        (detailed-translation (gtos-detailed-translation gtos)))
+        (detailed-translation (gtos-detailed-translation gtos))
+        (detailed-definition (gtos-detailed-definition gtos)))
     (insert
      (google-translate--translation-title gtos "Translate from %s to %s:\n")
      "\n"
@@ -618,7 +678,12 @@ http://www.gnu.org/software/emacs/manual/html_node/elisp/The-Echo-Area.html)"
          (google-translate--detailed-translation
           detailed-translation translation
           "\n%s\n" "%2d. %s\n")
-       (google-translate--suggestion gtos)))))
+       (google-translate--suggestion gtos))
+     (if detailed-definition
+         (google-translate--detailed-definition
+          detailed-definition translation
+          "\n%s\n" "%2d. %s\n")
+       ""))))
 
 (defun google-translate-read-source-language (&optional prompt)
   "Read a source language, with completion, and return its abbreviation.
