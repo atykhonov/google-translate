@@ -250,7 +250,7 @@ in the reverse direction."
      source-language target-language
      (if (use-region-p)
          (buffer-substring-no-properties (region-beginning) (region-end))
-       (or (current-word t)
+       (or (thing-at-point 'word)
            (error "No word at point."))))))
 
 ;;;###autoload
