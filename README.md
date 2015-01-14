@@ -238,9 +238,13 @@ You can customize the following variables:
 `google-translate-output-destination` determines translation output destination. If
 `nil` the translation output will be displayed in the pop up buffer. If value equal
 to `echo-area` then translation outputs in the Echo Area (see
-[Echo Area](http://www.gnu.org/software/emacs/manual/html_node/elisp/The-Echo-Area.html))
-And in case of `pop-up` the translation outputs to the pop up using `popup` package
-(see [popup-el](https://github.com/auto-complete/popup-el)).
+[Echo Area](http://www.gnu.org/software/emacs/manual/html_node/elisp/The-Echo-Area.html)). In
+case of `popup' the translation outputs to the popup tooltip using `popup`
+package. And in case of `kill-ring` the translation outputs to the kill ring. If you
+would like output translation to the Echo Area you would probably like to increase it
+because only part of translation could be visible there with the default settings. To
+increase echo area you could increase the value of `max-mini-window-height` variable,
+for example: `(setq max-mini-window-height 0.5)`.
 
 If `google-translate-enable-ido-completion` is non-NIL, the input
 will be read with ido-style completion.

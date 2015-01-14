@@ -69,10 +69,11 @@
 ;; `google-translate-output-destination' determines translation output
 ;; destination. If `nil' the translation output will be displayed in the pop up
 ;; buffer. If value equal to `echo-area' then translation outputs in the Echo
-;; Area. And in case of `popup' the translation outputs to the popup tooltip using
-;; `popup' package. If you would like output translation to the Echo Area you would
-;; probably like to increase it because only part of translation could be visible
-;; there. To increase echo area you could increase the value of
+;; Area. In case of `popup' the translation outputs to the popup tooltip using
+;; `popup' package. And in case of `kill-ring' the translation outputs to the kill
+;; ring. If you would like output translation to the Echo Area you would probably
+;; like to increase it because only part of translation could be visible there with
+;; the default settings. To increase echo area you could increase the value of
 ;; `max-mini-window-height' variable, for example: `(setq max-mini-window-height
 ;; 0.5)'.
 ;;
@@ -467,7 +468,7 @@ clicked."
       (call-process google-translate-listen-program nil nil nil
                     (format "%s" (google-translate-format-listen-url text language))))))
 
-(defun google-translate-translate (source-language target-language text)
+(defun google-translate-translate (source-language target-language text &optional output-destination)
   "Translate TEXT from SOURCE-LANGUAGE to TARGET-LANGUAGE.
 
 In case of `google-translate-output-destination' is nil pops up a
@@ -498,14 +499,19 @@ message is printed."
                :translation-phonetic (google-translate-json-translation-phonetic json)
                :detailed-translation detailed-translation
                :suggestion (when (null detailed-translation)
-                             (google-translate-json-suggestion json)))))
+                             (google-translate-json-suggestion json))))
+             (output-destination (if (null output-destination)
+                                     google-translate-output-destination
+                                   output-destination)))
         (cond
-         ((null google-translate-output-destination)
+         ((null output-destination)
           (google-translate-buffer-output-translation gtos))
-         ((equal google-translate-output-destination 'echo-area)
+         ((equal output-destination 'echo-area)
           (google-translate-echo-area-output-translation gtos))
-         ((equal google-translate-output-destination 'popup)
-          (google-translate-popup-output-translation gtos)))))))
+         ((equal output-destination 'popup)
+          (google-translate-popup-output-translation gtos))
+         ((equal output-destination 'kill-ring)
+          (google-translate-kill-ring-output-translation gtos)))))))
 
 (defun google-translate-popup-output-translation (gtos)
   "Output translation to the popup tooltip using `popup'
@@ -525,6 +531,16 @@ http://www.gnu.org/software/emacs/manual/html_node/elisp/The-Echo-Area.html)"
      (google-translate-insert-translation gtos)
      (google-translate--trim-string
       (buffer-substring (point-min) (point-max))))))
+
+(defun google-translate-kill-ring-output-translation (gtos)
+  "Output translation to the kill ring."
+  (kill-new
+   (with-temp-buffer
+     (insert
+      (gtos-translation gtos))
+     (google-translate--trim-string
+      (buffer-substring (point-min) (point-max)))))
+  (message "Translated text was added to the kill ring."))
 
 (defun google-translate-insert-translation (gtos)
   "Insert translation to the current buffer."
