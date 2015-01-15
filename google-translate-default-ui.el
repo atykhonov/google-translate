@@ -6,7 +6,7 @@
 ;; Author: Oleksandr Manzyuk <manzyuk@gmail.com>
 ;; Maintainer: Andrey Tykhonov <atykhonov@gmail.com>
 ;; URL: https://github.com/atykhonov/google-translate
-;; Version: 0.10.5
+;; Version: 0.10.6
 ;; Keywords: convenience
 
 ;; Contributors:
@@ -194,10 +194,10 @@ becomes the default target language and vice versa."
          (source-language (car langs))
          (target-language (cadr langs)))
     (google-translate-translate source-language target-language
-     (read-from-minibuffer
-      (format "Translate from %s to %s: "
-              (google-translate-language-display-name source-language)
-              (google-translate-language-display-name target-language))))))
+                                (read-from-minibuffer
+                                 (format "Translate from %s to %s: "
+                                         (google-translate-language-display-name source-language)
+                                         (google-translate-language-display-name target-language))))))
 
 ;;;###autoload
 (defun google-translate-query-translate (&optional override-p)
