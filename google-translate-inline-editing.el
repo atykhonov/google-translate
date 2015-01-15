@@ -2,7 +2,7 @@
                                                     target-language
                                                     point-pos-delta)
   (interactive)
-  (let* ((buffer-name "*Google Translate*")
+  (let* ((buffer-name google-translate-buffer-name)
          (buffer (get-buffer buffer-name))
          (start (next-single-property-change (point-min) 'read-only))
          (end (next-single-property-change start 'read-only))
@@ -21,7 +21,7 @@
 
 (defun google-translate-inline-translate-reversed ()
   (interactive)
-  (let* ((buffer-name "*Google Translate*")
+  (let* ((buffer-name google-translate-buffer-name)
          (buffer (get-buffer buffer-name))
          (source-language (buffer-local-value 'gt-source-language buffer))
          (target-language (buffer-local-value 'gt-target-language buffer)))

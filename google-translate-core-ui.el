@@ -204,6 +204,9 @@ query parameter in HTTP requests.")
 (defvar google-translate-translation-listening-debug nil
   "For debug translation listening purposes.")
 
+(defvar google-translate-buffer-name "*Google Translate*"
+  "Name of buffer into which outputs translations.")
+
 (defstruct gtos
   "google translate output structure contains miscellaneous
   information which intended to be outputed to the buffer, echo
@@ -549,7 +552,7 @@ http://www.gnu.org/software/emacs/manual/html_node/elisp/The-Echo-Area.html)"
 
 (defun google-translate-buffer-output-translation (gtos)
   "Output translation to the temp buffer."
-  (let ((buffer-name "*Google Translate*"))
+  (let ((buffer-name google-translate-buffer-name))
     (if google-translate-inline-editing
         (progn
           (with-current-buffer (get-buffer-create buffer-name)
