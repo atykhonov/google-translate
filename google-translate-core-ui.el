@@ -127,6 +127,7 @@
 
 (require 'cl)
 (require 'google-translate-core)
+(require 'google-translate-inline-editing)
 (require 'ido)
 
 
@@ -374,8 +375,8 @@ source and target languages."
       "")))
 
 (defun google-translate--detailed-translation (detailed-translation translation
-                                                                           format1
-                                                                           format2)
+                                                                    format1
+                                                                    format2)
   "Return detailed translation."
   (with-temp-buffer
     (loop for item across detailed-translation do
@@ -551,14 +552,17 @@ http://www.gnu.org/software/emacs/manual/html_node/elisp/The-Echo-Area.html)"
   (let ((buffer-name "*Google Translate*"))
     (if google-translate-inline-editing
         (progn
-          (when (bufferp (get-buffer buffer-name))
-            (kill-buffer buffer-name))
           (with-current-buffer (get-buffer-create buffer-name)
-            (read-only-mode -1)
-            (erase-buffer)
-            (google-translate-buffer-insert-translation gtos)
-            ;; (google-translate-inline-editing-mode)
-            (goto-char (point-min)))
+            (let ((inhibit-read-only t))
+              (erase-buffer)
+              (set-text-properties (point-min) (point-max) nil)
+              (google-translate-buffer-insert-translation gtos)
+              (google-translate-inline-editing-mode)
+              (make-local-variable 'gt-source-language)
+              (make-local-variable 'gt-target-language)
+              (setq gt-source-language (gtos-source-language gtos))
+              (setq gt-target-language (gtos-target-language gtos))
+              (goto-char (point-min))))
           (pop-to-buffer buffer-name))
       (with-output-to-temp-buffer buffer-name
         (set-buffer buffer-name)
@@ -577,11 +581,6 @@ http://www.gnu.org/software/emacs/manual/html_node/elisp/The-Echo-Area.html)"
     (put-text-property (point-min) (- (point) 1) 'read-only t)
     (insert
      (google-translate--translating-text gtos "%s"))
-    ;; (widget-create 'editable-field
-    ;;                :size 13
-    ;;                :format "Name: %v "    ; Text after the field!
-    ;;                (google-translate--translating-text gtos "%s"))
-    ;; (insert "xwidgetdemo<<< a button. another button\n") (goto-char (point-min)) (put-text-property (point) (+ 1 (point)) 'display '(xwidget :xwidget-id 1 :type 'webkit-osr :title "1" :width 40 :height 50))
     (setq read-only-point (point))
     (when (null google-translate-listen-program)
       (insert "\n"))
