@@ -439,20 +439,20 @@ source and target languages."
                                                                     format2)
   "Return detailed definition."
   (with-temp-buffer
+    (let ((section "DEFINITION"))
+      (put-text-property 0 (length section)
+			 'font-lock-face
+			 'google-translate-translation-face
+			 section)
+      (insert (format "\n%s\n" section)))
     (loop for item across detailed-definition do
           (let ((index 0)
-                (section "DEFINITION")
                 (label (aref item 0)))
             (unless (string-equal label "")
-              (put-text-property 0 (length section)
-                                 'font-lock-face
-                                 'google-translate-translation-face
-                                 section)
               (put-text-property 0 (length label)
                                  'font-lock-face
                                  'google-translate-translation-face
                                  label)
-              (insert (format "\n%s\n" section))
               (insert (format format1 label))
               (loop for definition across (aref item 1) do
                     (insert (format format2
