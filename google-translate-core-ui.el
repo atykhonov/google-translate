@@ -325,8 +325,11 @@ t then text will be editable."
         (insert (format output-format text))
         (facemenu-set-face face beg (point))
         (if read-write
-            (put-text-property beg (point) 'read-only nil)
-          (put-text-property beg (point) 'read-only t))
+            (progn
+              (put-text-property beg (point) 'read-only nil))
+          (progn
+            (put-text-property beg (point) 'keymap google-translate-inline-editing-text-mode-map)
+            (put-text-property beg (point) 'read-only t)))
         (buffer-substring (point-min) (point-max))))))
 
 (defun google-translate--translation-title (gtos format)
@@ -582,6 +585,8 @@ http://www.gnu.org/software/emacs/manual/html_node/elisp/The-Echo-Area.html)"
      "\n")
     (put-text-property 1 2 'front-sticky '(read-only))
     (put-text-property (point-min) (- (point) 1) 'read-only t)
+    (put-text-property (point-min) (- (point) 1)
+                       'keymap google-translate-inline-editing-text-mode-map)
     (insert
      (google-translate--translating-text gtos "%s"))
     (setq read-only-point (point))
@@ -599,7 +604,9 @@ http://www.gnu.org/software/emacs/manual/html_node/elisp/The-Echo-Area.html)"
           detailed-translation translation
           "\n%s\n" "%2d. %s\n")
        (google-translate--suggestion gtos)))
-    (put-text-property read-only-point (point-max) 'read-only t)))
+    (put-text-property read-only-point (point-max) 'read-only t)
+    (put-text-property (+ read-only-point 1) (point-max)
+                       'keymap google-translate-inline-editing-text-mode-map)))
 
 (defun google-translate-read-source-language (&optional prompt)
   "Read a source language, with completion, and return its abbreviation.

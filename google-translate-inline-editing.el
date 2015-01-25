@@ -19,6 +19,16 @@
       (google-translate-translate source-language target-language text)
       (goto-char point-pos))))
 
+(defvar google-translate-inline-editing-text-mode-map
+  (let ((map (make-sparse-keymap)))
+    (suppress-keymap map)
+    (define-key map (kbd "q") 'google-translate-kill-window)
+    map))
+
+(defun google-translate-kill-window ()
+  (interactive)
+  (kill-buffer-and-window))
+
 (defun google-translate-inline-translate-reversed ()
   (interactive)
   (let* ((buffer-name google-translate-buffer-name)
@@ -40,10 +50,14 @@
 provide key bindings for easier editing of translated text in the regular buffer."
   :group 'google-translate)
 
-(define-key google-translate-inline-editing-mode-map (kbd "C-c C-c") 'google-translate-inline-translate)
-(define-key google-translate-inline-editing-mode-map (kbd "C-c C-r") 'google-translate-inline-translate-reversed)
-(define-key google-translate-inline-editing-mode-map (kbd "C-c C-s") 'google-translate-inline-change-source-language)
-(define-key google-translate-inline-editing-mode-map (kbd "C-c C-t") 'google-translate-inline-change-target-language)
+(define-key google-translate-inline-editing-mode-map
+  (kbd "C-c C-c") 'google-translate-inline-translate)
+(define-key google-translate-inline-editing-mode-map
+  (kbd "C-c C-r") 'google-translate-inline-translate-reversed)
+(define-key google-translate-inline-editing-mode-map
+  (kbd "C-c C-s") 'google-translate-inline-change-source-language)
+(define-key google-translate-inline-editing-mode-map
+  (kbd "C-c C-t") 'google-translate-inline-change-target-language)
 (define-key google-translate-inline-editing-mode-map [?\t] 'forward-button)
 
 
