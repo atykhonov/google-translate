@@ -380,7 +380,7 @@ one respectively."
         (if (use-region-p)
             (google-translate--strip-string
              (buffer-substring-no-properties (region-beginning) (region-end)))
-          (current-word t)))
+          (current-word t t)))
 
   (setq google-translate-current-translation-direction 0)
 
