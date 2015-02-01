@@ -66,3 +66,39 @@ Feature: Smooth UI for Google Translate
     And I press "TAB"
     And I press "RET"
     Then I should see translation "предлагать"
+
+  Scenario: Translate a word emphasized with asterisks like *bold* such as in Org mode
+    Given I insert "You can make words *bold*, /italic/, _underlined_, =verbatim= and ~code~, and, if you must, ‘+strike-through+’."
+    And I go to word "bold"
+    When I translate word at point from "en" to "ru"
+    Then I should see translation "жирный"
+
+  Scenario: Translate a word emphasized with slashes like /italic/ such as in Org mode
+    Given I insert "You can make words *bold*, /italic/, _underlined_, =verbatim= and ~code~, and, if you must, ‘+strike-through+’."
+    And I go to word "italic"
+    When I translate word at point from "en" to "ru"
+    Then I should see translation "курсив"
+
+  Scenario: Translate a word emphasized with underscores like _underlined_ such as in Org mode
+    Given I insert "You can make words *bold*, /italic/, _underlined_, =verbatim= and ~code~, and, if you must, ‘+strike-through+’."
+    And I go to word "underlined"
+    When I translate word at point from "en" to "ru"
+    Then I should see translation "подчеркнутый"
+
+  Scenario: Translate a word emphasized with equals signs like =verbatim= such as in Org mode
+    Given I insert "You can make words *bold*, /italic/, _underlined_, =verbatim= and ~code~, and, if you must, ‘+strike-through+’."
+    And I go to word "verbatim"
+    When I translate word at point from "en" to "ru"
+    Then I should see translation "дословно"
+
+  Scenario: Translate a word emphasized with tildes like ~code~ such as in Org mode
+    Given I insert "You can make words *bold*, /italic/, _underlined_, =verbatim= and ~code~, and, if you must, ‘+strike-through+’."
+    And I go to word "code"
+    When I translate word at point from "en" to "ru"
+    Then I should see translation "код"
+
+  Scenario: Translate a word emphasized with pluses like ‘+strike-through+’ such as in Org mode
+    Given I insert "You can make words *bold*, /italic/, _underlined_, =verbatim= and ~code~, and, if you must, ‘+strike-through+’."
+    And I go to word "strike"
+    When I translate word at point from "en" to "ru"
+    Then I should see translation "забастовка"
