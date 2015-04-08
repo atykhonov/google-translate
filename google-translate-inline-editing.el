@@ -1,3 +1,15 @@
+(defvar google-translate-inline-text-keymap
+  (let ((map (make-sparse-keymap)))
+    (suppress-keymap map)
+    (define-key map (kbd "q") 'quit-window)
+    (define-key map (kbd "r") 'google-translate-inline-translate-reversed)
+    (define-key map (kbd "t") 'google-translate-inline-change-target-language)
+    (define-key map (kbd "s") 'google-translate-inline-change-source-language)
+    (define-key map (kbd "e") 'google-translate-inline-goto-text)
+    (define-key map (kbd "TAB") 'forward-button)
+    map)
+  "Keymap to apply to the text as a property.")
+
 (defun google-translate-inline-translate (&optional source-language
                                                     target-language
                                                     point-pos-delta)
@@ -6,7 +18,7 @@
          (buffer (get-buffer buffer-name))
          (start (next-single-property-change (point-min) 'read-only))
          (end (next-single-property-change start 'read-only))
-         (text (buffer-substring-no-properties (+ start 1) end))
+         (text (buffer-substring-no-properties (+ start 1) (- end 1)))
          (source-language (if (null source-language)
                               (buffer-local-value 'gt-source-language buffer)
                             source-language))
@@ -18,12 +30,6 @@
       (setq point-pos (point))
       (google-translate-translate source-language target-language text)
       (goto-char point-pos))))
-
-(defvar google-translate-inline-editing-text-mode-map
-  (let ((map (make-sparse-keymap)))
-    (suppress-keymap map)
-    (define-key map (kbd "q") 'google-translate-kill-window)
-    map))
 
 (defun google-translate-kill-window ()
   (interactive)
@@ -45,7 +51,12 @@
   (interactive)
   (google-translate-inline-translate nil (google-translate-read-target-language)))
 
-(define-derived-mode google-translate-inline-editing-mode fundamental-mode "GTInlineEditing"
+(defun google-translate-inline-goto-text ()
+  (interactive)
+  (goto-char (point-min))
+  (forward-line 2))
+
+(define-derived-mode google-translate-inline-editing-mode google-translate-mode "GTIE"
   "Google Translate Inline Editing major mode. This major mode is mainly intended to
 provide key bindings for easier editing of translated text in the regular buffer."
   :group 'google-translate)
@@ -58,7 +69,6 @@ provide key bindings for easier editing of translated text in the regular buffer
   (kbd "C-c C-s") 'google-translate-inline-change-source-language)
 (define-key google-translate-inline-editing-mode-map
   (kbd "C-c C-t") 'google-translate-inline-change-target-language)
-(define-key google-translate-inline-editing-mode-map [?\t] 'forward-button)
 
 
 (provide 'google-translate-inline-editing)

@@ -207,6 +207,14 @@ query parameter in HTTP requests.")
 (defvar google-translate-buffer-name "*Google Translate*"
   "Name of buffer into which outputs translations.")
 
+(defvar google-translate-text-keymap
+  (let ((map (make-sparse-keymap)))
+    (suppress-keymap map)
+    (define-key map (kbd "q") 'quit-window)
+    (define-key map (kbd "TAB") 'forward-button)
+    map)
+  "Keymap to apply to the text as a property.")
+
 (defstruct gtos
   "google translate output structure contains miscellaneous
   information which intended to be outputed to the buffer, echo
@@ -312,7 +320,7 @@ abbreviation is ABBREVIATION."
       "unspecified language"
     (car (rassoc abbreviation google-translate-supported-languages-alist))))
 
-(defun google-translate-paragraph (text face &optional output-format read-write)
+(defun google-translate-paragraph (text face &optional output-format)
   "Return TEXT as a filled paragraph into the current buffer and
 apply FACE to it. Optionally use OUTPUT-FORMAT. If READ-WRITE is
 t then text will be editable."
@@ -324,12 +332,6 @@ t then text will be editable."
       (let ((beg (point)))
         (insert (format output-format text))
         (facemenu-set-face face beg (point))
-        (if read-write
-            (progn
-              (put-text-property beg (point) 'read-only nil))
-          (progn
-            (put-text-property beg (point) 'keymap google-translate-inline-editing-text-mode-map)
-            (put-text-property beg (point) 'read-only t)))
         (buffer-substring (point-min) (point-max))))))
 
 (defun google-translate--translation-title (gtos format)
@@ -407,10 +409,16 @@ source and target languages."
             (facemenu-set-face 'google-translate-suggestion-label-face
                                beg (point)))
           (goto-char (+ (point) 1))
-          (let ((beg (point)))
+          (let ((beg (point))
+                (map (make-sparse-keymap)))
+            (define-key map (kbd "<RET>") 'google-translate--suggestion)
+            (define-key map (kbd "C-t") 'google-translate--suggestion)
+            ;; (insert suggestion)
+            ;; (put-text-property beg (point) 'keymap map)
             (insert-text-button suggestion
                                 'action 'google-translate--suggestion-action
                                 'follow-link t
+                                'keymap map
                                 'suggestion suggestion
                                 'source-language source-language
                                 'target-language target-language)
@@ -438,7 +446,7 @@ clicked."
       (google-translate-paragraph
        text
        'google-translate-text-face
-       output-format t))))
+       output-format))))
 
 (defun google-translate--listen-button (gtos)
   "Return listen button."
@@ -553,43 +561,16 @@ http://www.gnu.org/software/emacs/manual/html_node/elisp/The-Echo-Area.html)"
           "\n* %s " "%d. %s ")
        (google-translate--suggestion gtos)))))
 
-(defun google-translate-buffer-output-translation (gtos)
-  "Output translation to the temp buffer."
-  (let ((buffer-name google-translate-buffer-name))
-    (if google-translate-inline-editing
-        (progn
-          (with-current-buffer (get-buffer-create buffer-name)
-            (let ((inhibit-read-only t))
-              (erase-buffer)
-              (set-text-properties (point-min) (point-max) nil)
-              (google-translate-buffer-insert-translation gtos)
-              (google-translate-inline-editing-mode)
-              (make-local-variable 'gt-source-language)
-              (make-local-variable 'gt-target-language)
-              (setq gt-source-language (gtos-source-language gtos))
-              (setq gt-target-language (gtos-target-language gtos))
-              (goto-char (point-min))))
-          (pop-to-buffer buffer-name))
-      (with-output-to-temp-buffer buffer-name
-        (set-buffer buffer-name)
-        (google-translate-buffer-insert-translation gtos)))))
-
 (defun google-translate-buffer-insert-translation (gtos)
   "Insert translation to the current temp buffer."
   (let ((translation (gtos-translation gtos))
         (detailed-translation (gtos-detailed-translation gtos))
-        (inhibit-read-only t)
-        (read-only-point nil))
+        (inhibit-read-only t))
     (insert
      (google-translate--translation-title gtos "Translate from %s to %s:\n")
      "\n")
-    (put-text-property 1 2 'front-sticky '(read-only))
-    (put-text-property (point-min) (- (point) 1) 'read-only t)
-    (put-text-property (point-min) (- (point) 1)
-                       'keymap google-translate-inline-editing-text-mode-map)
     (insert
      (google-translate--translating-text gtos "%s"))
-    (setq read-only-point (point))
     (when (null google-translate-listen-program)
       (insert "\n"))
     (insert
@@ -603,10 +584,46 @@ http://www.gnu.org/software/emacs/manual/html_node/elisp/The-Echo-Area.html)"
          (google-translate--detailed-translation
           detailed-translation translation
           "\n%s\n" "%2d. %s\n")
-       (google-translate--suggestion gtos)))
-    (put-text-property read-only-point (point-max) 'read-only t)
-    (put-text-property (+ read-only-point 1) (point-max)
-                       'keymap google-translate-inline-editing-text-mode-map)))
+       (google-translate--suggestion gtos)))))
+
+(defun google-translate-buffer-output-translation (gtos)
+  "Output translation to the temp buffer."
+  (let ((buffer-name google-translate-buffer-name))
+    (progn
+      (with-current-buffer (get-buffer-create buffer-name)
+        (let ((inhibit-read-only t)
+              (tr-text-pos1 nil)
+              (tr-text-pos2 nil))  ;; translating text positions
+          (erase-buffer)
+          (set-text-properties (point-min) (point-max) nil)
+          (google-translate-buffer-insert-translation gtos)
+
+          (put-text-property 1 2 'front-sticky '(read-only))
+          (put-text-property (point-min) (point-max) 'read-only t)
+          
+          (if google-translate-inline-editing
+              (progn
+                (put-text-property (point-min) (point-max)
+                                   'keymap google-translate-inline-text-keymap)
+                (google-translate-inline-editing-mode)
+                (goto-char (point-min))
+                (forward-line 2)
+                (setq tr-text-pos1 (- (point) 1))
+                (goto-char (line-end-position))
+                (setq tr-text-pos2 (+ (point) 1))
+                (put-text-property tr-text-pos1 tr-text-pos2 'read-only nil)
+                (put-text-property tr-text-pos1 tr-text-pos2 'keymap nil))
+            (progn
+              (put-text-property (point-min) (point-max)
+                                 'keymap google-translate-text-keymap)
+              (google-translate-mode)))
+          
+          (make-local-variable 'gt-source-language)
+          (make-local-variable 'gt-target-language)
+          (setq gt-source-language (gtos-source-language gtos))
+          (setq gt-target-language (gtos-target-language gtos))
+          (goto-char (point-min))))
+      (pop-to-buffer buffer-name))))
 
 (defun google-translate-read-source-language (&optional prompt)
   "Read a source language, with completion, and return its abbreviation.
@@ -650,6 +667,11 @@ ido-style completion."
                #'ido-completing-read
              #'completing-read)
            prompt choices nil t nil nil def))
+
+(define-derived-mode google-translate-mode fundamental-mode "GT"
+  "Google Translate major mode. This major mode is mainly
+intended to extend fundamental-mode."
+  :group 'google-translate)
 
 
 (provide 'google-translate-core-ui)
