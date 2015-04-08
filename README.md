@@ -301,7 +301,7 @@ like so:
 
 ## Contributors
 
-Tassilo Horn
-Bernard Hurley
-Chris Bilson
-[Takumi Kinjo](https://github.com/kinjo)
+- Tassilo Horn
+- Bernard Hurley
+- Chris Bilson
+- [Takumi Kinjo](https://github.com/kinjo)
