@@ -298,3 +298,10 @@ like so:
 ```
   (set-face-attribute 'google-translate-translation-face nil :height 1.4)
 ```
+
+## Contributors
+
+- Tassilo Horn
+- Bernard Hurley
+- Chris Bilson
+- [Takumi Kinjo](https://github.com/kinjo)

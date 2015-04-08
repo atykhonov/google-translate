@@ -6,13 +6,14 @@
 ;; Author: Oleksandr Manzyuk <manzyuk@gmail.com>
 ;; Maintainer: Andrey Tykhonov <atykhonov@gmail.com>
 ;; URL: https://github.com/atykhonov/google-translate
-;; Version: 0.10.6
+;; Version: 0.11.0
 ;; Keywords: convenience
 
 ;; Contributors:
 ;;   Tassilo Horn <tsdh@gnu.org>
 ;;   Bernard Hurley <bernard@marcade.biz>
 ;;   Chris Bilson <cbilson@pobox.com>
+;;   Takumi Kinjo <takumi.kinjo@gmail.com>
 
 ;; This file is NOT part of GNU Emacs.
 
@@ -250,7 +251,7 @@ in the reverse direction."
      source-language target-language
      (if (use-region-p)
          (buffer-substring-no-properties (region-beginning) (region-end))
-       (or (current-word t t)
+       (or (thing-at-point 'word)
            (error "No word at point."))))))
 
 ;;;###autoload
