@@ -12,6 +12,7 @@
 ;;   Tassilo Horn <tsdh@gnu.org>
 ;;   Bernard Hurley <bernard@marcade.biz>
 ;;   Chris Bilson <cbilson@pobox.com>
+;;   Takumi Kinjo <takumi.kinjo@gmail.com>
 
 ;; This file is NOT part of GNU Emacs.
 
