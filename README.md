@@ -9,7 +9,7 @@ service directly from GNU Emacs.
 
 ## Installation
 
-#### From MELPA or Marmalade
+#### From MELPA
 
 Just run `M-x package-install RET google-translate RET`
 
