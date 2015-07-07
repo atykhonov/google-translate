@@ -35,7 +35,7 @@ Feature: Default UI for Google Translate
     And I go to word "but"
     And I translate selected region from "en" to "ru"
     Then there is no region selected
-    Then I should see translation "Это не только успешно пережил пять веков"
+    Then I should see translation "Он пережил не только пять веков"
 
   Scenario: Translate a word at point using default source language
     Given I set google-translate-default-source-language to "en"
@@ -127,7 +127,7 @@ Feature: Default UI for Google Translate
     Given I insert "You can make words *bold*, /italic/, _underlined_, =verbatim= and ~code~, and, if you must, ‘+strike-through+’."
     And I go to word "bold"
     When I translate word at point from "en" to "ru"
-    Then I should see translation "жирный"
+    Then I should see translation "смелый"
 
   Scenario: Translate a word emphasized with slashes like /italic/ such as in Org mode
     Given I insert "You can make words *bold*, /italic/, _underlined_, =verbatim= and ~code~, and, if you must, ‘+strike-through+’."

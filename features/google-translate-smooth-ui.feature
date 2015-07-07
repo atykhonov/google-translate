@@ -51,7 +51,7 @@ Feature: Smooth UI for Google Translate
     And I go to word "but"
     And I translate ""
     Then there is no region selected
-    Then I should see translation "Это не только успешно пережил пять веков"    
+    Then I should see translation "Он пережил не только пять веков"    
 
   Scenario: Suggestion when word is misspelled
     Given I set google-translate-translation-directions-alist to (("en" . "ru"))
@@ -71,7 +71,7 @@ Feature: Smooth UI for Google Translate
     Given I insert "You can make words *bold*, /italic/, _underlined_, =verbatim= and ~code~, and, if you must, ‘+strike-through+’."
     And I go to word "bold"
     When I translate word at point from "en" to "ru"
-    Then I should see translation "жирный"
+    Then I should see translation "смелый"
 
   Scenario: Translate a word emphasized with slashes like /italic/ such as in Org mode
     Given I insert "You can make words *bold*, /italic/, _underlined_, =verbatim= and ~code~, and, if you must, ‘+strike-through+’."
