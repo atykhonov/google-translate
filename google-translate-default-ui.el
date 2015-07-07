@@ -246,12 +246,14 @@ in the reverse direction."
 (defun %google-translate-at-point (override-p reverse-p)
   (let* ((langs (google-translate-read-args override-p reverse-p))
          (source-language (car langs))
-         (target-language (cadr langs)))
+         (target-language (cadr langs))
+         (bounds nil))
     (google-translate-translate
      source-language target-language
      (if (use-region-p)
          (buffer-substring-no-properties (region-beginning) (region-end))
-       (or (thing-at-point 'word)
+       (or (and (setq bounds (bounds-of-thing-at-point 'word))
+                (buffer-substring-no-properties (car bounds) (cdr bounds)))
            (error "No word at point."))))))
 
 ;;;###autoload
