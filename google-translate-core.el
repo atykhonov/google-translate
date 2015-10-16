@@ -199,7 +199,8 @@ translate TEXT from SOURCE-LANGUAGE to TARGET-LANGUAGE."
       ("otf"    . "1")
       ("srcrom" . "1")
       ("ssel"   . "0")
-      ("tsel"   . "0")))
+      ("tsel"   . "0")
+      ("tk"     . "160396|290233")))
    for-test-purposes))
 
 (defun google-translate-json-text-phonetic (json)
