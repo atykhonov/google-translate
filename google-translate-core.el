@@ -5,7 +5,7 @@
 ;; Author: Oleksandr Manzyuk <manzyuk@gmail.com>
 ;; Maintainer: Andrey Tykhonov <atykhonov@gmail.com>
 ;; URL: https://github.com/atykhonov/google-translate
-;; Version: 0.11.2
+;; Version: 0.11.3
 ;; Keywords: convenience
 
 ;; Contributors:
@@ -171,9 +171,28 @@ response in json format."
        (google-translate--insert-nulls
         (google-translate--request source-language target-language text))))))
 
-(defun google-translate--request (source-language 
-                                  target-language 
-                                  text 
+(defun google-translate--gen-rl (a b)
+  (cl-loop for c from 0 below (- (length b) 2) by 3
+           for d = (aref b (+ c 2)) do
+           (setq d (if (>= d ?a) (- d 87) (- d ?0)))
+           (setq d (if (= (aref b (1+ c)) ?+) (lsh a (- d)) (lsh a d)))
+           (setq a (if (= (aref b c) ?+) (logand (+ a d) 4294967295) (logxor a d))))
+  a)
+
+(defun google-translate--gen-tk (text)
+  (let* ((b (floor (/ (time-to-seconds) 3600)))
+         (ub "+-3^+b+-f")
+         (vb "+-a^+6")
+         (a (cl-reduce (lambda (a e) (google-translate--gen-rl (+ a e) vb))
+                       (encode-coding-string text 'utf-8) :initial-value b)))
+    (setq a (google-translate--gen-rl a ub))
+    (when (< a 0) (setq a (+ (logand a 2147483647) 2147483648)))
+    (setq a (% a (floor 1e6)))
+    (format "%s.%s" a (logxor a b))))
+
+(defun google-translate--request (source-language
+                                  target-language
+                                  text
                                   &optional for-test-purposes)
   "Send to the Google Translate http request which consigned to
 translate TEXT from SOURCE-LANGUAGE to TARGET-LANGUAGE."
@@ -200,7 +219,7 @@ translate TEXT from SOURCE-LANGUAGE to TARGET-LANGUAGE."
       ("srcrom" . "1")
       ("ssel"   . "0")
       ("tsel"   . "0")
-      ("tk"     . "160396|290233")))
+      ("tk"     . ,(google-translate--gen-tk text))))
    for-test-purposes))
 
 (defun google-translate-json-text-phonetic (json)
