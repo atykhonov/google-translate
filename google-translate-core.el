@@ -108,6 +108,7 @@ QUERY-PARAMS must be an alist of field-value pairs."
   (google-translate--format-listen-url `(("ie"      . "UTF-8")
                                          ("q"       . ,text)
                                          ("tl"      . ,language)
+                                         ("tk"      . ,(google-translate--gen-tk text))
                                          ("total"   . "1")
                                          ("idx"     . "0")
                                          ("textlen" . ,(number-to-string (length text)))
