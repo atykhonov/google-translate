@@ -5,7 +5,7 @@
 ;; Author: Oleksandr Manzyuk <manzyuk@gmail.com>
 ;; Maintainer: Andrey Tykhonov <atykhonov@gmail.com>
 ;; URL: https://github.com/atykhonov/google-translate
-;; Version: 0.11.4
+;; Version: 0.11.5
 ;; Keywords: convenience
 
 ;; Contributors:
@@ -113,7 +113,8 @@ QUERY-PARAMS must be an alist of field-value pairs."
                                          ("idx"     . "0")
                                          ("textlen" . ,(number-to-string (length text)))
                                          ("client"  . "t")
-                                         ("prev"    . "input"))))
+                                         ("prev"    . "input")
+                                         ("tk"      . ,(google-translate--gen-tk text)))))
 
 (defun google-translate--http-response-body (url &optional for-test-purposes)
   "Retrieve URL and return the response body as a string."
