@@ -62,7 +62,7 @@
     (let ((v (make-vector google-translate--bit-v-len 0)))
       (cl-loop for i downfrom (1- google-translate--bit-v-len) to 0
                with q
-               when (< n 1) return nil do               
+               when (< n 1) return nil do
                (setq q (ffloor (* n 0.5)))
                (aset v i (floor (- n (* 2.0 q))))
                (setq n q))
@@ -102,18 +102,16 @@ Shift the bits in N to the left or rihgt D places.
 D is an integer."
   (let ((v (google-translate--number-to-bit-v n))
         (v-result (make-vector google-translate--bit-v-len 0)))
-    (cond
-     ((zerop d) n)
-     ((< d 0) ;; Shift Right Logical
-      ;; [x0 x1 ... xn-d ... xn] => [0 ... 0 x0 x1 ... xn-d]
-      (cl-loop for i from (abs d) below google-translate--bit-v-len
-               for j from 0 do
-               (aset v-result i (aref v j))))
-     (t ;; Shift Left Logical
+    (if (< d 0) ;; Shift Right Logical
+        ;; [x0 x1 ... xn-d ... xn] => [0 ... 0 x0 x1 ... xn-d]
+        (cl-loop for i from (abs d) below google-translate--bit-v-len
+                 for j from 0 do
+                 (aset v-result i (aref v j)))
+      ;; Shift Left Logical
       ;; [x0 x1 ... xd ... xn] => [xd ... xn 0 ... 0]
       (cl-loop for i from d below google-translate--bit-v-len
                for j from 0 do
-               (aset v-result j (aref v i)))))
+               (aset v-result j (aref v i))))
     (google-translate--bit-v-to-number v-result)))
 
 (defun google-translate--gen-rl (a b)
