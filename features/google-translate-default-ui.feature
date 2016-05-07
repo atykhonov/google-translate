@@ -139,7 +139,7 @@ Feature: Default UI for Google Translate
     Given I insert "You can make words *bold*, /italic/, _underlined_, =verbatim= and ~code~, and, if you must, ‘+strike-through+’."
     And I go to word "underlined"
     When I translate word at point from "en" to "ru"
-    Then I should see translation "подчеркнул"
+    Then I should see translation "подчеркнутый"
 
   Scenario: Translate a word emphasized with equals signs like =verbatim= such as in Org mode
     Given I insert "You can make words *bold*, /italic/, _underlined_, =verbatim= and ~code~, and, if you must, ‘+strike-through+’."
