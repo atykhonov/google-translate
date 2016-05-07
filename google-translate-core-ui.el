@@ -5,7 +5,7 @@
 ;; Author: Oleksandr Manzyuk <manzyuk@gmail.com>
 ;; Maintainer: Andrey Tykhonov <atykhonov@gmail.com>
 ;; URL: https://github.com/atykhonov/google-translate
-;; Version: 0.11.5
+;; Version: 0.11.7
 ;; Keywords: convenience
 
 ;; Contributors:
@@ -651,7 +651,7 @@ http://www.gnu.org/software/emacs/manual/html_node/elisp/The-Echo-Area.html)"
 (defun google-translate-help-buffer-output-translation (gtos)
   "Output translation to the help buffer."
   (and google-translate-pop-up-buffer-set-focus
-      (select-window (display-buffer "*Help*")))
+       (select-window (display-buffer "*Help*")))
   (google-translate-buffer-insert-translation gtos))
 
 (defun google-translate-buffer-insert-translation (gtos)
