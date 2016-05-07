@@ -5,7 +5,7 @@
 ;; Author: Oleksandr Manzyuk <manzyuk@gmail.com>
 ;; Maintainer: Andrey Tykhonov <atykhonov@gmail.com>
 ;; URL: https://github.com/atykhonov/google-translate
-;; Version: 0.11.5
+;; Version: 0.11.7
 ;; Keywords: convenience
 
 ;; Contributors:
@@ -502,22 +502,20 @@ clicked."
                                 target-language
                                 suggestion)))
 
-(defun google-translate--listen-button (gtos)
+(defun google-translate--listen-button (language text)
   "Return listen button."
-  (let ((language (gtos-source-language gtos))
-        (text (gtos-text gtos)))
-    (with-temp-buffer
-      (insert " ")
-      (let ((beg (point)))
-        (insert-text-button "[Listen]"
-                            'action 'google-translate--listen-action
-                            'follow-link t
-                            'text text
-                            'language language)
-        (facemenu-set-face 'google-translate-listen-button-face
-                           beg (point))
-        (insert "\n"))
-      (buffer-substring (point-min) (point-max)))))
+  (with-temp-buffer
+    (insert " ")
+    (let ((beg (point)))
+      (insert-text-button "[Listen]"
+                          'action 'google-translate--listen-action
+                          'follow-link t
+                          'text text
+                          'language language)
+      (facemenu-set-face 'google-translate-listen-button-face
+                         beg (point))
+      (insert "\n"))
+    (buffer-substring (point-min) (point-max))))
 
 (defun google-translate--listen-action (button)
   "Do translation listening."
@@ -653,14 +651,17 @@ http://www.gnu.org/software/emacs/manual/html_node/elisp/The-Echo-Area.html)"
 (defun google-translate-help-buffer-output-translation (gtos)
   "Output translation to the help buffer."
   (and google-translate-pop-up-buffer-set-focus
-      (select-window (display-buffer "*Help*")))
+       (select-window (display-buffer "*Help*")))
   (google-translate-buffer-insert-translation gtos))
 
 (defun google-translate-buffer-insert-translation (gtos)
   "Insert translation to the current temp buffer."
   (let ((translation (gtos-translation gtos))
         (detailed-translation (gtos-detailed-translation gtos))
-        (detailed-definition (gtos-detailed-definition gtos)))
+        (detailed-definition (gtos-detailed-definition gtos))
+        (source-language (gtos-source-language gtos))
+        (target-language (gtos-target-language gtos))
+        (text (gtos-text gtos)))
     (insert
      (google-translate--translation-title gtos "Translate from %s to %s:\n")
      "\n"
@@ -670,10 +671,16 @@ http://www.gnu.org/software/emacs/manual/html_node/elisp/The-Echo-Area.html)"
           "%s\n"
         "%s"))
      (if google-translate-listen-program
-         (google-translate--listen-button gtos) "")
+         (google-translate--listen-button source-language text) "")
      (google-translate--text-phonetic gtos "\n%s\n")
      "\n"
-     (google-translate--translated-text gtos "%s\n")
+     (google-translate--translated-text
+      gtos
+      (if (null google-translate-listen-program)
+          "%s\n"
+        "%s"))
+     (if google-translate-listen-program
+         (google-translate--listen-button target-language translation) "")
      (google-translate--translation-phonetic gtos "\n%s\n")
      (if detailed-translation
          (google-translate--detailed-translation
