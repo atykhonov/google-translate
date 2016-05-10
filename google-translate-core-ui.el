@@ -13,6 +13,7 @@
 ;;   Bernard Hurley <bernard@marcade.biz>
 ;;   Chris Bilson <cbilson@pobox.com>
 ;;   Takumi Kinjo <takumi.kinjo@gmail.com>
+;;   momomo5717 <momomo5717@google.com>
 
 ;; This file is NOT part of GNU Emacs.
 
@@ -382,7 +383,7 @@ source and target languages."
 `google-translate-show-phonetic' is set to t."
   (let ((text-phonetic (gtos-text-phonetic gtos)))
     (if (and google-translate-show-phonetic
-               (not (string-equal text-phonetic "")))
+             (not (string-equal text-phonetic "")))
         (google-translate-paragraph
          text-phonetic
          'google-translate-phonetic-face
@@ -402,7 +403,7 @@ source and target languages."
 `google-translate-show-phonetic' is set to t."
   (let ((translation-phonetic (gtos-translation-phonetic gtos)))
     (if (and google-translate-show-phonetic
-               (not (string-equal translation-phonetic "")))
+             (not (string-equal translation-phonetic "")))
         (google-translate-paragraph
          translation-phonetic
          'google-translate-phonetic-face
@@ -410,8 +411,8 @@ source and target languages."
       "")))
 
 (defun google-translate--detailed-translation (detailed-translation translation
-                                                                           format1
-                                                                           format2)
+                                                                    format1
+                                                                    format2)
   "Return detailed translation."
   (with-temp-buffer
     (loop for item across detailed-translation do
@@ -436,8 +437,8 @@ source and target languages."
     (buffer-substring (point-min) (point-max))))
 
 (defun google-translate--detailed-definition (detailed-definition definition
-                                                                    format1
-                                                                    format2)
+                                                                  format1
+                                                                  format2)
   "Return detailed definition."
   (with-temp-buffer
     (let ((section "DEFINITION"))
