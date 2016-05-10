@@ -153,7 +153,6 @@ the list of available languages."
                            google-translate-supported-languages-alist)
                  (other :tag "Always ask" nil)))
 
-
 (defun google-translate-read-args (override-p reverse-p)
   "Query and return the language arguments of `google-translate-translate'.
 
@@ -194,11 +193,20 @@ becomes the default target language and vice versa."
   (let* ((langs (google-translate-read-args override-p reverse-p))
          (source-language (car langs))
          (target-language (cadr langs)))
-    (google-translate-translate source-language target-language
-                                (read-from-minibuffer
-                                 (format "Translate from %s to %s: "
-                                         (google-translate-language-display-name source-language)
-                                         (google-translate-language-display-name target-language))))))
+    (google-translate-translate
+     source-language target-language
+     (if google-translate-input-method-auto-toggling
+         (minibuffer-with-setup-hook
+             (lambda ()
+               (google-translate-setup-preferable-input-method source-language))
+           (%google-translate-default-ui-read-from-minibuffer source-language target-language))
+       (%google-translate-default-ui-read-from-minibuffer source-language target-language)))))
+
+(defun %google-translate-default-ui-read-from-minibuffer (source-language target-language)
+  (read-from-minibuffer
+   (format "Translate from %s to %s: "
+           (google-translate-language-display-name source-language)
+           (google-translate-language-display-name target-language))))
 
 ;;;###autoload
 (defun google-translate-query-translate (&optional override-p)

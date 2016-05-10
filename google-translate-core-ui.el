@@ -323,6 +323,34 @@ window (buffer with translation) gets focus.")
   "Face used to display button \"Listen\"."
   :group 'google-translate-core-ui)
 
+(defvar google-translate-input-method-auto-toggling nil
+  "When t compare current source language with the values from
+`google-translate-preferable-input-methods-alist' and enables
+appropriate input method for the minibuffer. So this feature may
+allow to avoid switching between input methods while translating
+using different languages.")
+
+(defvar google-translate-preferable-input-methods-alist
+  '((nil . nil))
+  "Alist of preferable input methods for certain languages.
+
+Each element is a cons-cell of the form (INPUT-METHOD
+. LANGUAGES-LIST), where INPUT-METHOD is the input method which
+will be switched on, when translation source language equals to
+one of the language from the LANGUAGE-LIST.
+
+INPUT-METHOD could be specified as nil. In such case input method
+disables.
+
+As example, this alist could looks like the following:
+
+  '((nil . \"en\")
+    (ukrainian-programmer-dvorak . (\"ru\" \"uk\")))
+
+In this way, `ukrainian-programmer-dvorak' will be auto enabled
+for the minibuffer when Russian or Ukrainian (as source language)
+is active.")
+
 (defun google-translate-supported-languages ()
   "Return a list of names of languages supported by Google Translate."
   (mapcar #'car google-translate-supported-languages-alist))
@@ -351,6 +379,25 @@ apply FACE to it. Optionally use OUTPUT-FORMAT."
       (facemenu-set-face face beg (point))
       (fill-region beg (point))
       (buffer-substring (point-min) (point-max)))))
+
+(defun google-translate-setup-preferable-input-method (source-language)
+  "Set input method which takes from the value of
+`google-translate-preferable-input-methods-alist' variable."
+  (interactive)
+  (let* ((preferable-input-method
+          (google-translate-find-preferable-input-method source-language)))
+    (set-input-method preferable-input-method)))
+
+(defun google-translate-find-preferable-input-method (source-language)
+  "Look for the SOURCE-LANGUAGE in the
+`google-translate-preferable-input-methods-alist' and return
+input method for it."
+  (let ((input-method nil))
+    (dolist (item google-translate-preferable-input-methods-alist)
+      (dolist (language (cdr item))
+        (when (string-equal source-language language)
+          (setq input-method (car item)))))
+    input-method))
 
 (defun google-translate--translation-title (gtos format)
   "Return translation title which contains information about used
@@ -735,7 +782,6 @@ ido-style completion."
                #'ido-completing-read
              #'completing-read)
            prompt choices nil t nil nil def))
-
 
 (provide 'google-translate-core-ui)
 
