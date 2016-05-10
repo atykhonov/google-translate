@@ -135,7 +135,7 @@
 ;;; Code:
 ;;
 
-(require 'cl)
+(eval-when-compile (require 'cl))
 (require 'google-translate-core)
 (require 'ido)
 
