@@ -13,7 +13,7 @@
 ;;   Bernard Hurley <bernard@marcade.biz>
 ;;   Chris Bilson <cbilson@pobox.com>
 ;;   Takumi Kinjo <takumi.kinjo@gmail.com>
-;;   momomo5717 <momomo5717@google.com>
+;;   momomo5717 <momomo5717@gmail.com>
 
 ;; This file is NOT part of GNU Emacs.
 
