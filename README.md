@@ -136,7 +136,7 @@ to contain translation directions.
 
 For example it could be defined (in your .emacs or init.el) as:
 
-(setq google-translate-translation-directions-alist '(("en" . "ru"))
+(setq google-translate-translation-directions-alist '(("en" . "ru")))
 
 in this way one translation direction ("en" > "ru") is defined and
 when `google-translate-smooth-translate' function executes it will
