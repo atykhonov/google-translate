@@ -197,29 +197,6 @@ you would like to always use and to avoid repetitive language
 quering it is reasonable to define them in the mentioned
 `google-translate-translation-directions-alist` variable.
 
-##### Input method auto toggling
-
-While switching within directions I noticed that I change input method
-quite often. Input method auto toggling allows switch on appropriate
-input method while switching within directions. Auto toggling will
-work in case of `google-translate-input-method-auto-toggling` is set
-to `t` and `google-translate-preferable-input-methods-alist` is
-defined properly.
-
-This variable may be defined as
-follow (just for example):
-
-```
-(setq google-translate-preferable-input-methods-alist '((nil . ("en"))
-                                                        (ukrainian-programmer-dvorak . ("ru" "uk"))))
-```
-
-In this way, input method disables (because of nil) for the
-minibuffer when source language is English. And
-"ukrainian-programmer-dvorak" input method enables when source
-language is Russian or Ukrainian.
-
-
 ## Common UI Customization
 
 Described customization options are actual for both UI features:
@@ -237,40 +214,72 @@ You can customize the following variables:
 
 - `google-translate-pop-up-buffer-set-focus`
 
-`google-translate-output-destination` determines translation output destination. If
-`nil` the translation output will be displayed in the pop up buffer. If value equal
-to `echo-area` then translation outputs in the Echo Area (see
+`google-translate-output-destination` determines translation output
+destination. If `nil` the translation output will be displayed in the
+pop up buffer. If value equal to `echo-area` then translation outputs
+in the Echo Area
+(see
 [Echo Area](http://www.gnu.org/software/emacs/manual/html_node/elisp/The-Echo-Area.html)). In
-case of `popup` the translation outputs to the popup tooltip using `popup`
-package. And in case of `kill-ring` the translation outputs to the kill ring. If you
-would like output translation to the Echo Area you would probably like to increase it
-because only part of translation could be visible there with the default settings. To
-increase echo area you could increase the value of `max-mini-window-height` variable,
-for example: `(setq max-mini-window-height 0.5)`.
+case of `popup` the translation outputs to the popup tooltip using
+`popup` package. And in case of `kill-ring` the translation outputs to
+the kill ring. If you would like output translation to the Echo Area
+you would probably like to increase it because only part of
+translation could be visible there with the default settings. To
+increase echo area you could increase the value of
+`max-mini-window-height` variable, for example: `(setq
+max-mini-window-height 0.5)`.
 
-If `google-translate-enable-ido-completion` is non-NIL, the input
-will be read with ido-style completion.
+If `google-translate-enable-ido-completion` is non-NIL, the input will
+be read with ido-style completion.
 
 The variable `google-translate-show-phonetic` controls whether the
 phonetic spelling of the original text and its translation is
 displayed if available. If you want to see the phonetics, set this
 variable to t.
 
-The variable `google-translate-listen-program` determines the program to use to
-listen translations. By default the program looks for `mplayer` in the PATH, if
-`mplayer` is found then listening function will be available and you'll see `Listen`
-button in the buffer with the translation. You can use any other suitable program. If
-you use Windows please download and unpack `mplayer` and add its path (directory) to
-to the system PATH variable. Please note that translation listening is not available
-if `google-translate-output-destination` is set to `echo-area` or `pop-up`.
+The variable `google-translate-listen-program` determines the program
+to use to listen translations. By default the program looks for
+`mplayer` in the PATH, if `mplayer` is found then listening function
+will be available and you'll see `Listen` button in the buffer with
+the translation. You can use any other suitable program. If you use
+Windows please download and unpack `mplayer` and add its path
+(directory) to to the system PATH variable. Please note that
+translation listening is not available if
+`google-translate-output-destination` is set to `echo-area` or
+`pop-up`.
 
-The variable `google-translate-pop-up-buffer-set-focus` determines whether window
-(buffer) with translation gets focus when it pop ups. If `nil`, it doesn't get focus
-and focus remains in the same window as was before translation. If `t`, window
-(buffer with translation) gets focus. Please note that that setting works only for
-pop up buffer, i.e. when `google-translate-output-destination` is `nil`.
+The variable `google-translate-pop-up-buffer-set-focus` determines
+whether window (buffer) with translation gets focus when it pop
+ups. If `nil`, it doesn't get focus and focus remains in the same
+window as was before translation. If `t`, window (buffer with
+translation) gets focus. Please note that that setting works only for
+pop up buffer, i.e. when `google-translate-output-destination` is
+`nil`.
 
-There are also six faces you can customize:
+The `google-translate-input-method-auto-toggling' variable
+determines whether input method auto toggling is enabled or not.
+
+While switching among languages I noticed that I change input
+method quite often. Input method auto toggling allows switch on
+appropriate input method while switching among languages. Auto
+toggling will work in case of
+`google-translate-input-method-auto-toggling' is set to `t' and
+`google-translate-preferable-input-methods-alist' is defined
+properly.
+
+This variable may be defined as follow (just for example):
+
+```
+(setq google-translate-preferable-input-methods-alist '((nil . ("en"))
+                                                        (ukrainian-programmer-dvorak . ("ru" "uk"))))
+```
+
+In this way, input method is disabled (because of nil) for the
+minibuffer when source language is English. And
+"ukrainian-programmer-dvorak" input method is enabled when source
+language is Russian or Ukrainian.
+
+#### Customization of faces
 
 - `google-translate-text-face`, used to display the original text
   (defaults to `default`)

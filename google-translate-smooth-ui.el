@@ -58,12 +58,6 @@
 ;;
 ;; Configuration:
 ;;
-;; It is reasonable to define the following variables:
-;;
-;; - `google-translate-translation-directions-alist'
-;;
-;; - `google-translate-preferable-input-methods-alist'
-;;
 ;; `google-translate-translation-directions-alist' alist is intended
 ;; to contain translation directions.
 ;;
@@ -117,30 +111,9 @@
 ;; you would like to always use and to avoid repetitive language
 ;; quering it is reasonable to define them in the mentioned
 ;; `google-translate-translation-directions-alist' variable.
-;;
-;; Input method auto toggling
 
-;; While switching within directions I noticed that I change input
-;; method quite often. Input method auto toggling allows switch on
-;; appropriate input method while switching within directions. Auto
-;; toggling will work in case of
-;; `google-translate-input-method-auto-toggling' is set to `t' and
-;; `google-translate-preferable-input-methods-alist' is defined
-;; properly.
-
-;; This variable may be defined as follow (just for example):
-
-;; (setq google-translate-preferable-input-methods-alist '((nil . ("en"))
-;;                                                         (ukrainian-programmer-dvorak . ("ru" "uk"))))
-
-;; In this way, input method disables (because of nil) for the
-;; minibuffer when source language is English. And
-;; "ukrainian-programmer-dvorak" input method enables when source
-;; language is Russian or Ukrainian.
-
-;;
 ;; Customization:
-;;
+
 ;; `google-translate-smooth-ui' doesn't contain any customizable
 ;; variables. But `google-translate-smooth-ui' extends
 ;; `google-translate-core-ui' and thus it could be customized via this
@@ -157,14 +130,6 @@
 (defgroup google-translate-smooth-ui nil
   "Just Another UI for Google Translate package."
   :group 'processes)
-
-(defvar google-translate-input-method-auto-toggling nil
-  "When t compare current source language (from current
-translation direction) with the values from
-`google-translate-preferable-input-methods-alist' and enables
-appropriate input method for the minibuffer. So this feature may
-allow to avoid switching between input methods while translating
-using different languages.")
 
 (defvar google-translate-translation-directions-alist
   '()
@@ -183,31 +148,7 @@ As example, this alist could looks like the following:
   '((\"en\" . \"ru\")
     (\"ru\" . \"en\")
     (\"uk\" . \"ru\")
-    (\"ru\" . \"uk\"))
-")
-
-(defvar google-translate-preferable-input-methods-alist
-  '((nil . nil))
-  "Alist of preferable input methods for certain languages.
-
-Each element is a cons-cell of the form (INPUT-METHOD
-. LANGUAGES-LIST), where INPUT-METHOD is the input method which
-will be switched on when translation source language equals to
-one of the language from the LANGUAGE-LIST while changing
-translation direction.
-
-INPUT-METHOD could be specified as nil. In such case input method
-disables.
-
-As example, this alist could looks like the following:
-
-  '((nil . \"en\")
-    (ukrainian-programmer-dvorak . (\"ru\" \"uk\")))
-
-In this way, `ukrainian-programmer-dvorak' will be auto enabled
-for the minibuffer when Russian or Ukrainian (as source language)
-is active while changing translation direction.
-")
+    (\"ru\" . \"uk\"))")
 
 (defvar google-translate-current-translation-direction 0
   "Points to nth element of
@@ -262,28 +203,6 @@ switch to the last one."
   (setq google-translate-try-other-direction t)
   (exit-minibuffer))
 
-(defun google-translate-find-preferable-input-method (source-language)
-  "Look for the SOURCE-LANGUAGE in the
-`google-translate-preferable-input-methods-alist' and return
-input method for it."
-  (let ((input-method nil))
-    (dolist (item google-translate-preferable-input-methods-alist)
-      (dolist (language (cdr item))
-        (when (string-equal source-language language)
-          (setq input-method (car item)))))
-    input-method))
-
-(defun google-translate-setup-preferable-input-method ()
-  "Set input method which takes from the value of
-`google-translate-preferable-input-methods-alist' variable."
-  (interactive)
-  (let* ((source-language
-          (google-translate--current-direction-source-language))
-         (preferable-input-method
-          (google-translate-find-preferable-input-method
-           source-language)))
-    (set-input-method preferable-input-method)))
-
 (defun google-translate-query-translate-using-directions ()
   "Tranlate query using translation directions described by
 `google-translate-translation-directions-alist' variable.
@@ -302,7 +221,10 @@ C-n - to select next direction."
     (setq text 
           (if google-translate-input-method-auto-toggling
               (minibuffer-with-setup-hook
-                  'google-translate-setup-preferable-input-method
+                  (lambda ()
+                    (google-translate-setup-preferable-input-method
+                     (google-translate--current-direction-source-language)))
+                'google-translate-setup-preferable-input-method
                 (google-translate--read-from-minibuffer))
             (google-translate--read-from-minibuffer)))
     (if google-translate-try-other-direction
