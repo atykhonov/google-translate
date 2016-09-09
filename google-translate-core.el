@@ -5,7 +5,7 @@
 ;; Author: Oleksandr Manzyuk <manzyuk@gmail.com>
 ;; Maintainer: Andrey Tykhonov <atykhonov@gmail.com>
 ;; URL: https://github.com/atykhonov/google-translate
-;; Version: 0.11.11
+;; Version: 0.11.12
 ;; Keywords: convenience
 
 ;; Contributors:
@@ -261,7 +261,7 @@ translation it is possible to get suggestion."
 
 (defun google-translate-version ()
   (interactive)
-  (message "Google Translate (version): %s" "0.11.11"))
+  (message "Google Translate (version): %s" "0.11.12"))
 
 
 (provide 'google-translate-core)
