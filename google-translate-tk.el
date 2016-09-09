@@ -43,6 +43,17 @@
 
 (defvar google-translate--bit-v-len 32)
 
+(defvar google-translate--tkk-url
+  "http://translate.google.com/")
+
+(defvar google-translate--tkk-regex
+  "TKK=eval('((function(){var\\s-+a\\\\x3d\\(-?[0-9]+\\);var\\s-+b\\\\x3d\\(-?[0-9]+\\);return\\s-+\\([0-9]+\\)"
+  "Regexp for `google-translate--search-tkk'.")
+
+(defvar google-translate--tkk-debug
+  nil
+  "For debugging of tk related issues.")
+
 (defun google-translate--bit-v-2comp (v)
   "Return the two's complement of V."
   (let* ((vc (vconcat v))
@@ -115,13 +126,6 @@ D is an integer."
                (aset v-result j (aref v i))))
     (google-translate--bit-v-to-number v-result)))
 
-(defvar google-translate--tkk-url
-  "http://translate.google.com/")
-
-(defvar google-translate--tkk-regex
-  "TKK=eval('((function(){var\\s-+a\\\\x3d\\(-?[0-9]+\\);var\\s-+b\\\\x3d\\(-?[0-9]+\\);return\\s-+\\([0-9]+\\)"
-  "Regexp for `google-translate--search-tkk'.")
-
 (defun google-translate--search-tkk ()
   "Search TKK."
   (if (re-search-forward google-translate--tkk-regex nil t)
@@ -133,9 +137,16 @@ D is an integer."
   "Return a list of b and d1 for `google-translate--gen-tk'."
   (let* ((url-request-extra-headers '(("Connection" . "close")))
          (buf (url-retrieve-synchronously google-translate--tkk-url))
+         (debug-buffer-name "*Google Translate Debug*")
+         tkk-contents
          tkk-ls)
     (with-current-buffer buf
-      (setq tkk-ls (google-translate--search-tkk)))
+      (setq tkk-ls (google-translate--search-tkk))
+      (setq tkk-contents (buffer-string)))
+    (when google-translate--tkk-debug
+      (with-output-to-temp-buffer debug-buffer-name
+        (prin1 tkk-contents))
+      (select-window (display-buffer debug-buffer-name)))
     (when (buffer-live-p buf) (kill-buffer buf))
     (list (cl-third tkk-ls)
           (google-translate--lsh (+ (cl-first tkk-ls) (cl-second tkk-ls)) 0))))
