@@ -274,9 +274,10 @@ This variable may be defined as follow (just for example):
                                                         (ukrainian-programmer-dvorak . ("ru" "uk"))))
 ```
 
-In this way, input method disables (because of nil) for the minibuffer
-when source language is English. And "ukrainian-programmer-dvorak"
-input method is enabled when source language is Russian or Ukrainian.
+In this way, input method is disabled (because of nil) for the
+minibuffer when source language is English. And
+"ukrainian-programmer-dvorak" input method is enabled when source
+language is Russian or Ukrainian.
 
 #### Customization of faces
 
