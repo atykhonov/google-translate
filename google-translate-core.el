@@ -5,7 +5,7 @@
 ;; Author: Oleksandr Manzyuk <manzyuk@gmail.com>
 ;; Maintainer: Andrey Tykhonov <atykhonov@gmail.com>
 ;; URL: https://github.com/atykhonov/google-translate
-;; Version: 0.11.7
+;; Version: 0.11.12
 ;; Keywords: convenience
 
 ;; Contributors:
@@ -13,6 +13,7 @@
 ;;   Bernard Hurley <bernard@marcade.biz>
 ;;   Chris Bilson <cbilson@pobox.com>
 ;;   Takumi Kinjo <takumi.kinjo@gmail.com>
+;;   momomo5717 <momomo5717@gmail.com>
 
 ;; This file is NOT part of GNU Emacs.
 
@@ -257,6 +258,10 @@ translation it is possible to get suggestion."
   (let ((info (aref json 7)))
     (when info
       (aref info 1))))
+
+(defun google-translate-version ()
+  (interactive)
+  (message "Google Translate (version): %s" "0.11.12"))
 
 
 (provide 'google-translate-core)

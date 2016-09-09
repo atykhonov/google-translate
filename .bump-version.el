@@ -7,4 +7,4 @@
    "google-translate-pkg.el"
    "google-translate-smooth-ui.el"
    "Makefile"))
- (:current-version "0.11.7"))
+ (:current-version "0.11.12"))

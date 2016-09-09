@@ -6,7 +6,7 @@
 ;; Author: Oleksandr Manzyuk <manzyuk@gmail.com>
 ;; Maintainer: Andrey Tykhonov <atykhonov@gmail.com>
 ;; URL: https://github.com/atykhonov/google-translate
-;; Version: 0.11.7
+;; Version: 0.11.12
 ;; Keywords: convenience
 
 ;; Contributors:
@@ -14,6 +14,7 @@
 ;;   Bernard Hurley <bernard@marcade.biz>
 ;;   Chris Bilson <cbilson@pobox.com>
 ;;   Takumi Kinjo <takumi.kinjo@gmail.com>
+;;   momomo5717 <momomo5717@gmail.com>
 
 ;; This file is NOT part of GNU Emacs.
 
@@ -41,6 +42,17 @@
 
 
 (defvar google-translate--bit-v-len 32)
+
+(defvar google-translate--tkk-url
+  "http://translate.google.com/")
+
+(defvar google-translate--tkk-regex
+  "TKK=eval('((function(){var\\s-+a\\\\x3d\\(-?[0-9]+\\);var\\s-+b\\\\x3d\\(-?[0-9]+\\);return\\s-+\\([0-9]+\\)"
+  "Regexp for `google-translate--search-tkk'.")
+
+(defvar google-translate--tkk-debug
+  nil
+  "For debugging of tk related issues.")
 
 (defun google-translate--bit-v-2comp (v)
   "Return the two's complement of V."
@@ -114,6 +126,31 @@ D is an integer."
                (aset v-result j (aref v i))))
     (google-translate--bit-v-to-number v-result)))
 
+(defun google-translate--search-tkk ()
+  "Search TKK."
+  (if (re-search-forward google-translate--tkk-regex nil t)
+      (mapcar #'string-to-number
+              (list (match-string 1) (match-string 2) (match-string 3)))
+    (error "Failed to search TKK")))
+
+(defun google-translate--get-b-d1 ()
+  "Return a list of b and d1 for `google-translate--gen-tk'."
+  (let* ((url-request-extra-headers '(("Connection" . "close")))
+         (buf (url-retrieve-synchronously google-translate--tkk-url))
+         (debug-buffer-name "*Google Translate Debug*")
+         tkk-contents
+         tkk-ls)
+    (with-current-buffer buf
+      (setq tkk-ls (google-translate--search-tkk))
+      (setq tkk-contents (buffer-string)))
+    (when google-translate--tkk-debug
+      (with-output-to-temp-buffer debug-buffer-name
+        (prin1 tkk-contents))
+      (select-window (display-buffer debug-buffer-name)))
+    (when (buffer-live-p buf) (kill-buffer buf))
+    (list (cl-third tkk-ls)
+          (google-translate--lsh (+ (cl-first tkk-ls) (cl-second tkk-ls)) 0))))
+
 (defun google-translate--gen-rl (a b)
   (cl-loop for c from 0 below (- (length b) 2) by 3
            for d = (aref b (+ c 2)) do
@@ -126,13 +163,16 @@ D is an integer."
                      (google-translate--logxor a d))))
   a)
 
-(defun google-translate--gen-tk (text &optional float-time)
-  (let* ((b (ffloor (/ (or float-time (time-to-seconds)) 3600.0)))
+(defun google-translate--gen-tk (text &optional b-d1)
+  (setq b-d1 (or b-d1 (google-translate--get-b-d1)))
+  (let* ((b (cl-first b-d1))
+         (d1 (cl-second b-d1))
          (ub "+-3^+b+-f")
          (vb "+-a^+6")
          (a (cl-reduce (lambda (a e) (google-translate--gen-rl (+ a e) vb))
                        (encode-coding-string text 'utf-8) :initial-value b)))
     (setq a (google-translate--gen-rl a ub))
+    (setq a (google-translate--logxor a d1))
     (when (< a 0) ;; (abs a) + 2^31
       (setq a (+ (google-translate--logand a 2147483647.0) 2147483648.0)))
     (setq a (ffloor (mod a 1e6)))
@@ -142,3 +182,4 @@ D is an integer."
 
 
 (provide 'google-translate-tk)
+;;; google-translate-tk.el ends here

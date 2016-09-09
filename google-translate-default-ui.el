@@ -6,7 +6,7 @@
 ;; Author: Oleksandr Manzyuk <manzyuk@gmail.com>
 ;; Maintainer: Andrey Tykhonov <atykhonov@gmail.com>
 ;; URL: https://github.com/atykhonov/google-translate
-;; Version: 0.11.7
+;; Version: 0.11.12
 ;; Keywords: convenience
 
 ;; Contributors:
@@ -14,6 +14,7 @@
 ;;   Bernard Hurley <bernard@marcade.biz>
 ;;   Chris Bilson <cbilson@pobox.com>
 ;;   Takumi Kinjo <takumi.kinjo@gmail.com>
+;;   momomo5717 <momomo5717@gmail.com>
 
 ;; This file is NOT part of GNU Emacs.
 

@@ -5,7 +5,7 @@
 ;; Author: Oleksandr Manzyuk <manzyuk@gmail.com>
 ;; Maintainer: Andrey Tykhonov <atykhonov@gmail.com>
 ;; URL: https://github.com/atykhonov/google-translate
-;; Version: 0.11.7
+;; Version: 0.11.12
 ;; Keywords: convenience
 
 ;; Contributors:
@@ -13,6 +13,7 @@
 ;;   Bernard Hurley <bernard@marcade.biz>
 ;;   Chris Bilson <cbilson@pobox.com>
 ;;   Takumi Kinjo <takumi.kinjo@gmail.com>
+;;   momomo5717 <momomo5717@gmail.com>
 
 ;; This file is NOT part of GNU Emacs.
 
@@ -52,7 +53,7 @@
 ;; `google-translate-read-source-language' reads source language from minibuffer and
 ;; returns language abbreviation. `google-translate-read-target-language' reads
 ;; target language from minibuffer and returns language abbreviation.
-;; 
+;;
 ;; Customization:
 
 ;; You can customize the following variables:
@@ -143,6 +144,7 @@
 (defvar google-translate-supported-languages-alist
   '(("Afrikaans"           . "af")
     ("Albanian"            . "sq")
+    ("Amharic"             . "am")
     ("Arabic"              . "ar")
     ("Armenian"            . "hy")
     ("Azerbaijani"         . "az")
@@ -156,6 +158,7 @@
     ("Chichewa"            . "ny")
     ("Chinese Simplified"  . "zh-CN")
     ("Chinese Traditional" . "zh-TW")
+    ("Corsican"            . "co")
     ("Croatian"            . "hr")
     ("Czech"               . "cs")
     ("Danish"              . "da")
@@ -166,6 +169,7 @@
     ("Filipino"            . "tl")
     ("Finnish"             . "fi")
     ("French"              . "fr")
+    ("Frisian"             . "fy")
     ("Galician"            . "gl")
     ("Georgian"            . "ka")
     ("German"              . "de")
@@ -173,6 +177,7 @@
     ("Gujarati"            . "gu")
     ("Haitian Creole"      . "ht")
     ("Hausa"               . "ha")
+    ("Hawaiian"            . "haw")
     ("Hebrew"              . "iw")
     ("Hindi"               . "hi")
     ("Hmong"               . "hmn")
@@ -188,10 +193,13 @@
     ("Kazakh"              . "kk")
     ("Khmer"               . "km")
     ("Korean"              . "ko")
+    ("Kurdish (Kurmanji)"  . "ku")
+    ("Kyrgyz"              . "ky")
     ("Lao"                 . "lo")
     ("Latin"               . "la")
     ("Latvian"             . "lv")
     ("Lithuanian"          . "lt")
+    ("Luxembourgish"       . "lb")
     ("Macedonian"          . "mk")
     ("Malagasy"            . "mg")
     ("Malay"               . "ms")
@@ -203,14 +211,19 @@
     ("Myanmar (Burmese)"   . "my")
     ("Nepali"              . "ne")
     ("Norwegian"           . "no")
+    ("Pashto"              . "ps")
     ("Persian"             . "fa")
     ("Polish"              . "pl")
     ("Portuguese"          . "pt")
     ("Punjabi"             . "pa")
     ("Romanian"            . "ro")
     ("Russian"             . "ru")
+    ("Samoan"              . "sm")
+    ("Scots Gaelic"        . "gd")
     ("Serbian"             . "sr")
     ("Sesotho"             . "st")
+    ("Shona"               . "sn")
+    ("Sindhi"              . "sd")
     ("Sinhala"             . "si")
     ("Slovak"              . "sk")
     ("Slovenian"           . "sl")
@@ -229,6 +242,7 @@
     ("Uzbek"               . "uz")
     ("Vietnamese"          . "vi")
     ("Welsh"               . "cy")
+    ("Xhosa"               . "xh")
     ("Yiddish"             . "yi")
     ("Yoruba"              . "yo")
     ("Zulu"                . "zu"))
@@ -429,7 +443,7 @@ source and target languages."
 `google-translate-show-phonetic' is set to t."
   (let ((text-phonetic (gtos-text-phonetic gtos)))
     (if (and google-translate-show-phonetic
-               (not (string-equal text-phonetic "")))
+             (not (string-equal text-phonetic "")))
         (google-translate-paragraph
          text-phonetic
          'google-translate-phonetic-face
@@ -449,7 +463,7 @@ source and target languages."
 `google-translate-show-phonetic' is set to t."
   (let ((translation-phonetic (gtos-translation-phonetic gtos)))
     (if (and google-translate-show-phonetic
-               (not (string-equal translation-phonetic "")))
+             (not (string-equal translation-phonetic "")))
         (google-translate-paragraph
          translation-phonetic
          'google-translate-phonetic-face
@@ -457,8 +471,8 @@ source and target languages."
       "")))
 
 (defun google-translate--detailed-translation (detailed-translation translation
-                                                                           format1
-                                                                           format2)
+                                                                    format1
+                                                                    format2)
   "Return detailed translation."
   (with-temp-buffer
     (loop for item across detailed-translation do
@@ -483,8 +497,8 @@ source and target languages."
     (buffer-substring (point-min) (point-max))))
 
 (defun google-translate--detailed-definition (detailed-definition definition
-                                                                    format1
-                                                                    format2)
+                                                                  format1
+                                                                  format2)
   "Return detailed definition."
   (with-temp-buffer
     (let ((section "DEFINITION"))
