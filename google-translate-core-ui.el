@@ -336,6 +336,12 @@ when it pop ups. If `nil', it doesn't get focus and focus remains
 in the same window as was before translation. If `t',
 window (buffer with translation) gets focus.")
 
+(defcustom google-translate-listen-button-label
+  "[Listen]"
+  "Label of the 'Listen' button."
+  :group 'google-translate-core-ui
+  :type 'string)
+
 (defface google-translate-text-face
   '((t (:inherit default)))
   "Face used to display the original text."
@@ -596,7 +602,7 @@ clicked."
   "Return listen button."
   (with-temp-buffer
     (insert " ")
-    (insert-text-button "[Listen]"
+    (insert-text-button google-translate-listen-button-label
                         'action 'google-translate--listen-action
                         'face 'google-translate-listen-button-face
                         'follow-link t
