@@ -755,6 +755,7 @@ http://www.gnu.org/software/emacs/manual/html_node/elisp/The-Echo-Area.html)"
         (detailed-definition (gtos-detailed-definition gtos))
         (source-language (gtos-source-language gtos))
         (target-language (gtos-target-language gtos))
+        (auto-detected-language (gtos-auto-detected-language gtos))
         (text (gtos-text gtos)))
     (insert
      (google-translate--translation-title gtos "Translate from %s to %s:\n")
@@ -765,7 +766,10 @@ http://www.gnu.org/software/emacs/manual/html_node/elisp/The-Echo-Area.html)"
           "%s\n"
         "%s"))
      (if google-translate-listen-program
-         (google-translate--listen-button source-language text) "")
+         (google-translate--listen-button
+          (if (string-equal source-language "auto")
+              auto-detected-language
+            source-language) text) "")
      (google-translate--text-phonetic gtos "\n%s\n")
      "\n"
      (google-translate--translated-text
