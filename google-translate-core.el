@@ -73,11 +73,15 @@
   "Google Translate core script."
   :group 'processes)
 
+(defvar google-translate-target-url
+   (or  (and (equal (current-time-zone) '(28800 "CST")) 
+        "http://www.google.cn") "http://www.google.com"))
+
 (defvar google-translate-base-url
-  "http://translate.google.com/translate_a/single")
+  (concat google-translate-target-url "/translate_a/single")
 
 (defvar google-translate-listen-url
-  "http://translate.google.com/translate_tts")
+  (concat google-translate-target-url "/translate_tts")
 
 (defun google-translate--format-query-string (query-params)
   "Format QUERY-PARAMS as a query string.
