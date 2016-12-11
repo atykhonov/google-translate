@@ -342,6 +342,11 @@ window (buffer with translation) gets focus.")
   :group 'google-translate-core-ui
   :type 'string)
 
+(defcustom google-translate-try-uncomment t
+  "If non-nil, try to uncomment translate region."
+  :group 'google-translate-core-ui
+  :type 'boolean)
+
 (defface google-translate-text-face
   '((t (:inherit default)))
   "Face used to display the original text."
@@ -833,6 +838,41 @@ ido-style completion."
                #'ido-completing-read
              #'completing-read)
            prompt choices nil t nil nil def))
+
+(defun google-translate--clone-buffer-setting (original)
+  "Clone buffer setting from ORIGINAL buffer."
+  (let (mode lvars)
+    (with-current-buffer original
+      (setq mode major-mode)
+      (setq lvars (buffer-local-variables)))
+    ;; Now set up the major mode.
+    (funcall mode)
+    ;; Set up other local variables.
+    (mapc (lambda (v)
+	    (condition-case ()	;in case var is read-only
+		(if (symbolp v)
+		    (makunbound v)
+		  ;; prevent to associate to file
+		  (unless (eq (car v) 'buffer-file-name)
+		    (set (make-local-variable (car v)) (cdr v))))
+	      (error nil)))
+	  lvars)))
+
+(defun google-translate-buffer-substring (start end)
+  "Return the result of `buffer-substring-no-properties'.
+But if `google-translate-try-uncomment' is non-nil, call
+`uncomment-region' before."
+  (if (or (null google-translate-try-uncomment) (null comment-start))
+      (buffer-substring-no-properties start end)
+    ;; try uncomment text
+    (let ((oldbuf (current-buffer))
+	  (text (buffer-substring start end)))
+      (with-temp-buffer
+	;; clone setting from original buffer
+	(google-translate--clone-buffer-setting oldbuf)
+	(insert text)
+	(ignore-errors (uncomment-region (point-min) (point-max)))
+	(buffer-substring-no-properties (point-min) (point-max))))))
 
 (provide 'google-translate-core-ui)
 
