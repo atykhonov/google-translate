@@ -214,6 +214,10 @@ You can customize the following variables:
 
 - `google-translate-pop-up-buffer-set-focus`
 
+- `google-translate-try-uncomment`
+
+- `google-translate-preferable-input-methods-alist`
+
 `google-translate-output-destination` determines translation output
 destination. If `nil` the translation output will be displayed in the
 pop up buffer. If value equal to `echo-area` then translation outputs
@@ -256,15 +260,33 @@ translation) gets focus. Please note that that setting works only for
 pop up buffer, i.e. when `google-translate-output-destination` is
 `nil`.
 
-The `google-translate-input-method-auto-toggling' variable
-determines whether input method auto toggling is enabled or not.
+If the value of `google-translate-try-uncomment` equals to `t`, then
+`google-translate` tries to uncomment the text before translation. The
+original text (in the original buffer) remains unchanged. For example,
+if the following text is selected and it is translated in `Emacs-Lisp`
+mode:
 
-While switching among languages I noticed that I change input
-method quite often. Input method auto toggling allows switch on
-appropriate input method while switching among languages. Auto
-toggling will work in case of
-`google-translate-input-method-auto-toggling' is set to `t' and
-`google-translate-preferable-input-methods-alist' is defined
+```
+;; If `google-translate-enable-ido-completion' is non-NIL, the
+;; input will be read with ido-style completion.
+```
+
+`google-translate` uncomments it on the fly, and the following text
+(without `;;` chars) is translated:
+
+```
+If `google-translate-enable-ido-completion' is non-NIL, the input
+will be read with ido-style completion.
+```
+
+The `google-translate-input-method-auto-toggling` variable determines
+whether input method auto toggling is enabled or not.
+
+While switching among languages I noticed that I change input method
+quite often. Input method auto toggling allows switch on appropriate
+input method while switching among languages. Auto toggling will work
+in case of `google-translate-input-method-auto-toggling` is set to `t`
+and `google-translate-preferable-input-methods-alist` is defined
 properly.
 
 This variable may be defined as follow (just for example):

@@ -69,6 +69,8 @@
 ;;
 ;; - `google-translate-pop-up-buffer-set-focus'
 ;;
+;; - `google-translate-try-uncomment'
+;;
 ;; - `google-translate-preferable-input-methods-alist'
 ;;
 ;; `google-translate-output-destination' determines translation output
@@ -109,6 +111,25 @@
 ;; translation) gets focus. Please note that that setting works only
 ;; for pop up buffer, i.e. when `google-translate-output-destination'
 ;; is `nil'.
+;;
+;; If the value of `google-translate-try-uncomment' equals to `t',
+;; then `google-translate' tries to uncomment the text before
+;; translation. The original text (in the original buffer) remains
+;; unchanged. For example, if the following text is selected and it is
+;; translated in `Emacs-Lisp' mode:
+;;
+;; [text-start]
+;; ;; If `google-translate-enable-ido-completion' is non-NIL, the
+;; ;; input will be read with ido-style completion.
+;; [text-end]
+;;
+;; `google-translate' uncomments it on the fly, and the following text
+;; (without `;;' chars) is translated:
+;;
+;; [text-start]
+;; If `google-translate-enable-ido-completion' is non-NIL, the input
+;; will be read with ido-style completion.
+;; [text-end]
 ;;
 ;; The `google-translate-input-method-auto-toggling' variable
 ;; determines whether input method auto toggling is enabled or not.
@@ -543,9 +564,9 @@ source and target languages."
   (with-temp-buffer
     (let ((section "DEFINITION"))
       (put-text-property 0 (length section)
-			 'font-lock-face
-			 'google-translate-translation-face
-			 section)
+                         'font-lock-face
+                         'google-translate-translation-face
+                         section)
       (insert (format "\n%s\n" section)))
     (loop for item across detailed-definition do
           (let ((index 0)
@@ -849,14 +870,14 @@ ido-style completion."
     (funcall mode)
     ;; Set up other local variables.
     (mapc (lambda (v)
-	    (condition-case ()	;in case var is read-only
-		(if (symbolp v)
-		    (makunbound v)
-		  ;; prevent to associate to file
-		  (unless (eq (car v) 'buffer-file-name)
-		    (set (make-local-variable (car v)) (cdr v))))
-	      (error nil)))
-	  lvars)))
+            (condition-case ()  ;in case var is read-only
+                (if (symbolp v)
+                    (makunbound v)
+                  ;; prevent to associate to file
+                  (unless (eq (car v) 'buffer-file-name)
+                    (set (make-local-variable (car v)) (cdr v))))
+              (error nil)))
+          lvars)))
 
 (defun google-translate-buffer-substring (start end)
   "Return the result of `buffer-substring-no-properties'.
@@ -866,13 +887,14 @@ But if `google-translate-try-uncomment' is non-nil, call
       (buffer-substring-no-properties start end)
     ;; try uncomment text
     (let ((oldbuf (current-buffer))
-	  (text (buffer-substring start end)))
+          (text (buffer-substring start end)))
       (with-temp-buffer
-	;; clone setting from original buffer
-	(google-translate--clone-buffer-setting oldbuf)
-	(insert text)
-	(ignore-errors (uncomment-region (point-min) (point-max)))
-	(buffer-substring-no-properties (point-min) (point-max))))))
+        ;; clone setting from original buffer
+        (google-translate--clone-buffer-setting oldbuf)
+        (insert text)
+        (ignore-errors (uncomment-region (point-min) (point-max)))
+        (buffer-substring-no-properties (point-min) (point-max))))))
+
 
 (provide 'google-translate-core-ui)
 
