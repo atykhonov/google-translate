@@ -40,11 +40,17 @@
 
 (require 'cl-lib)
 
+(defgroup google-translate-tk nil
+  "Google Translate generation tk parameter script"
+  :group 'processes)
 
 (defvar google-translate--bit-v-len 32)
 
-(defvar google-translate--tkk-url
-  "http://translate.google.com/")
+(defcustom google-translate--tkk-url
+  "http://translate.google.com/"
+  "Google Translate get TKK url"
+  :group 'google-translate-tk
+  :type 'string)
 
 (defvar google-translate--tkk-regex
   "TKK=eval('((function(){var\\s-+a\\\\x3d\\(-?[0-9]+\\);var\\s-+b\\\\x3d\\(-?[0-9]+\\);return\\s-+\\([0-9]+\\)"
