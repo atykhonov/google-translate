@@ -644,7 +644,8 @@ translation in the popup tooltip using `popup' package.
 To deal with multi-line regions, sequences of white space
 are replaced with a single space. If the region contains not text, a
 message is printed."
-  (let* ((json (google-translate-request source-language
+  (let* ((text (replace-regexp-in-string "\n" " " text))
+	 (json (google-translate-request source-language
                                          target-language
                                          text)))
     (if (null json)
