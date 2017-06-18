@@ -35,7 +35,7 @@ Feature: Default UI for Google Translate
     And I go to word "but"
     And I translate selected region from "en" to "ru"
     Then there is no region selected
-    Then I should see translation "Он пережил не только пять веков"
+    Then I should see translation "Он пережил не только пять столетий,"
 
   Scenario: Translate a word at point using default source language
     Given I set google-translate-default-source-language to "en"
