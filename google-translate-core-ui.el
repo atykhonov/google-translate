@@ -76,13 +76,13 @@
 ;; the pop up buffer. If value equal to `echo-area' then translation
 ;; outputs in the Echo Area. In case of `popup' the translation
 ;; outputs to the popup tooltip using `popup' package. In case of
-;; `kill-ring' the translation outputs to the kill ring. And In case
-;; of `current-buffer' the translation outputs to the current buffer.
-;; If you would like output translation to the Echo Area you would
-;; probably like to increase it because only part of translation could
-;; visible there with the default settings. To increase echo area you
-;; could increase the value of `max-mini-window-height' variable,
-;; for example: `(setq max-mini-window-height 0.5)'.
+;; `kill-ring' the translation outputs to the kill ring. And in case
+;; of `current-buffer' the translation outputs to the current
+;; buffer. If you would like output translation to the Echo Area you
+;; would probably like to increase it because only part of translation
+;; could visible there with the default settings. To increase Echo
+;; Area you could increase the value of `max-mini-window-height'
+;; variable, for example: `(setq max-mini-window-height 0.5)'.
 ;;
 ;; If `google-translate-enable-ido-completion' is non-NIL, the input
 ;; will be read with ido-style completion.
