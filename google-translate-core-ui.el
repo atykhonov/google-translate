@@ -75,13 +75,14 @@
 ;; destination. If `nil' the translation output will be displayed in
 ;; the pop up buffer. If value equal to `echo-area' then translation
 ;; outputs in the Echo Area. In case of `popup' the translation
-;; outputs to the popup tooltip using `popup' package. And in case of
-;; `kill-ring' the translation outputs to the kill ring. If you would
-;; like output translation to the Echo Area you would probably like to
-;; increase it because only part of translation could be visible there
-;; with the default settings. To increase echo area you could increase
-;; the value of `max-mini-window-height' variable, for example: `(setq
-;; max-mini-window-height 0.5)'.
+;; outputs to the popup tooltip using `popup' package. In case of
+;; `kill-ring' the translation outputs to the kill ring. And in case
+;; of `current-buffer' the translation outputs to the current
+;; buffer. If you would like output translation to the Echo Area you
+;; would probably like to increase it because only part of translation
+;; could visible there with the default settings. To increase Echo
+;; Area you could increase the value of `max-mini-window-height'
+;; variable, for example: `(setq max-mini-window-height 0.5)'.
 ;;
 ;; If `google-translate-enable-ido-completion' is non-NIL, the input
 ;; will be read with ido-style completion.
@@ -678,6 +679,8 @@ message is printed."
           (google-translate-popup-output-translation gtos))
          ((equal output-destination 'kill-ring)
           (google-translate-kill-ring-output-translation gtos))
+         ((equal output-destination 'current-buffer)
+          (google-translate-current-buffer-output-translation gtos))
          ((equal output-destination 'help)
           (let ((describe-func
                  (function
@@ -715,6 +718,12 @@ http://www.gnu.org/software/emacs/manual/html_node/elisp/The-Echo-Area.html)"
      (google-translate--trim-string
       (buffer-substring (point-min) (point-max)))))
   (message "Translated text was added to the kill ring."))
+
+(defun google-translate-current-buffer-output-translation (gtos)
+  "Output translation to current buffer."
+  (insert
+   (gtos-translation gtos))
+  (message "Translated text was added to current buffer."))
 
 (defun google-translate-insert-translation (gtos)
   "Insert translation to the current buffer."
