@@ -260,9 +260,9 @@ in the reverse direction."
     (google-translate-translate
      source-language target-language
      (if (use-region-p)
-         (buffer-substring-no-properties (region-beginning) (region-end))
+         (google-translate-buffer-substring (region-beginning) (region-end))
        (or (and (setq bounds (bounds-of-thing-at-point 'word))
-                (buffer-substring-no-properties (car bounds) (cdr bounds)))
+                (google-translate-buffer-substring (car bounds) (cdr bounds)))
            (error "No word at point."))))))
 
 ;;;###autoload

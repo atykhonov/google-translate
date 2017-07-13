@@ -303,7 +303,7 @@ one respectively."
   (setq google-translate-translation-direction-query
         (if (use-region-p)
             (google-translate--strip-string
-             (buffer-substring-no-properties (region-beginning) (region-end)))
+             (google-translate-buffer-substring (region-beginning) (region-end)))
           (current-word t t)))
 
   (setq google-translate-current-translation-direction 0)
