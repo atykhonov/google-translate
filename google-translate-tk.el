@@ -44,7 +44,7 @@
 (defvar google-translate--bit-v-len 32)
 
 (defvar google-translate--tkk-url
-  "http://translate.google.com/")
+  "https://translate.google.com/")
 
 (defvar google-translate--tkk-regex
   "TKK=eval('((function(){var\\s-+a\\\\x3d\\(-?[0-9]+\\);var\\s-+b\\\\x3d\\(-?[0-9]+\\);return\\s-+\\([0-9]+\\)"
