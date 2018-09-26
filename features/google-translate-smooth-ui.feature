@@ -55,12 +55,12 @@ Feature: Smooth UI for Google Translate
 
   Scenario: Suggestion when word is misspelled
     Given I set google-translate-translation-directions-alist to (("en" . "ru"))
-    When I translate "sudgest"
+    When I translate "sugest"
     Then I should see suggestion "suggest"
 
   Scenario: Linked suggestion: click on suggestion
     Given I set google-translate-translation-directions-alist to (("en" . "ru"))
-    When I translate "sudgest"
+    When I translate "sugest"
     Then I should see suggestion "suggest"
     And I press "TAB"
     And I press "TAB"
