@@ -110,13 +110,13 @@ Feature: Default UI for Google Translate
   Scenario: Suggestion when word is misspelled
     Given I set google-translate-default-source-language to "en"
     Given I set google-translate-default-target-language to "ru"
-    When I translate "sudgest"
+    When I translate "sugest"
     Then I should see suggestion "suggest"
 
   Scenario: Linked suggestion: click on suggestion
     Given I set google-translate-default-source-language to "en"
     Given I set google-translate-default-target-language to "ru"
-    When I translate "sudgest"
+    When I translate "sugest"
     Then I should see suggestion "suggest"
     And I press "TAB"
     And I press "TAB"
