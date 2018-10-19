@@ -78,7 +78,7 @@ In this case, the function `google-translate-query-translate` is
 only going to query the source language and text to translate.
 If you need to translate to some language other than Russian, you
 can override the default for the target language by supplying a
-`C-u' prefix argument, in which case you will be queried for both
+`C-u` prefix argument, in which case you will be queried for both
 the source and target languages, as well as text to translate.
 
 If you frequently translate from some fixed language, it is also
@@ -139,7 +139,7 @@ For example it could be defined (in your .emacs or init.el) as:
 (setq google-translate-translation-directions-alist '(("en" . "ru")))
 
 in this way one translation direction ("en" > "ru") is defined and
-when `google-translate-smooth-translate' function executes it will
+when `google-translate-smooth-translate` function executes it will
 output the prompt (in minibuffer) which will looks like as the
 following:
 
@@ -221,8 +221,8 @@ in the Echo Area
 (see
 [Echo Area](http://www.gnu.org/software/emacs/manual/html_node/elisp/The-Echo-Area.html)). In
 case of `popup` the translation outputs to the popup tooltip using
-`popup` package. In case of `kill-ring' the translation outputs to the
-kill ring. And in case of `current-buffer' the translation outputs to
+`popup` package. In case of `kill-ring` the translation outputs to the
+kill ring. And in case of `current-buffer` the translation outputs to
 the current buffer. If you would like output translation to the Echo
 Area you would probably like to increase it because only part of
 translation could be visible there with the default settings. To
@@ -257,15 +257,15 @@ translation) gets focus. Please note that that setting works only for
 pop up buffer, i.e. when `google-translate-output-destination` is
 `nil`.
 
-The `google-translate-input-method-auto-toggling' variable
+The `google-translate-input-method-auto-toggling` variable
 determines whether input method auto toggling is enabled or not.
 
 While switching among languages I noticed that I change input
 method quite often. Input method auto toggling allows switch on
 appropriate input method while switching among languages. Auto
 toggling will work in case of
-`google-translate-input-method-auto-toggling' is set to `t' and
-`google-translate-preferable-input-methods-alist' is defined
+`google-translate-input-method-auto-toggling` is set to `t` and
+`google-translate-preferable-input-methods-alist` is defined
 properly.
 
 This variable may be defined as follow (just for example):
