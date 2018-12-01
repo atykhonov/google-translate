@@ -121,14 +121,12 @@ D is an integer."
 
 (defun google-translate--search-tkk ()
   "Search TKK."
-  (let ((start nil)
-        (tkk nil)
-        (nums '()))
-    (setq start (search-forward ";TKK='"))
-    (search-forward "';")
-    (backward-char 2)
-    (setq tkk (buffer-substring start (point)))
-    (setq nums (split-string tkk "\\."))
+  (let* ((tkk-length 17)
+         (end (search-forward-regexp "tkk.+[0-9]\\{6\\}.[0-9]\\{10\\}"))
+         (start (- end tkk-length))
+         (tkk (buffer-substring start end))
+         (nums (split-string tkk "\\.")))
+
     (list (string-to-number (car nums))
           (string-to-number (car (cdr nums))))))
 
