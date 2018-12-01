@@ -122,7 +122,7 @@ D is an integer."
 (defun google-translate--search-tkk ()
   "Search TKK."
   (let* ((tkk-length 17)
-         (end (search-forward-regexp "tkk.+[0-9]\\{6\\}.[0-9]\\{10\\}"))
+         (end (search-forward-regexp "tkk.+[0-9]+\\.[0-9]+"))
          (start (- end tkk-length))
          (tkk (buffer-substring start end))
          (nums (split-string tkk "\\.")))
