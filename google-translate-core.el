@@ -73,11 +73,24 @@
   "Google Translate core script."
   :group 'processes)
 
-(defvar google-translate-base-url
-  "http://translate.google.com/translate_a/single")
+(defcustom google-translate-http-over-ssl/tls nil
+  "If non-NIL, translate a text using HTTPS protocol (HTTP is in
+use by default)."
+  :group 'google-translate-core
+  :type '(choice (const :tag "No"  nil)
+                 (const :tag "Yes" t)))
 
-(defvar google-translate-listen-url
-  "http://translate.google.com/translate_tts")
+(defvar google-translate-base-url
+  "http://translate.google.com")
+
+(defvar google-translate-base-url-secure
+  "https://translate.google.com")
+
+(defvar google-translate-text-translation-url-path
+  "/translate_a/single")
+
+(defvar google-translate-audio-translation-url-path
+  "/translate_tts")
 
 (defun google-translate--format-query-string (query-params)
   "Format QUERY-PARAMS as a query string.
@@ -89,21 +102,27 @@ QUERY-PARAMS must be an alist of field-value pairs."
                          (url-hexify-string (cdr p))))
              query-params "&"))
 
+(defun google-translate--base-url ()
+  "Return a base URL of Google Translate."
+  (if google-translate-http-over-ssl/tls
+      google-translate-base-url-secure
+    google-translate-base-url))
+
 (defun google-translate--format-request-url (query-params)
-  "Format QUERY-PARAMS as a Google Translate HTTP request URL.
+  "Format QUERY-PARAMS as a Google Translate HTTP(S) request URL.
 
 QUERY-PARAMS must be an alist of field-value pairs."
-  (concat google-translate-base-url
-          "?"
-          (google-translate--format-query-string query-params)))
+  (let ((url (concat (google-translate--base-url)
+                     google-translate-text-translation-url-path)))
+    (concat url "?" (google-translate--format-query-string query-params))))
 
 (defun google-translate--format-listen-url (query-params)
-  "Format QUERY-PARAMS as a Google Translate HTTP request URL for listen translation.
+  "Format QUERY-PARAMS as a Google Translate HTTP(S) request URL for audio translation.
 
 QUERY-PARAMS must be an alist of field-value pairs."
-  (concat google-translate-listen-url
-          "?"
-          (google-translate--format-query-string query-params)))
+  (let ((url (concat (google-translate--base-url)
+                     google-translate-audio-translation-url-path)))
+    (concat url "?" (google-translate--format-query-string query-params))))
 
 (defun google-translate-format-listen-url (text language)
   "Format listen url for TEXT and TARGET-LANGUAGE."
