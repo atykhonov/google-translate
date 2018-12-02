@@ -6,7 +6,7 @@
 ;; Author: Oleksandr Manzyuk <manzyuk@gmail.com>
 ;; Maintainer: Andrey Tykhonov <atykhonov@gmail.com>
 ;; URL: https://github.com/atykhonov/google-translate
-;; Version: 0.11.15
+;; Version: 0.11.16
 ;; Keywords: convenience
 
 ;; Contributors:
@@ -124,8 +124,8 @@ D is an integer."
   (let ((start nil)
         (tkk nil)
         (nums '()))
-    (setq start (search-forward ";TKK='"))
-    (search-forward "';")
+    (setq start (search-forward ",tkk:'"))
+    (search-forward "',")
     (backward-char 2)
     (setq tkk (buffer-substring start (point)))
     (setq nums (split-string tkk "\\."))

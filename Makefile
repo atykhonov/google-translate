@@ -6,7 +6,7 @@ ELC = $(SRC:.el=.elc)
 CASK ?= cask
 PKG_DIR := $(shell $(CASK) package-directory)
 FEATURES = $(wildcard features/*.feature)
-VERSION = 0.11.15
+VERSION = 0.11.16
 TARGET_DIR = google-translate-$(VERSION)
 
 all: test marmalade tag
