@@ -280,6 +280,21 @@ reverse direction."
   (interactive "P")
   (%google-translate-at-point override-p t))
 
+;;;###autoload
+(defun google-translate-buffer (&optional override-p reverse-p)
+  "Translate current buffer.
+
+For the meaning of OVERRIDE-P, see `google-translate-query-translate'."
+  (interactive "P")
+  (let* ((langs (google-translate-read-args override-p reverse-p))
+         (source-language (car langs))
+         (target-language (cadr langs)))
+    (google-translate-translate
+     source-language target-language
+     (if (use-region-p)
+         (buffer-substring-no-properties (region-beginning) (region-end))
+       (or (buffer-substring-no-properties (point-min) (point-max))
+           (error "Translate current buffer error."))))))
 
 (provide 'google-translate-default-ui)
 
