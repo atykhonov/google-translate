@@ -6,7 +6,7 @@
 ;; Author: Oleksandr Manzyuk <manzyuk@gmail.com>
 ;; Maintainer: Andrey Tykhonov <atykhonov@gmail.com>
 ;; URL: https://github.com/atykhonov/google-translate
-;; Version: 0.11.15
+;; Version: 0.11.17
 ;; Keywords: convenience
 
 ;; Contributors:
@@ -46,6 +46,8 @@
 (defvar google-translate--tkk-url
   "http://translate.google.com/")
 
+(defvar google-translate--tkk-cache
+  "/tmp/google-translate-tkk.cache")
 
 (defun google-translate--bit-v-2comp (v)
   "Return the two's complement of V."
@@ -119,6 +121,7 @@ D is an integer."
                (aset v-result j (aref v i))))
     (google-translate--bit-v-to-number v-result)))
 
+
 (defun google-translate--search-tkk ()
   "Search TKK."
   (let* ((start (- (search-forward-regexp "tkk[^[:digit:]]+[[:digit:]]\\{1\\}")
@@ -130,13 +133,36 @@ D is an integer."
     (list (string-to-number (car nums))
           (string-to-number (car (cdr nums))))))
 
+(defun get-string-from-file (filePath)
+  "Return filePath's file content."
+  (with-temp-buffer
+    (insert-file-contents filePath)
+    (buffer-string)))
+
+(defun google-translate--try-cached-tkk ()
+  (let* ((tkk (get-string-from-file google-translate--tkk-cache))
+         (nums (split-string tkk "\\.")))
+    (list (string-to-number (car nums))
+          (string-to-number (car (cdr nums))))))
+
+(defun google-translate--try-search-and-cache-tkk (buf)
+  (with-current-buffer buf
+    (let ((tkk (google-translate--search-tkk)) )
+      (write-region (concat (number-to-string (car tkk))
+                            "."
+                            (number-to-string (cadr tkk)))
+                    nil google-translate--tkk-cache)
+      tkk)))
 
 (defun google-translate--get-b-d1 ()
   "Return a list of b and d1 for `google-translate--gen-tk'."
   (let* ((url-request-extra-headers '(("Connection" . "close")))
          (buf (url-retrieve-synchronously google-translate--tkk-url)))
-    (with-current-buffer buf
-      (google-translate--search-tkk))))
+    (if (= (buffer-size buf) 0)
+        (if (file-exists-p google-translate--tkk-cache)
+            (google-translate--try-cached-tkk)
+          (google-translate--try-search-and-cache-tkk buf))
+      (google-translate--try-search-and-cache-tkk buf))))
 
 (defun google-translate--gen-rl (a b)
   (cl-loop for c from 0 below (- (length b) 2) by 3
