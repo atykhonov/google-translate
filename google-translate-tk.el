@@ -39,6 +39,7 @@
 ;;; Code:
 
 (require 'cl-lib)
+(require 'google-translate-backend)
 
 
 (defvar google-translate--bit-v-len 32)
@@ -134,9 +135,10 @@ D is an integer."
 
 (defun google-translate--get-b-d1 ()
   "Return a list of b and d1 for `google-translate--gen-tk'."
-  (let* ((url-request-extra-headers '(("Connection" . "close")))
-         (buf (url-retrieve-synchronously google-translate--tkk-url)))
-    (with-current-buffer buf
+  (let ((url-request-extra-headers '(("Connection" . "close"))))
+    (with-temp-buffer
+      (save-excursion (google-translate-backend-retrieve
+                       google-translate--tkk-url))
       (google-translate--search-tkk))))
 
 (defun google-translate--gen-rl (a b)

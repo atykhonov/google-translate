@@ -119,17 +119,13 @@ QUERY-PARAMS must be an alist of field-value pairs."
 
 (defun google-translate--http-response-body (url &optional for-test-purposes)
   "Retrieve URL and return the response body as a string."
-  (with-current-buffer (url-retrieve-synchronously url)
-    (set-buffer-multibyte t)
-    (goto-char (point-min))
-    (when (null for-test-purposes)
-      (re-search-forward (format "\n\n"))
-      (delete-region (point-min) (point)))
-    (if (null for-test-purposes)
-        (prog1 
-            (buffer-string)
-          (kill-buffer))
-      (buffer-name))))
+  (let ((google-translate-backend-debug (or for-test-purposes
+                                            google-translate-backend-debug)))
+    (with-temp-buffer
+      (save-excursion
+        (google-translate-backend-retrieve url))
+      (set-buffer-multibyte t)
+      (buffer-string))))
 
 (defun google-translate--insert-nulls (string)
   "Google Translate responses with an almost valid JSON string
