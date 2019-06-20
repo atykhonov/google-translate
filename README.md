@@ -310,6 +310,46 @@ like so:
 ```
   (set-face-attribute 'google-translate-translation-face nil :height 1.4)
 ```
+#### Utilize curl, wget or else as a last resort
+
+If you have any troubles that relate to http, like `Search failed: ",tkk:'"`,
+try to use `curl` or `wget` for the backend method.
+
+The variable `'google-translate-backend-method` switches the backend
+method and currently available symbols are below:
+
+- emacs: use built in `url-retrieve-synchronously` (default)
+- curl: invoke curl
+- wget: invoke wget
+
+So if you prefer curl, put following line to your init.el:
+
+```
+(setq google-translate-backend-method 'curl)
+```
+
+In case neither curl nor wget is your preference, you can add another
+command to the variable `'google-translate-backend-commands` and
+employ it, for example:
+
+```
+(push '(foo :name "foo-x86" :args ("-q" "--agent"))
+      google-translate-backend-commands)
+(setq google-translate-backend-method 'foo)
+```
+
+For further information, please refer to the documentation of
+`'google-translate-backend-commands`.
+
+Additionally, these variables would be useful for troubleshooting:
+
+- `google-translate-backend-user-agent`, user agent string for HTTP
+  request header
+  (defaults to `"Emacs"`)
+
+- `google-translate-backend-debug`, log URL access activities to the
+  buffer `*google-translate-backend-debug*`
+  (defaults to nil)
 
 ## Contributors
 
