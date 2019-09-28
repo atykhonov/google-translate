@@ -178,9 +178,7 @@ response in json format."
 translate TEXT from SOURCE-LANGUAGE to TARGET-LANGUAGE."
   (google-translate--http-response-body
    (google-translate--format-request-url
-    `(("client" . "t")
-      ("ie"     . "UTF-8")
-      ("oe"     . "UTF-8")
+    `(("client" . "webapp")
       ("sl"     . ,source-language)
       ("tl"     . ,target-language)
       ("q"      . ,text)
