@@ -45,7 +45,7 @@
 (defvar google-translate--bit-v-len 32)
 
 (defvar google-translate--tkk-url
-  "http://translate.google.com/")
+  "http://translate.google.cn/")
 
 
 (defun google-translate--bit-v-2comp (v)
