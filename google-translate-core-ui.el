@@ -681,6 +681,8 @@ message is printed."
           (google-translate-kill-ring-output-translation gtos))
          ((equal output-destination 'current-buffer)
           (google-translate-current-buffer-output-translation gtos))
+	 ((equal output-destination "return")
+          (gtos-translation gtos))
          ((equal output-destination 'help)
           (let ((describe-func
                  (function
