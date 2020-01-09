@@ -647,7 +647,8 @@ are replaced with a single space. If the region contains not text, a
 message is printed."
   (let* ((json (google-translate-request source-language
                                          target-language
-                                         text)))
+                                         text))
+	 (word-translate-t (= (length (split-string text)) 1)))
     (if (null json)
         (message "Nothing to translate.")
       (let* ((detailed-translation
@@ -665,7 +666,7 @@ message is printed."
                :translation-phonetic (google-translate-json-translation-phonetic json)
                :detailed-translation detailed-translation
                :detailed-definition detailed-definition
-               :suggestion (when (null detailed-translation)
+               :suggestion (when (and word-translate-t (null detailed-translation))
                              (google-translate-json-suggestion json))))
              (output-destination (if (null output-destination)
                                      google-translate-output-destination
