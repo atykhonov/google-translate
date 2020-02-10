@@ -251,9 +251,10 @@ speech."
 `google-translate-request' function) suggestion. This function
 does matter when translating misspelled word. So instead of
 translation it is possible to get suggestion."
-  (let ((info (aref json 7)))
-    (when info
-      (aref info 1))))
+  (when-let ((info (and (< 7 (length json))
+                        (aref json 7))))
+    (and (< 1 (length info))
+         (aref info 1))))
 
 (defun google-translate-version ()
   (interactive)
