@@ -690,7 +690,9 @@ message is printed."
             (with-help-window (help-buffer)
               (funcall describe-func gtos))))
          ((equal output-destination 'paragraph-overlay)
-          (google-translate-paragraph-overlay-output-translation gtos)))))))
+          (google-translate-paragraph-overlay-output-translation gtos))
+         ((equal output-destination 'paragraph-insert)
+          (google-translate-paragraph-insert-output-translation gtos)))))))
 
 (defun google-translate-popup-output-translation (gtos)
   "Output translation to the popup tooltip using `popup'
@@ -765,6 +767,15 @@ http://www.gnu.org/software/emacs/manual/html_node/elisp/The-Echo-Area.html)"
        'display (propertize
                  (concat "\n\n" translation "\n")
                  'face `(:background ,(color-darken-name (face-background 'default) 4)))))))
+
+(defun google-translate-paragraph-insert-output-translation (gtos)
+  "Insert translation below the paragraph with overlay."
+  (let ((start (save-excursion (start-of-paragraph-text) (point)))
+        (end (save-excursion (end-of-paragraph-text) (point)))
+        (below-paragraph (save-excursion (end-of-paragraph-text) (next-line) (point)))
+        (translation (gtos-translation gtos)))
+    (goto-char below-paragraph)
+    (insert (concat "\n" translation "\n"))))
 
 (defun google-translate-help-buffer-output-translation (gtos)
   "Output translation to the help buffer."
