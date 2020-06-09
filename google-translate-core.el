@@ -252,7 +252,7 @@ speech."
 does matter when translating misspelled word. So instead of
 translation it is possible to get suggestion."
   (let ((info (aref json 7)))
-    (when info
+    (unless (seq-empty-p info)
       (aref info 1))))
 
 (defun google-translate-version ()
