@@ -296,6 +296,43 @@ For the meaning of OVERRIDE-P, see `google-translate-query-translate'."
        (or (buffer-substring-no-properties (point-min) (point-max))
            (error "Translate current buffer error."))))))
 
+;;;###autoload
+(defun google-translate-paragraphs (&optional override-p reverse-p)
+  "Translate current buffer with paragraph by paragraph and show results in overlay below paragraph."
+  (interactive "P")
+  (let* ((langs (google-translate-read-args override-p reverse-p))
+         (source-language (car langs))
+         (target-language (cadr langs)))
+    (goto-char (point-min))
+    (while (not (equal (point) (point-max))) ; reached end of buffer
+      (google-translate-translate
+       source-language target-language
+       (save-excursion
+         (mark-paragraph)
+         (buffer-substring-no-properties (region-beginning) (region-end)))
+       'paragraph-overlay)
+      (deactivate-mark)
+      (forward-paragraph)
+      (next-line))))
+
+;;;###autoload
+(defun google-translate-paragraphs-insert (&optional override-p reverse-p)
+  "Translate current buffer with paragraph by paragraph and insert results below paragraph."
+  (interactive "P")
+  (let* ((langs (google-translate-read-args override-p reverse-p))
+         (source-language (car langs))
+         (target-language (cadr langs)))
+    (goto-char (point-min))
+    (while (not (equal (point) (point-max))) ; reached end of buffer
+      (google-translate-translate
+       source-language target-language
+       (save-excursion
+         (mark-paragraph)
+         (buffer-substring-no-properties (region-beginning) (region-end)))
+       'paragraph-insert)
+      (deactivate-mark)
+      (next-line))))
+
 (provide 'google-translate-default-ui)
 
 
