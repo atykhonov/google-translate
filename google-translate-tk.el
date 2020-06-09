@@ -41,11 +41,17 @@
 (require 'cl-lib)
 (require 'google-translate-backend)
 
+(defgroup google-translate-tk nil
+  "Google Translate generation tk parameter script"
+  :group 'processes)
 
 (defvar google-translate--bit-v-len 32)
 
-(defvar google-translate--tkk-url
-  "http://translate.google.com/")
+(defcustom google-translate--tkk-url
+  "http://translate.google.com/"
+  "Google Translate get TKK url"
+  :group 'google-translate-tk
+  :type 'string)
 
 
 (defun google-translate--bit-v-2comp (v)
