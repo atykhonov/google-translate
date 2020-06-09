@@ -625,12 +625,13 @@ clicked."
     (if google-translate-translation-listening-debug
         (with-current-buffer (get-buffer-create buf)
           (insert (format "Listen program: %s\r\n" google-translate-listen-program))
-          (insert (format "Listen URL: %s\r\n" (google-translate-format-listen-url text language)))
-          (call-process google-translate-listen-program nil t nil
-                        (format "%s" (google-translate-format-listen-url text language)))
+          (mapc (lambda (x) (insert (format "Listen URL: %s\r\n" x)))
+                (google-translate-format-listen-urls text language))
+          (apply 'call-process google-translate-listen-program nil t nil
+                 (google-translate-format-listen-urls text language))
           (switch-to-buffer buf))
-      (call-process google-translate-listen-program nil nil nil
-                    (format "%s" (google-translate-format-listen-url text language))))))
+      (apply 'call-process google-translate-listen-program nil nil nil
+             (google-translate-format-listen-urls text language)))))
 
 (defun google-translate-translate (source-language target-language text &optional output-destination)
   "Translate TEXT from SOURCE-LANGUAGE to TARGET-LANGUAGE.
