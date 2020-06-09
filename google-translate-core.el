@@ -85,6 +85,54 @@
   :group 'google-translate-core
   :type 'string)
 
+(defvar google-translate-punctuation-re "[,、]"
+  "Regexp describing the punctuation.")
+
+(defvar google-translate-listen-maxlen 200
+  "Split text for tts url to less than this. If 0, disable split.")
+
+(defun google-translate--split-text (text maxlen)
+  "Split TEXT to less than MAXLEN at applicable point for translating."
+  (let (result)
+    (if (or (null maxlen) (<= maxlen 0))
+	      (push text result)
+      ;; split long text?
+      (with-temp-buffer
+	      (save-excursion (insert text))
+	      ;; strategy to split at applicable point
+	      ;; 1) fill-region remaining text by maxlen
+	      ;; 2) find end of sentence, end of punctuation, word boundary
+	      ;; 3) consume from remaining text between start and (2)
+	      ;; 4) repeat
+	      (let ((fill-column (* maxlen 3))
+	            (sentence-end-double-space nil)
+	            (pos (point-min)))
+	        (while (< pos (point-max))
+	          (save-restriction
+	            (narrow-to-region pos (point-max))
+	            (fill-region pos (point-max))
+	            (let ((limit (+ pos maxlen)))
+		            (if (>= limit (point-max))
+		                (setq limit (point-max))
+		              (goto-char limit)
+		              ;; try to split at end of sentence
+		              (if (> (backward-sentence) pos)
+		                  (setq limit (point))
+		                ;; try to split at end of punctuation
+		                (goto-char limit)
+		                (if (re-search-backward google-translate-punctuation-re
+					                                  pos t)
+			                  (setq limit (1+ (point))) ; include punctuation
+		                  (goto-char limit)
+		                  ;; try to split at word boundary
+		                  (forward-word-strictly -1)
+		                  (when (> (point) pos)
+			                  (setq limit (point))))))
+		            (push (buffer-substring-no-properties pos limit) result)
+		            (goto-char limit)
+		            (setq pos limit)))))))
+    (reverse result)))
+
 (defun google-translate--format-query-string (query-params)
   "Format QUERY-PARAMS as a query string.
 
@@ -111,17 +159,30 @@ QUERY-PARAMS must be an alist of field-value pairs."
           "?"
           (google-translate--format-query-string query-params)))
 
-(defun google-translate-format-listen-url (text language)
+(defun google-translate-format-listen-url (text language &optional total idx)
   "Format listen url for TEXT and TARGET-LANGUAGE."
   (google-translate--format-listen-url `(("ie"      . "UTF-8")
                                          ("q"       . ,text)
                                          ("tl"      . ,language)
-                                         ("total"   . "1")
-                                         ("idx"     . "0")
+                                         ("total"   . ,(or total "1"))
+                                         ("idx"     . ,(or idx "0"))
                                          ("textlen" . ,(number-to-string (length text)))
                                          ("client"  . "t")
                                          ("prev"    . "input")
                                          ("tk"      . ,(google-translate--gen-tk text)))))
+
+(defun google-translate-format-listen-urls (text language)
+  "Split TEXT with `google-translate--split-text', then format
+listen url for TEXT and TARGET-LANGUAGE."
+  (let* ((texts (google-translate--split-text
+		             text google-translate-listen-maxlen))
+	       (total (number-to-string (length texts)))
+	       (idx 0))
+    (mapcar (lambda (x)
+	            (prog1 (google-translate-format-listen-url x language total
+							                                           (number-to-string idx))
+		            (setq idx (1+ idx))))
+	          texts)))
 
 (defun google-translate--http-response-body (url &optional for-test-purposes)
   "Retrieve URL and return the response body as a string."
