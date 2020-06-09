@@ -322,11 +322,17 @@ suitable program."
 
 (defcustom google-translate-output-destination
   nil
-  "Determines where translation output will be displayed. If
-`nil' the translation output will be displayed in the pop up
-buffer (default). If value equals to `echo-area' then translation
-outputs in the Echo Area. And in case of `popup' the translation
-outputs to the popup tooltip using `popup' package."
+  "Determines where translation output will be displayed.
+
+- If it is `nil', output to temporary pop up buffer (default).
+- `echo-area': output to the Echo Area.
+- `popup': output to the popup tooltip using `popup' package.
+- `kill-ring': the output will be added in kill-ring.
+- `current-buffer': the output will be inserted to current buffer.
+- `help': output to help buffer.
+- `paragraph-overlay': output in current buffer overlay paragraph by paragraph.
+- `paragraph-insert': output will be inserted in current buffer paragraph by paragraph.
+"
   :group 'google-translate-core-ui
   :type '(symbol))
 
