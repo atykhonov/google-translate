@@ -14,6 +14,7 @@
 ;;   Chris Bilson <cbilson@pobox.com>
 ;;   Takumi Kinjo <takumi.kinjo@gmail.com>
 ;;   momomo5717 <momomo5717@gmail.com>
+;;   stardiviner <numbchild@gmail.com>
 
 ;; This file is NOT part of GNU Emacs.
 
