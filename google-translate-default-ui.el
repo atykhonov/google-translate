@@ -259,11 +259,11 @@ in the reverse direction."
          (bounds nil))
     (google-translate-translate
      source-language target-language
-     (if (use-region-p)
-         (buffer-substring-no-properties (region-beginning) (region-end))
-       (or (and (setq bounds (bounds-of-thing-at-point 'word))
+     (cond ((string-equal major-mode "pdf-view-mode") (car (pdf-view-active-region-text)))
+           ((use-region-p) (buffer-substring-no-properties (region-beginning) (region-end)))
+       (t (or (and (setq bounds (bounds-of-thing-at-point 'word))
                 (buffer-substring-no-properties (car bounds) (cdr bounds)))
-           (error "No word at point."))))))
+           (error "No word at point.")))))))
 
 ;;;###autoload
 (defun google-translate-at-point (&optional override-p)
@@ -286,16 +286,17 @@ reverse direction."
 
 For the meaning of OVERRIDE-P, see `google-translate-query-translate'."
   (interactive "P")
-  (let* ((langs (google-translate-read-args override-p reverse-p))
-         (source-language (car langs))
-         (target-language (cadr langs)))
-    (google-translate-translate
-     source-language target-language
-     (cond
-      ((string-equal major-mode "pdf-view-mode") (car (pdf-view-active-region-text)))
-      ((use-region-p) (buffer-substring-no-properties (region-beginning) (region-end)))
-      ((or (buffer-substring-no-properties (point-min) (point-max))
-           (error "Translate current buffer error.")))))))
+  (if (string-equal major-mode "pdf-view-mode")
+      (message "In PDF, select region and use google-translate-at-point")
+    (let* ((langs (google-translate-read-args override-p reverse-p))
+           (source-language (car langs))
+           (target-language (cadr langs)))
+      (google-translate-translate
+       source-language target-language
+       (if (use-region-p)
+           (buffer-substring-no-properties (region-beginning) (region-end))
+         (or (buffer-substring-no-properties (point-min) (point-max))
+             (error "Translate current buffer error.")))))))
 
 ;;;###autoload
 (defun google-translate-paragraphs (&optional override-p reverse-p)
