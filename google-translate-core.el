@@ -85,6 +85,12 @@
   :group 'google-translate-core
   :type 'string)
 
+(defvar google-translate-host-language
+  (if current-iso639-language
+			(symbol-name current-iso639-language)
+		"en")
+  "Host language to translate.")
+
 (defvar google-translate-punctuation-re "[,、]"
   "Regexp describing the punctuation.")
 
@@ -248,6 +254,7 @@ translate TEXT from SOURCE-LANGUAGE to TARGET-LANGUAGE."
     `(("client" . "t")
       ("ie"     . "UTF-8")
       ("oe"     . "UTF-8")
+      ("hl"     . ,google-translate-host-language)
       ("sl"     . ,source-language)
       ("tl"     . ,target-language)
       ("q"      . ,text)
