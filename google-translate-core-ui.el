@@ -334,7 +334,14 @@ suitable program."
 - `paragraph-insert': output will be inserted in current buffer paragraph by paragraph.
 "
   :group 'google-translate-core-ui
-  :type '(symbol))
+  :type '(repeat (choice (const :tag "temporary popup buffer" nil)
+                         (const :tag "Echo Area" echo-area)
+                         (const :tag "popup tooltip using popup.el" popup)
+                         (const :tag "kill-ring" kill-ring)
+                         (const :tag "current buffer" current-buffer)
+                         (const :tag "popup Help buffer" help)
+                         (const :tag "paragraph-by-paragraph in overlay" paragraph-overlay)
+                         (const :tag "paragraph-by-paragraph inserted in buffer" paragraph-insert))))
 
 (defcustom google-translate-pop-up-buffer-set-focus
   nil
