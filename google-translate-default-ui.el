@@ -291,9 +291,10 @@ For the meaning of OVERRIDE-P, see `google-translate-query-translate'."
          (target-language (cadr langs)))
     (google-translate-translate
      source-language target-language
-     (cond ((string-equal major-mode "pdf-view-mode") (car (pdf-view-active-region-text)))
-           ((use-region-p) (buffer-substring-no-properties (region-beginning) (region-end)))
-       ((or (buffer-substring-no-properties (point-min) (point-max))
+     (cond
+      ((string-equal major-mode "pdf-view-mode") (car (pdf-view-active-region-text)))
+      ((use-region-p) (buffer-substring-no-properties (region-beginning) (region-end)))
+      ((or (buffer-substring-no-properties (point-min) (point-max))
            (error "Translate current buffer error.")))))))
 
 ;;;###autoload
