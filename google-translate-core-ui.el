@@ -649,12 +649,8 @@ clicked."
 (defun google-translate-translate (source-language target-language text &optional output-destination)
   "Translate TEXT from SOURCE-LANGUAGE to TARGET-LANGUAGE.
 
-In case of `google-translate-output-destination' is nil pops up a
-buffer named *Google Translate* with available translations of
-TEXT. In case of `google-translate-output-destination' is
-`echo-area' outputs translation in the echo area. If
-`google-translate-output-destination' is `popup' outputs
-translation in the popup tooltip using `popup' package.
+About the OUTPUT-DESTINATION, check out option
+`google-translate-output-destination'.
 
 To deal with multi-line regions, sequences of white space
 are replaced with a single space. If the region contains not text, a
