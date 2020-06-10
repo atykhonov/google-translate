@@ -14,6 +14,7 @@
 ;;   Chris Bilson <cbilson@pobox.com>
 ;;   Takumi Kinjo <takumi.kinjo@gmail.com>
 ;;   momomo5717 <momomo5717@gmail.com>
+;;   stardiviner <numbchild@gmail.com>
 
 ;; This file is NOT part of GNU Emacs.
 
@@ -334,7 +335,14 @@ suitable program."
 - `paragraph-insert': output will be inserted in current buffer paragraph by paragraph.
 "
   :group 'google-translate-core-ui
-  :type '(symbol))
+  :type '(repeat (choice (const :tag "temporary popup buffer" nil)
+                         (const :tag "Echo Area" echo-area)
+                         (const :tag "popup tooltip using popup.el" popup)
+                         (const :tag "kill-ring" kill-ring)
+                         (const :tag "current buffer" current-buffer)
+                         (const :tag "popup Help buffer" help)
+                         (const :tag "paragraph-by-paragraph in overlay" paragraph-overlay)
+                         (const :tag "paragraph-by-paragraph inserted in buffer" paragraph-insert))))
 
 (defcustom google-translate-pop-up-buffer-set-focus
   nil
@@ -642,12 +650,8 @@ clicked."
 (defun google-translate-translate (source-language target-language text &optional output-destination)
   "Translate TEXT from SOURCE-LANGUAGE to TARGET-LANGUAGE.
 
-In case of `google-translate-output-destination' is nil pops up a
-buffer named *Google Translate* with available translations of
-TEXT. In case of `google-translate-output-destination' is
-`echo-area' outputs translation in the echo area. If
-`google-translate-output-destination' is `popup' outputs
-translation in the popup tooltip using `popup' package.
+About the OUTPUT-DESTINATION, check out option
+`google-translate-output-destination'.
 
 To deal with multi-line regions, sequences of white space
 are replaced with a single space. If the region contains not text, a
