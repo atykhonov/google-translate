@@ -299,27 +299,43 @@ For the meaning of OVERRIDE-P, see `google-translate-query-translate'."
            (error "Translate current buffer error.")))))))
 
 ;;;###autoload
-(defun google-translate-paragraphs (&optional override-p reverse-p)
-  "Translate current buffer with paragraph by paragraph and show results in overlay below paragraph."
+(defun google-translate-paragraphs-overlay (&optional override-p reverse-p)
+  "Translate current buffer with paragraph by paragraph and show results in overlay below paragraph.
+This command also specificly support org-mode."
   (interactive "P")
   (let* ((langs (google-translate-read-args override-p reverse-p))
          (source-language (car langs))
-         (target-language (cadr langs)))
+         (target-language (cadr langs))
+         (last-paragraph-begin 1))
     (goto-char (point-min))
     (while (not (equal (point) (point-max))) ; reached end of buffer
-      (google-translate-translate
-       source-language target-language
-       (save-excursion
-         (mark-paragraph)
-         (buffer-substring-no-properties (region-beginning) (region-end)))
-       'paragraph-overlay)
-      (deactivate-mark)
-      (forward-paragraph)
-      (next-line))))
+      (if (eq major-mode 'org-mode)
+          (if (eq (car (org-element-at-point)) 'paragraph)
+              (progn
+                (org-mark-element)
+                (exchange-point-and-mark)
+                (unless (= last-paragraph-begin (region-beginning))
+                  (google-translate-translate
+                   source-language target-language
+                   (buffer-substring-no-properties (region-beginning) (region-end))
+                   'paragraph-overlay)
+                  (setq last-paragraph-begin (region-beginning)))
+                (deactivate-mark))
+            (next-line 2))
+        (google-translate-translate
+         source-language target-language
+         (save-excursion
+           (mark-paragraph)
+           (buffer-substring-no-properties (region-beginning) (region-end)))
+         'paragraph-overlay)
+        (deactivate-mark)
+        (forward-paragraph)
+        (next-line)))))
 
 ;;;###autoload
 (defun google-translate-paragraphs-insert (&optional override-p reverse-p)
-  "Translate current buffer with paragraph by paragraph and insert results below paragraph."
+  "Translate current buffer with paragraph by paragraph and insert results below paragraph.
+This command does NOT support document format like org-mode."
   (interactive "P")
   (let* ((langs (google-translate-read-args override-p reverse-p))
          (source-language (car langs))
