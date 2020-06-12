@@ -328,7 +328,7 @@ This command also specificly support org-mode."
          (save-excursion
            (mark-paragraph)
            (buffer-substring-no-properties (region-beginning) (region-end)))
-         'paragraph-overlay)
+         '(paragraph-overlay))
         (deactivate-mark)
         (forward-paragraph)
         (next-line)))))
@@ -348,7 +348,7 @@ This command does NOT support document format like org-mode."
        (save-excursion
          (mark-paragraph)
          (buffer-substring-no-properties (region-beginning) (region-end)))
-       'paragraph-insert)
+       '(paragraph-insert))
       (deactivate-mark)
       (next-line))))
 

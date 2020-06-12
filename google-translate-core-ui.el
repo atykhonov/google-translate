@@ -647,11 +647,15 @@ clicked."
       (apply 'call-process google-translate-listen-program nil nil nil
              (google-translate-format-listen-urls text language)))))
 
-(defun google-translate-translate (source-language target-language text &optional output-destination)
+(defun google-translate-translate (source-language target-language text &optional output-destinations)
   "Translate TEXT from SOURCE-LANGUAGE to TARGET-LANGUAGE.
 
-About the OUTPUT-DESTINATION, check out option
-`google-translate-output-destination'.
+About the OUTPUT-DESTINATIONS, All output destination elements in
+this list will be invoked. If you just want one output
+destination, then use a list that only contains one element of
+that output destination.
+
+More info check out option `google-translate-output-destination'.
 
 To deal with multi-line regions, sequences of white space
 are replaced with a single space. If the region contains not text, a
@@ -661,49 +665,56 @@ message is printed."
                                          text)))
     (if (null json)
         (message "Nothing to translate.")
-      (let* ((detailed-translation
-              (google-translate-json-detailed-translation json))
-             (detailed-definition
-              (google-translate-json-detailed-definition json))
-             (gtos
-              (make-gtos
-               :source-language source-language
-               :target-language target-language
-               :auto-detected-language (aref json 2)
-               :text text
-               :text-phonetic (google-translate-json-text-phonetic json)
-               :translation (google-translate-json-translation json)
-               :translation-phonetic (google-translate-json-translation-phonetic json)
-               :detailed-translation detailed-translation
-               :detailed-definition detailed-definition
-               :suggestion (when (null detailed-translation)
-                             (google-translate-json-suggestion json))))
-             (output-destination (if (null output-destination)
-                                     google-translate-output-destination
-                                   output-destination)))
-        (cond
-         ((null output-destination)
-          (google-translate-buffer-output-translation gtos))
-         ((equal output-destination 'echo-area)
-          (google-translate-echo-area-output-translation gtos))
-         ((equal output-destination 'popup)
-          (google-translate-popup-output-translation gtos))
-         ((equal output-destination 'kill-ring)
-          (google-translate-kill-ring-output-translation gtos))
-         ((equal output-destination 'current-buffer)
-          (google-translate-current-buffer-output-translation gtos))
-         ((equal output-destination 'help)
-          (let ((describe-func
-                 (function
-                  (lambda (gtos)
-                    (google-translate-help-buffer-output-translation gtos)))))
-            (help-setup-xref (list 'google-translate-translate source-language target-language text) nil)
-            (with-help-window (help-buffer)
-              (funcall describe-func gtos))))
-         ((equal output-destination 'paragraph-overlay)
-          (google-translate-paragraph-overlay-output-translation gtos))
-         ((equal output-destination 'paragraph-insert)
-          (google-translate-paragraph-insert-output-translation gtos)))))))
+      (cl-flet* ((output-dispatcher
+                  (output-destination gtos)
+                  (cond
+                   ((null output-destination)
+                    (google-translate-buffer-output-translation gtos))
+                   ((equal output-destination 'echo-area)
+                    (google-translate-echo-area-output-translation gtos))
+                   ((equal output-destination 'popup)
+                    (google-translate-popup-output-translation gtos))
+                   ((equal output-destination 'kill-ring)
+                    (google-translate-kill-ring-output-translation gtos))
+                   ((equal output-destination 'current-buffer)
+                    (google-translate-current-buffer-output-translation gtos))
+                   ((equal output-destination 'help)
+                    (let ((describe-func
+                           (function
+                            (lambda (gtos)
+                              (google-translate-help-buffer-output-translation gtos)))))
+                      (help-setup-xref
+                       (list 'google-translate-translate source-language target-language text) nil)
+                      (with-help-window (help-buffer)
+                        (funcall describe-func gtos))))
+                   ((equal output-destination 'paragraph-overlay)
+                    (google-translate-paragraph-overlay-output-translation gtos))
+                   ((equal output-destination 'paragraph-insert)
+                    (google-translate-paragraph-insert-output-translation gtos)))))
+        (let* ((detailed-translation
+                (google-translate-json-detailed-translation json))
+               (detailed-definition
+                (google-translate-json-detailed-definition json))
+               (gtos
+                (make-gtos
+                 :source-language source-language
+                 :target-language target-language
+                 :auto-detected-language (aref json 2)
+                 :text text
+                 :text-phonetic (google-translate-json-text-phonetic json)
+                 :translation (google-translate-json-translation json)
+                 :translation-phonetic (google-translate-json-translation-phonetic json)
+                 :detailed-translation detailed-translation
+                 :detailed-definition detailed-definition
+                 :suggestion (when (null detailed-translation)
+                               (google-translate-json-suggestion json))))
+               (output-destinations (if (null output-destinations)
+                                        google-translate-output-destination
+                                      output-destinations)))
+          (if (seq-empty-p output-destinations)
+              (output-dispatcher nil gtos)
+            (mapc (lambda (output-destination) (output-dispatcher output-destination gtos))
+                  output-destinations)))))))
 
 (defun google-translate-popup-output-translation (gtos)
   "Output translation to the popup tooltip using `popup'
