@@ -301,7 +301,7 @@ For the meaning of OVERRIDE-P, see `google-translate-query-translate'."
 
 ;;;###autoload
 (defun google-translate-paragraphs-overlay (&optional override-p reverse-p)
-  "Translate current buffer with paragraph by paragraph and show results in overlay below paragraph.
+  "Translate current buffer with paragraph by paragraph and SHOW results in overlay below paragraph.
 This command also specificly support org-mode."
   (interactive "P")
   (let* ((langs (google-translate-read-args override-p reverse-p))
@@ -335,7 +335,7 @@ This command also specificly support org-mode."
 
 ;;;###autoload
 (defun google-translate-paragraphs-insert (&optional override-p reverse-p)
-  "Translate current buffer with paragraph by paragraph and insert results below paragraph.
+  "Translate current buffer with paragraph by paragraph and INSERT results below paragraph.
 This command does NOT support document format like org-mode."
   (interactive "P")
   (let* ((langs (google-translate-read-args override-p reverse-p))
