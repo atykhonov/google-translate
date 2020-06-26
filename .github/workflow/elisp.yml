@@ -1,0 +1,22 @@
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  check: # Better to use a descriptive name
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-16.04, ubuntu-18.04]
+        emacs_version: [25.1, snapshot]
+    steps:
+      - uses: actions/checkout@v2 # You need to check out your own project
+      - uses: purcell/setup-emacs@master # Get the right Emacs version
+        with:
+          version: ${{ matrix.emacs_version }}
+      - uses: leotaku/elisp-check@master
+        with:
+          check: melpa
+          file: *.el # Wildcards do work, but just specifing the file makes things simpler to read
+      - name: Run tests
+        run: 'emacs -Q --batch -L . -l test/*.el -f ert-run-tests-batch-and-exit'
