@@ -1,4 +1,4 @@
-;;; google-translate-cache.el --- caching translation results
+;;; google-translate-cache.el --- Caching translation results
 
 ;; Copyright (C) 2012 Oleksandr Manzyuk <manzyuk@gmail.com>
 

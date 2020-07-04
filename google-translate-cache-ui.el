@@ -1,10 +1,11 @@
-;;; google-translate-cache-ui.el --- caching translation results ui
+;;; google-translate-cache-ui.el --- Caching translation results UI
 
 ;; Copyright (C) 2012 Oleksandr Manzyuk <manzyuk@gmail.com>
 
 ;; Author: Oleksandr Manzyuk <manzyuk@gmail.com>
 ;; Maintainer: Andrey Tykhonov <atykhonov@gmail.com>
 ;; URL: https://github.com/atykhonov/google-translate
+;; Package-Requires: ((emacs "24.3") (popup "0.5.8"))
 ;; Version: 0.12.1
 ;; Keywords: convenience
 
@@ -34,6 +35,8 @@
 
 ;;; Commentary:
 
+;; UI for caching.
+;;
 ;; `google-translate-cache-words-in-buffer' - retreives and caches
 ;;  translations for every word in the buffer.
 ;;
