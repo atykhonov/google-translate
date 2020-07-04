@@ -70,7 +70,6 @@
 
 (require 'json)
 (require 'url)
-(require 'cl-macs)
 (require 'google-translate-tk)
 (require 'google-translate-cache)
 
