@@ -42,12 +42,12 @@
 ;;
 ;; `google-translate-cache-words-in-region' - retreives and caches
 ;;  translations for every word in the active region.
+;;
 
 ;;; Code:
 
-(require 'cl-macs)
+(eval-when-compile (require 'cl-lib))
 (require 'google-translate-default-ui)
-
 
 (defun %google-translate-cache-words-in-region (start end &optional override-p)
   "Translate and cache words between START and END.

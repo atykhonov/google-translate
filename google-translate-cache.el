@@ -35,10 +35,11 @@
 ;;; Commentary:
 
 ;; Caches translation results.
+;;
 
 ;;; Code:
 
-(require 'cl-macs)
+(eval-when-compile (require 'cl-lib))
 (require 'recentf)
 
 
