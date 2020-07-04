@@ -168,7 +168,7 @@
 ;;; Code:
 ;;
 
-(eval-when-compile (require 'cl))
+(eval-when-compile (require 'cl-lib))
 (require 'google-translate-core)
 (require 'ido)
 
