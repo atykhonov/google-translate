@@ -351,6 +351,10 @@ when it pop ups. If `nil', it doesn't get focus and focus remains
 in the same window as was before translation. If `t',
 window (buffer with translation) gets focus.")
 
+(defcustom google-translate-display-translation-phonetic t
+  "Determines whether display phonetic transcription of the
+translating text.")
+
 (defcustom google-translate-listen-button-label
   "[Listen]"
   "Label of the 'Listen' button."
@@ -673,7 +677,8 @@ message is printed."
                :text text
                :text-phonetic (google-translate-json-text-phonetic json)
                :translation (google-translate-json-translation json)
-               :translation-phonetic (google-translate-json-translation-phonetic json)
+               :translation-phonetic (if google-translate-display-translation-phonetic
+                                         (google-translate-json-translation-phonetic json) "")
                :detailed-translation detailed-translation
                :detailed-definition detailed-definition
                :suggestion (when (null detailed-translation)
