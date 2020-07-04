@@ -5,7 +5,7 @@
 ;; Author: Oleksandr Manzyuk <manzyuk@gmail.com>
 ;; Maintainer: Andrey Tykhonov <atykhonov@gmail.com>
 ;; URL: https://github.com/atykhonov/google-translate
-;; Package-Requires: ((emacs "24.3"))
+;; Package-Requires: ((emacs "24.3") (ido "1.57") (popup "0.5.8"))
 ;; Version: 0.12.0
 ;; Keywords: convenience
 
@@ -171,6 +171,7 @@
 (eval-when-compile (require 'cl-lib))
 (require 'google-translate-core)
 (require 'ido)
+(require 'popup)
 
 
 (defvar google-translate-supported-languages-alist
