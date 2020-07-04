@@ -322,7 +322,7 @@ This command also specificly support org-mode."
                    'paragraph-overlay)
                   (setq last-paragraph-begin (region-beginning)))
                 (deactivate-mark))
-            (next-line 2))
+            (forward-line 2))
         (google-translate-translate
          source-language target-language
          (save-excursion
@@ -331,7 +331,7 @@ This command also specificly support org-mode."
          'paragraph-overlay)
         (deactivate-mark)
         (forward-paragraph)
-        (next-line)))))
+        (forward-line)))))
 
 ;;;###autoload
 (defun google-translate-paragraphs-insert (&optional override-p reverse-p)
@@ -350,7 +350,7 @@ This command does NOT support document format like org-mode."
          (buffer-substring-no-properties (region-beginning) (region-end)))
        'paragraph-insert)
       (deactivate-mark)
-      (next-line))))
+      (forward-line))))
 
 (provide 'google-translate-default-ui)
 

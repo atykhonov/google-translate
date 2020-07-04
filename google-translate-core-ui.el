@@ -778,7 +778,7 @@ http://www.gnu.org/software/emacs/manual/html_node/elisp/The-Echo-Area.html)"
         (end (save-excursion (end-of-paragraph-text) (point)))
         (below-paragraph (if (eq major-mode 'org-mode)
                              (save-excursion (previous-line) (point))
-                           (save-excursion (end-of-paragraph-text) (next-line) (point))))
+                           (save-excursion (end-of-paragraph-text) (forward-line) (point))))
         (translation (gtos-translation gtos)))
     (with-silent-modifications
       (put-text-property
@@ -791,7 +791,7 @@ http://www.gnu.org/software/emacs/manual/html_node/elisp/The-Echo-Area.html)"
   "Insert translation below the paragraph with overlay."
   (let ((start (save-excursion (start-of-paragraph-text) (point)))
         (end (save-excursion (end-of-paragraph-text) (point)))
-        (below-paragraph (save-excursion (end-of-paragraph-text) (next-line) (point)))
+        (below-paragraph (save-excursion (end-of-paragraph-text) (forward-line) (point)))
         (translation (gtos-translation gtos)))
     (goto-char below-paragraph)
     (insert (concat "\n" translation "\n"))))
