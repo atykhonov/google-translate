@@ -531,25 +531,25 @@ source and target languages."
                                                                     format2)
   "Return detailed translation."
   (with-temp-buffer
-    (loop for item across detailed-translation do
-          (let ((index 0)
-                (label (aref item 0)))
-            (unless (string-equal label "")
-              (put-text-property 0 (length label)
-                                 'font-lock-face
-                                 'google-translate-translation-face
-                                 label)
-              (insert (format format1 label))
-              (loop for translation across (aref item 2) do
-                    (let ((content
-                           (format "%s (%s)"
-                                   (aref translation 0)
-                                   (mapconcat 'identity
-                                              (aref translation 1)
-                                              ", "))))
-                      (insert (format format2
-                                      (incf index)
-                                      content)))))))
+    (cl-loop for item across detailed-translation do
+             (let ((index 0)
+                   (label (aref item 0)))
+               (unless (string-equal label "")
+                 (put-text-property 0 (length label)
+                                    'font-lock-face
+                                    'google-translate-translation-face
+                                    label)
+                 (insert (format format1 label))
+                 (cl-loop for translation across (aref item 2) do
+                          (let ((content
+                                 (format "%s (%s)"
+                                         (aref translation 0)
+                                         (mapconcat 'identity
+                                                    (aref translation 1)
+                                                    ", "))))
+                            (insert (format format2
+                                            (cl-incf index)
+                                            content)))))))
     (buffer-substring (point-min) (point-max))))
 
 (defun google-translate--detailed-definition (detailed-definition definition
@@ -559,27 +559,27 @@ source and target languages."
   (with-temp-buffer
     (let ((section "DEFINITION"))
       (put-text-property 0 (length section)
-			 'font-lock-face
-			 'google-translate-translation-face
-			 section)
+                         'font-lock-face
+                         'google-translate-translation-face
+                         section)
       (insert (format "\n%s\n" section)))
-    (loop for item across detailed-definition do
-          (let ((index 0)
-                (label (aref item 0)))
-            (unless (string-equal label "")
-              (put-text-property 0 (length label)
-                                 'font-lock-face
-                                 'google-translate-translation-face
-                                 label)
-              (insert (format format1 label))
-              (loop for definition across (aref item 1) do
-                    (insert (format format2
-                                    (incf index)
-                                    (if (> (length definition) 2)
-                                        (format "%s\n    \"%s\""
-                                                (aref definition 0)
-                                                (aref definition 2))
-                                      (format "%s" (aref definition 0)))))))))
+    (cl-loop for item across detailed-definition do
+             (let ((index 0)
+                   (label (aref item 0)))
+               (unless (string-equal label "")
+                 (put-text-property 0 (length label)
+                                    'font-lock-face
+                                    'google-translate-translation-face
+                                    label)
+                 (insert (format format1 label))
+                 (cl-loop for definition across (aref item 1) do
+                          (insert (format format2
+                                          (cl-incf index)
+                                          (if (> (length definition) 2)
+                                              (format "%s\n    \"%s\""
+                                                      (aref definition 0)
+                                                      (aref definition 2))
+                                            (format "%s" (aref definition 0)))))))))
     (buffer-substring (point-min) (point-max))))
 
 (defun google-translate--suggestion (gtos)
