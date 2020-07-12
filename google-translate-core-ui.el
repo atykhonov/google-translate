@@ -288,7 +288,7 @@ query parameter in HTTP requests.")
 (defvar google-translate-translation-listening-debug nil
   "For debug translation listening purposes.")
 
-(defstruct gtos
+(cl-defstruct gtos
   "google translate output structure contains miscellaneous
   information which intended to be outputed to the buffer, echo
   area or popup tooltip."
