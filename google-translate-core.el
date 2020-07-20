@@ -258,9 +258,6 @@ response in json format."
                   (progn
                     (setq cleaned-text (downcase cleaned-text))
                     (setq text (downcase text))))
-              (google-translate--cache-rebuild-if-necessary
-               source-language
-               target-language)
               (or (google-translate-cache-get source-language
                                               target-language
                                               cleaned-text)

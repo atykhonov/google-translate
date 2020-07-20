@@ -49,16 +49,16 @@
 (eval-when-compile (require 'cl-lib))
 (require 'google-translate-default-ui)
 
-(defun %google-translate-cache-words-in-region (start end &optional override-p)
-  "Translate and cache words between START and END.
+(defun %google-translate-cache-words-in-region (beg end &optional override-p)
+  "Translate and cache words between BEG and END.
 
 For the meaning of OVERRIDE-P, see `google-translate-query-translate'."
   (let ((langs (google-translate-read-args override-p nil))
         (word 1)
-        (total (count-words start end)))
+        (total (count-words beg end)))
     (save-excursion
       (save-restriction
-        (narrow-to-region start end)
+        (narrow-to-region beg end)
         (goto-char (point-min))
         (while (forward-word-strictly 1)
           (message "Processing word %d/%d." word total)

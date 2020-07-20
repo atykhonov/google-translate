@@ -171,7 +171,6 @@
 (eval-when-compile (require 'cl-lib))
 (require 'google-translate-core)
 (require 'ido)
-(require 'popup)
 (require 'color)
 
 (defvar google-translate-supported-languages-alist

@@ -35,7 +35,9 @@
 ;;; Commentary:
 
 ;; Caches translation results.
-;;
+
+;; Segmentation into multiple files is used, so that when the cache
+;; is needed, there's no need to load everything.
 
 ;;; Code:
 
@@ -136,28 +138,33 @@ CACHED-MAX found in SOURCE-LANGUAGE/TARGET-LANGUAGE/max-files."
   (message "Rebuilding Google Translate cache...")
   (let ((contents nil)
         (x 0))
+    ;; clean out the existing files collecting the cache into `contents'
     (cl-loop for x from 0 to cached-max
-             do (let* ((name (concat source-language "/" target-language "/cache_" (int-to-string x)))
+             do (let* ((name (concat source-language "/" target-language "/cache-" (int-to-string x)))
                        (segment (google-translate--cache-get-file name)))
                   (setf contents (append contents (plist-get segment :contents)))
                   (delete-file (google-translate--cache-expand-rpath name))
-                  (plist-put segment :contents nil)
-                  (plist-put segment :dirty nil)))
+                  (setf google-translate-cache-files
+                        (assoc-delete-all (google-translate--cache-expand-rpath name)
+                                          google-translate-cache-files))))
+    ;; rebuild cache from `contents'
     (dolist (x contents)
-      (google-translate-cache-add source-language target-language (car x) (cdr x)))))
+      (google-translate--cache-add-helper source-language target-language (car x) (cdr x)))))
 
 (defun google-translate--cache-rebuild-if-necessary (source-language target-language)
   "Recache from SOURCE-LANGUAGE to TARGET-LANGUAGE to fit `google-translate-cache-files-per-language'."
   (let* ((max-files (google-translate--cache-get-file
-                     (concat source-language "/" target-language "/max_files")))
+                     (concat source-language "/" target-language "/max-files")))
          (cached-max (plist-get max-files :contents))
          (needed-max google-translate-cache-files-per-language))
-    (if (and cached-max (not (equal cached-max needed-max)))
-        (progn
-          (google-translate--cache-rebuild-helper source-language target-language cached-max)
-          (plist-put max-files :contents google-translate-cache-files-per-language)
-          (plist-put max-files :dirty t)
-          (google-translate-cache-save)))))
+    (if (null cached-max)
+        (progn (plist-put max-files :contents needed-max)
+               (plist-put max-files :dirty t))
+      (when (not (equal cached-max needed-max))
+        (google-translate--cache-rebuild-helper source-language target-language cached-max)
+        (plist-put max-files :contents google-translate-cache-files-per-language)
+        (plist-put max-files :dirty t)
+        (google-translate-cache-save)))))
 
 (defun google-translate--cache-get-hash (key)
   "Return cache file # where to keep string KEY."
@@ -181,12 +188,12 @@ CACHED-MAX found in SOURCE-LANGUAGE/TARGET-LANGUAGE/max-files."
            "/cache-"
            (int-to-string (google-translate--cache-get-hash key)))))
 
-(defun google-translate-cache-add (source-language target-language key translation)
+(defun google-translate--cache-add-helper (source-language target-language key translation)
   "Cache TRANSLATION for KEY from SOURCE-LANGUAGE to TARGET-LANGUAGE.
 
-Segmentation into multiple files is used, so that when the cache is needed,
-there's no need to load everything.  `google-translate--key-to-segment-id'
-decides to which file the KEY goes to."
+`google-translate--cache-rebuild-helper' is calling this functions instead of
+`google-translate-cache-add', because that one calls
+`google-translate--cache-rebuild-if-necessary'."
   (let ((cache-segment
          (google-translate--cache-get-segment source-language target-language key)))
     ;; remove duplicates
@@ -197,11 +204,19 @@ decides to which file the KEY goes to."
                (cons (cons key translation)
                      (plist-get cache-segment :contents)))
     ;; mark segment as modified
-    (plist-put cache-segment :dirty t))
+    (plist-put cache-segment :dirty t)))
+
+(defun google-translate-cache-add (source-language target-language key translation)
+  "Cache TRANSLATION for KEY from SOURCE-LANGUAGE to TARGET-LANGUAGE.
+
+`google-translate--key-to-segment-id' decides to which file the KEY goes to."
+  (google-translate--cache-rebuild-if-necessary source-language target-language)
+  (google-translate--cache-add-helper source-language target-language key translation)
   translation)
 
 (defun google-translate-cache-get (source-language target-language key)
   "Get cached translation for KEY from SOURCE-LANGUAGE to TARGET-LANGUAGE."
+  (google-translate--cache-rebuild-if-necessary source-language target-language)
   (let ((cache-segment
          (google-translate--cache-get-segment source-language target-language key)))
     (alist-get key (plist-get cache-segment :contents) nil nil 'equal)))
