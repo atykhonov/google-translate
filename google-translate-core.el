@@ -175,7 +175,7 @@ QUERY-PARAMS must be an alist of field-value pairs."
                                          ("total"   . ,(or total "1"))
                                          ("idx"     . ,(or idx "0"))
                                          ("textlen" . ,(number-to-string (length text)))
-                                         ("client"  . "t")
+                                         ("client"  . "gtx")
                                          ("prev"    . "input")
                                          ("tk"      . ,(google-translate--gen-tk text)))))
 
@@ -253,7 +253,7 @@ response in json format."
 translate TEXT from SOURCE-LANGUAGE to TARGET-LANGUAGE."
   (google-translate--http-response-body
    (google-translate--format-request-url
-    `(("client" . "t")
+    `(("client" . "gtx")
       ("ie"     . "UTF-8")
       ("oe"     . "UTF-8")
       ("hl"     . ,google-translate-host-language)
