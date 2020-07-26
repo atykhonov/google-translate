@@ -43,9 +43,13 @@
 
 (eval-when-compile (require 'cl-lib))
 (require 'recentf)
+(require 'dired)
 
 
-(defvar google-translate-cache-files nil)
+(defvar google-translate-cache-files nil
+  "Holds all loaded and newly created cache-related files as a list of \
+elements with form (filename . plist).  See \
+`google-translate--cache-get-file' for the format of the plist.")
 
 
 (defgroup google-translate-cache nil
@@ -121,9 +125,11 @@ Because cache files don't need to be in recentf."
 (defun google-translate--cache-get-file (rpath)
   "Load file `google-translate-cache-directory'/RPATH.
 
-Return it as a property list, :dirty as nil and :contents as the contents of
-the file.  :dirty being non-nil indicates the need to be saved by
-`google-translate-cache-save'."
+Return it as a property list, :dirty as nil and :contents as the contents of \
+the file.  :dirty being non-nil indicates the need to be saved by \
+`google-translate-cache-save'.
+
+If the file doesn't exist, return the :contents as nil."
   (let ((path (google-translate--cache-expand-rpath rpath)))
     (cl-flet ((get () (alist-get path google-translate-cache-files nil nil 'equal)))
       (or (get)
@@ -227,7 +233,13 @@ CACHED-MAX found in SOURCE-LANGUAGE/TARGET-LANGUAGE/max-files."
    (cl-loop for f in google-translate-cache-files
             do (save-excursion
                  (if (plist-get (cdr f) :dirty)
-                     (let ((buf (find-file-noselect (car f))))
+                     (let ((buf (find-file-noselect (car f)))
+                           (dir (file-name-directory (car f))))
+                       ;; Ensure the existence of the directory.
+                       ;; Otherwise the user gets a dialogue about this
+                       ;; (aka "you want to create this dir?") when emacs exits.
+                       (unless (f-exists-p dir)
+                         (dired-create-directory dir))
                        (plist-put (cdr f) :dirty nil)
                        (set-buffer buf)
                        (erase-buffer)
