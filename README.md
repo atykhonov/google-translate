@@ -1,6 +1,8 @@
 # Emacs interface to Google Translate
 
 [![Join the chat at https://gitter.im/atykhonov/google-translate](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/atykhonov/google-translate?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![MELPA](https://melpa.org/packages/google-translate-badge.svg)](https://melpa.org/#/google-translate)
+[![MELPA Stable](https://stable.melpa.org/packages/google-translate-badge.svg)](https://stable.melpa.org/#/google-translate)
 
 ## Summary
 
