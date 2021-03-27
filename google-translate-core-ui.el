@@ -173,6 +173,7 @@
 (require 'ido)
 (require 'popup)
 (require 'color)
+(require 'facemenu)
 
 (defvar google-translate-supported-languages-alist
   '(("Afrikaans"           . "af")
