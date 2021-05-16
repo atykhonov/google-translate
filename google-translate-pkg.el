@@ -1,2 +1,2 @@
-(define-package "google-translate" "0.12.0"
+(define-package "google-translate" "0.12.1"
   "Emacs interface to Google Translate.")

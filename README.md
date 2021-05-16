@@ -241,7 +241,7 @@ displayed if available. If you want to see the phonetics, set this
 variable to t.
 
 The variable `google-translate-listen-program` determines the program
-to use to listen translations. By default the program looks for
+to use to listen to translations. By default the program looks for
 `mplayer` in the PATH, if `mplayer` is found then listening function
 will be available and you'll see `Listen` button in the buffer with
 the translation. You can use any other suitable program. If you use
@@ -353,6 +353,34 @@ Additionally, these variables would be useful for troubleshooting:
   buffer `*google-translate-backend-debug*`
   (defaults to nil)
 
+## Cache
+
+Translation results may be cached by setting `google-translate-use-cache`
+to `t` (default). Only the text is cached, not the audio from `[Listen]`.
+
+Some customization variables:
+
+- `google-translate-cache-files-per-language` specifies how many files 
+   may be used for storing the cache on the disk per language pair
+   (for incremental loading and saving),
+
+- `google-translate-cache-word-limit` specifies maximum words a request 
+  (w/out the translation) may have in order to be cached. `nil` for no
+  limit.
+
+- `google-translate-cache-downcase-requests` indicates whether the text should
+  be downcased before translation (when it doesn't exceed 
+  `google-translate-cache-word-limit`, that is) (defaults to `t`),
+
+- `google-translate-cache-directory` is the directory where the cache is to
+  be saved (defaults to `~/.emacs.d/var/translate-cache`).
+
+For batch word caching (such as vocabulary), see 
+`google-translate-cache-words-in-region` and 
+`google-translate-cache-words-in-buffer`.
+
+`google-translate-cache-save` is added to `kill-emacs-hook`.
+
 ## Contributors
 
 - Tassilo Horn
@@ -363,3 +391,4 @@ Additionally, these variables would be useful for troubleshooting:
 - [Michihito Shigemura](https://github.com/shigemk2)
 - [Tomotaka SUWA](https://github.com/t-suwa)
 - [stardiviner](https://github.com/stardiviner)
+- Dmitrii Korobeinikov

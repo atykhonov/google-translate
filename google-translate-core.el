@@ -6,7 +6,7 @@
 ;; Maintainer: Andrey Tykhonov <atykhonov@gmail.com>
 ;; URL: https://github.com/atykhonov/google-translate
 ;; Package-Requires: ((emacs "25.1"))
-;; Version: 0.12.0
+;; Version: 0.12.1
 ;; Keywords: convenience
 
 ;; Contributors:
@@ -16,6 +16,7 @@
 ;;   Takumi Kinjo <takumi.kinjo@gmail.com>
 ;;   momomo5717 <momomo5717@gmail.com>
 ;;   stardiviner <numbchild@gmail.com>
+;;   Dmitrii Korobeinikov <dim1212k@gmail.com>
 
 ;; This file is NOT part of GNU Emacs.
 
@@ -70,6 +71,7 @@
 (require 'json)
 (require 'url)
 (require 'google-translate-tk)
+(require 'google-translate-cache)
 
 (defgroup google-translate-core nil
   "Google Translate core script."
@@ -238,12 +240,32 @@ request."
 translate TEXT from SOURCE-LANGUAGE to TARGET-LANGUAGE. Returns
 response in json format."
   (let ((cleaned-text (google-translate-prepare-text-for-request text)))
-    (when (and
-           (stringp cleaned-text)
-           (> (length cleaned-text) 0))
-      (json-read-from-string
-       (google-translate--insert-nulls
-        (google-translate--request source-language target-language text))))))
+    (when (and (stringp cleaned-text)
+               (> (length cleaned-text) 0))
+      (cl-flet ((translate () (json-read-from-string
+                               (google-translate--insert-nulls
+                                (google-translate--request
+                                 source-language
+                                 target-language
+                                 text)))))
+        (if (and google-translate-use-cache
+                 (or (null google-translate-cache-word-limit)
+                     (<= (length (split-string cleaned-text))
+                         google-translate-cache-word-limit)))
+            (progn
+              (if google-translate-cache-downcase-requests
+                  ;; rely on dynamic scoping
+                  (progn
+                    (setq cleaned-text (downcase cleaned-text))
+                    (setq text (downcase text))))
+              (or (google-translate-cache-get source-language
+                                              target-language
+                                              cleaned-text)
+                  (google-translate-cache-add source-language
+                                              target-language
+                                              cleaned-text
+                                              (translate))))
+          (translate))))))
 
 (defun google-translate--request (source-language
                                   target-language
@@ -333,7 +355,7 @@ translation it is possible to get suggestion."
 
 (defun google-translate-version ()
   (interactive)
-  (message "Google Translate (version): %s" "0.12.0"))
+  (message "Google Translate (version): %s" "0.12.1"))
 
 
 (provide 'google-translate-core)
