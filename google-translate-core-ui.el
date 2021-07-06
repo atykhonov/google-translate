@@ -363,6 +363,12 @@ translation) gets focus.")
   :group 'google-translate-core-ui
   :type 'string)
 
+(defcustom google-translate-translation-to-kill-ring nil
+  "Add translation to kill-ring after translate commands if it's `t'."
+  :type 'boolean
+  :safe #'booleanp
+  :group 'google-translate-core-ui)
+
 (defface google-translate-text-face
   '((t (:inherit default)))
   "Face used to display the original text."
@@ -422,6 +428,10 @@ As example, this alist could looks like the following:
 In this way, `ukrainian-programmer-dvorak' will be auto enabled
 for the minibuffer when Russian or Ukrainian (as source language)
 is active.")
+
+
+(defvar google-translate-result-translation nil
+  "The result translation of `google-translate-translate'.")
 
 (defun google-translate-supported-languages ()
   "Return a list of names of languages supported by Google Translate."
@@ -662,7 +672,9 @@ About the OUTPUT-DESTINATION, check out option
 
 To deal with multi-line regions, sequences of white space
 are replaced with a single space. If the region contains not text, a
-message is printed."
+message is printed.
+
+At last will save result translation to `google-translate-result-translation'."
   (let* ((json (google-translate-request source-language
                                          target-language
                                          text)))
@@ -711,7 +723,10 @@ message is printed."
          ((equal output-destination 'paragraph-overlay)
           (google-translate-paragraph-overlay-output-translation gtos))
          ((equal output-destination 'paragraph-insert)
-          (google-translate-paragraph-insert-output-translation gtos)))))))
+          (google-translate-paragraph-insert-output-translation gtos)))))
+    (setq google-translate-result-translation (gtos-translation gtos))
+    (when google-translate-result-to-kill-ring
+      (kill-new google-translate-result-translation))))
 
 (defun google-translate-popup-output-translation (gtos)
   "Output translation to the popup tooltip using `popup'
