@@ -1,54 +1,42 @@
 .PHONY : all test unit-test ecukes
 
 EMACS ?= emacs
-SRC = $(filter-out %-pkg.el, $(wildcard *.el reporters/*.el))
-ELC = $(SRC:.el=.elc)
-CASK ?= cask
-PKG_DIR := $(shell $(CASK) package-directory)
+EASK ?= eask
 FEATURES = $(wildcard features/*.feature)
-VERSION = 0.12.0
-TARGET_DIR = google-translate-$(VERSION)
 
-all: test marmalade tag
+all: test tag
+
+ci: clean package install compile test
 
 test:
 	$(MAKE) unit-test
 	$(MAKE) ecukes
 
 unit-test:
-	$(CASK) exec ert-runner
-
-$(PKG_DIR):
-	Cask
-	$(CASK) install
-	touch $@
+	$(EASK) ert ./test/*.el
 
 ecukes:
-	$(CASK) exec ecukes --reporter magnars --script $(FEATURES) --no-win
+	$(EASK) exec ecukes --reporter magnars --script $(FEATURES) --no-win
 
-marmalade: marmalade-tar marmalade-upload marmalade-rm
+package:
+	@echo "Packaging..."
+	$(EASK) package
 
-marmalade-tar:
-	mkdir $(TARGET_DIR)
-	cp google-translate-core-ui.el $(TARGET_DIR)
-	cp google-translate-core.el $(TARGET_DIR)
-	cp google-translate-default-ui.el $(TARGET_DIR)
-	cp google-translate-query-auto-complete.el $(TARGET_DIR)
-	cp google-translate-smooth-ui.el $(TARGET_DIR)
-	cp google-translate.el $(TARGET_DIR)
-	cp README.md $(TARGET_DIR)
-	cp google-translate-pkg.el $(TARGET_DIR)
-	tar -cf google-translate-$(VERSION).tar $(TARGET_DIR)
+install:
+	@echo "Installing..."
+	$(EASK) install
 
-marmalade-upload:
-	marmalade-upload -u atykhonov google-translate-$(VERSION).tar || true
+compile:
+	@echo "Compiling..."
+	$(EASK) compile
 
-marmalade-rm:
-	rm google-translate-$(VERSION).tar
-	rm -rf $(TARGET_DIR)
+checkdoc:
+	@echo "Run checkdoc..."
+	$(EASK) checkdoc
 
-version:
-	@echo $(VERSION)
+lint:
+	@echo "Run package-lint..."
+	$(EASK) lint
 
-tag:
-	git tag v$(VERSION) && git push origin --tags
+clean:
+	$(EASK) clean-all

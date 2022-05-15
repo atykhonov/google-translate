@@ -1,7 +1,11 @@
-(source melpa)
-
-(package "google-translate" "0.8.2"
+(package "google-translate" 
+         "0.8.2"
          "Emacs interface to Google Translate.")
+
+(source "melpa")
+
+(depends-on "emacs" "24.3")
+(depends-on "popup")
 
 (development
  (depends-on "f")
