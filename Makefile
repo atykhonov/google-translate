@@ -9,6 +9,7 @@ all: test tag
 ci: clean package install compile test
 
 test:
+	$(EASK) install-deps --dev
 	$(MAKE) unit-test
 	$(MAKE) ecukes
 
