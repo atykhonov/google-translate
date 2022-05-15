@@ -1,5 +1,5 @@
 (package "google-translate" 
-         "0.8.2"
+         "0.12.0"
          "Emacs interface to Google Translate.")
 
 (package-file "google-translate.el")
