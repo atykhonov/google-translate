@@ -2,6 +2,10 @@
          "0.8.2"
          "Emacs interface to Google Translate.")
 
+(package-file "google-translate.el")
+
+(files "google-translate-*.el")
+
 (source "melpa")
 
 (depends-on "emacs" "24.3")
