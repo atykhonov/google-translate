@@ -1,2 +1,3 @@
 *.elc
 /.cask/*
+/.dir-locals-2.el
