@@ -33,6 +33,8 @@ jobs:
       with:
         version: 'snapshot'
     - uses: actions/checkout@v3
+    - name: Setup Cask
+      run: 'cask'
     - name: Run tests
       if: matrix.allow_failure != true
       run: 'make test'
