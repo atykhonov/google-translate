@@ -37,7 +37,7 @@ jobs:
       run: 'cask'
     - name: Run tests
       if: matrix.allow_failure != true
-      run: 'make test'
+      run: 'make unit-test'
     - name: Run tests (allow failure)
       if: matrix.allow_failure == true
       run: 'make test || true'
