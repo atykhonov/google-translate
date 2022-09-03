@@ -69,6 +69,7 @@
 
 (require 'json)
 (require 'url)
+(require 'google-translate-backend)
 
 (defgroup google-translate-core nil
   "Google Translate core script."
