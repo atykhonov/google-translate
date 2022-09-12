@@ -69,7 +69,7 @@
 
 (require 'json)
 (require 'url)
-(require 'google-translate-tk)
+(require 'google-translate-backend)
 
 (defgroup google-translate-core nil
   "Google Translate core script."
@@ -176,8 +176,7 @@ QUERY-PARAMS must be an alist of field-value pairs."
                                          ("idx"     . ,(or idx "0"))
                                          ("textlen" . ,(number-to-string (length text)))
                                          ("client"  . "gtx")
-                                         ("prev"    . "input")
-                                         ("tk"      . ,(google-translate--gen-tk text)))))
+                                         ("prev"    . "input"))))
 
 (defun google-translate-format-listen-urls (text language)
   "Split TEXT with `google-translate--split-text', then format
@@ -274,8 +273,7 @@ translate TEXT from SOURCE-LANGUAGE to TARGET-LANGUAGE."
       ("otf"    . "1")
       ("srcrom" . "1")
       ("ssel"   . "0")
-      ("tsel"   . "0")
-      ("tk"     . ,(google-translate--gen-tk text))))
+      ("tsel"   . "0")))
    for-test-purposes))
 
 (defun google-translate-json-text-phonetic (json)

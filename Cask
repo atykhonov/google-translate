@@ -3,6 +3,8 @@
 (package "google-translate" "0.8.2"
          "Emacs interface to Google Translate.")
 
+(package-file "google-translate.el")
+
 (development
  (depends-on "f")
  (depends-on "s")
