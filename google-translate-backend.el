@@ -104,7 +104,7 @@ Disabled if `google-translate-backend-debug' is nil."
   "Get URL contents by `url-retrieve-synchronously'."
   (insert
    (let ((url-user-agent google-translate-backend-user-agent))
-     (with-current-buffer (url-retrieve-synchronously url)
+     (with-current-buffer (url-retrieve-synchronously url nil nil 15)
        (set-buffer-multibyte t)
        (google-translate-backend--log url 'emacs)
        (goto-char (point-min))
