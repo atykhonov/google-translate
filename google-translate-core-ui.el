@@ -723,10 +723,10 @@ At last will save result translation to `google-translate-result-translation'."
          ((equal output-destination 'paragraph-overlay)
           (google-translate-paragraph-overlay-output-translation gtos))
          ((equal output-destination 'paragraph-insert)
-          (google-translate-paragraph-insert-output-translation gtos)))))
-    (setq google-translate-result-translation (gtos-translation gtos))
-    (when google-translate-result-to-kill-ring
-      (kill-new google-translate-result-translation))))
+          (google-translate-paragraph-insert-output-translation gtos)))
+        (setq google-translate-result-translation (gtos-translation gtos))
+        (when google-translate-result-to-kill-ring
+          (kill-new google-translate-result-translation))))))
 
 (defun google-translate-popup-output-translation (gtos)
   "Output translation to the popup tooltip using `popup'
