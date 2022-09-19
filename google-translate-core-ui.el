@@ -725,7 +725,7 @@ At last will save result translation to `google-translate-result-translation'."
          ((equal output-destination 'paragraph-insert)
           (google-translate-paragraph-insert-output-translation gtos)))
         (setq google-translate-result-translation (gtos-translation gtos))
-        (when google-translate-result-to-kill-ring
+        (when google-translate-translation-to-kill-ring
           (kill-new google-translate-result-translation))))))
 
 (defun google-translate-popup-output-translation (gtos)
