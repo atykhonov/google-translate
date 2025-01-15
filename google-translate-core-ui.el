@@ -369,6 +369,15 @@ translation) gets focus.")
   :safe #'booleanp
   :group 'google-translate-core-ui)
 
+(define-derived-mode google-translate-mode
+  help-mode "Google Translate"
+  "Major mode for google translate output.")
+
+(defvar google-translate-mode-mode-map
+  (let ((map (make-sparse-keymap)))
+    map)
+  "Keymap for `google-translate-mode'.")
+
 (defface google-translate-text-face
   '((t (:inherit default)))
   "Face used to display the original text."
@@ -860,7 +869,8 @@ http://www.gnu.org/software/emacs/manual/html_node/elisp/The-Echo-Area.html)"
          (google-translate--detailed-definition
           detailed-definition translation
           "\n%s\n" "%2d. %s\n")
-       ""))))
+       ""))
+    (google-translate-mode)))
 
 (defun google-translate-read-source-language (&optional prompt)
   "Read a source language, with completion, and return its abbreviation.
