@@ -1,4 +1,4 @@
-;;; google-translate-posframe-ui-test.el --- Tests for posframe UI -*- lexical-binding: t; -*-
+;;; google-translate-posframe-test.el --- Tests for posframe UI -*- lexical-binding: t; -*-
 
 ;;; Commentary:
 
@@ -8,7 +8,7 @@
 ;;; Code:
 
 (require 'ert)
-(require 'google-translate-posframe-ui)
+(require 'google-translate-posframe)
 
 ;;; Cache tests
 
@@ -148,7 +148,7 @@
 ;;; Fetch with cache tests
 
 (ert-deftest test-google-translate-posframe--fetch-uses-cache ()
-  "Fetch should use cached result without calling google-translate-request."
+  "Fetch should use cached result without calling `google-translate-request'."
   (let ((google-translate-posframe--cache (make-hash-table :test 'equal))
         (google-translate-posframe-cache-ttl 3600)
         (callback-called nil)
@@ -174,5 +174,5 @@
     ;; Same inputs should produce equal keys
     (should (equal key1 (google-translate-posframe--cache-key "en" "ru" "hello")))))
 
-(provide 'google-translate-posframe-ui-test)
-;;; google-translate-posframe-ui-test.el ends here
+(provide 'google-translate-posframe-test)
+;;; google-translate-posframe-test.el ends here

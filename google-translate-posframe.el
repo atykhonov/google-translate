@@ -1,4 +1,4 @@
-;;; google-translate-posframe-ui.el --- Posframe popup UI for Google Translate -*- lexical-binding: t; -*-
+;;; google-translate-posframe.el --- Posframe popup UI for Google Translate -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2026 Ag Ibragimov
 
@@ -6,7 +6,6 @@
 ;; URL: https://github.com/atykhonov/google-translate
 ;; Version: 0.12.0
 ;; Keywords: convenience text tools
-;; Package-Requires: ((emacs "26.1") (posframe "1.0"))
 
 ;; This file is NOT part of GNU Emacs.
 
@@ -67,6 +66,13 @@
 
 (declare-function evil-normal-state-p "evil-states")
 (declare-function evil-visual-state-p "evil-states")
+
+(defvar google-translate-default-source-language)
+(defvar google-translate-default-target-language)
+
+;; Defined by `define-minor-mode' below, declared here to silence
+;; the byte-compiler for references before the mode definition.
+(defvar google-translate-posframe-mode)
 
 ;;; Customization
 
@@ -161,7 +167,7 @@ values are (timestamp . translation).")
 
 (defun google-translate-posframe--cache-get (source-lang target-lang text)
   "Look up cached translation for TEXT from SOURCE-LANG to TARGET-LANG.
-Returns the translation string if a valid (non-expired) entry exists, nil otherwise."
+Return the translation string if a valid entry exists, nil otherwise."
   (when-let* ((key (google-translate-posframe--cache-key source-lang target-lang text))
               (entry (gethash key google-translate-posframe--cache))
               (timestamp (car entry))
@@ -238,8 +244,8 @@ Returns truncated text, or original if already within limits."
 
 (defun google-translate-posframe--get-text-to-translate ()
   "Get text to translate based on context.
-Priority: active region > paragraph (if at boundary) > sentence (if at start) > word at point.
-Returns a string or nil."
+Priority: active region > paragraph (if at boundary) >
+sentence (if at start) > word at point.  Returns a string or nil."
   (cond
    ;; Active region
    ((use-region-p)
@@ -505,5 +511,10 @@ Auto-dismisses on next command."
   (interactive)
   (google-translate-posframe--hide))
 
-(provide 'google-translate-posframe-ui)
-;;; google-translate-posframe-ui.el ends here
+(provide 'google-translate-posframe)
+;;; google-translate-posframe.el ends here
+
+
+;; Local Variables:
+;; package-lint-main-file: "google-translate.el"
+;; End:
