@@ -1,4 +1,4 @@
-;;; google-translate-core-ui.el --- The google translate core UI
+;;; google-translate-core-ui.el --- The google translate core UI -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2012 Oleksandr Manzyuk <manzyuk@gmail.com>
 
@@ -330,6 +330,7 @@ You can use any other suitable program."
 
 - If it is `nil', output to temporary pop up buffer (default).
 - `echo-area': output to the Echo Area.
+- `posframe': output to the child frame using `posframe' package.
 - `popup': output to the popup tooltip using `popup' package.
 - `kill-ring': the output will be added in `kill-ring'.
 - `current-buffer': the output will be inserted to current buffer.
@@ -339,6 +340,7 @@ You can use any other suitable program."
   :group 'google-translate-core-ui
   :type '(repeat (choice (const :tag "temporary popup buffer" nil)
                          (const :tag "Echo Area" echo-area)
+                         (const :tag "posframe (a child-frame)" posframe)
                          (const :tag "popup tooltip using popup.el" popup)
                          (const :tag "kill-ring" kill-ring)
                          (const :tag "current buffer" current-buffer)
@@ -407,6 +409,10 @@ translation) gets focus.")
   '((t (:inherit button :height 0.8)))
   "Face used to display button \"Listen\"."
   :group 'google-translate-core-ui)
+
+(defface google-translate-posframe-face
+  '((t (:inherit tooltip)))
+  "Face used to display `posframe' child frame.")
 
 (defvar google-translate-input-method-auto-toggling nil
   "When t, the current source language is compared.
@@ -715,6 +721,8 @@ At last will save result translation to `google-translate-result-translation'."
           (google-translate-buffer-output-translation gtos))
          ((equal output-destination 'echo-area)
           (google-translate-echo-area-output-translation gtos))
+         ((equal output-destination 'posframe)
+          (google-translate-posframe-output-translation gtos))
          ((equal output-destination 'popup)
           (google-translate-popup-output-translation gtos))
          ((equal output-destination 'kill-ring)
@@ -736,6 +744,35 @@ At last will save result translation to `google-translate-result-translation'."
         (setq google-translate-result-translation (gtos-translation gtos))
         (when google-translate-translation-to-kill-ring
           (kill-new google-translate-result-translation))))))
+
+(defun google-translate-posframe-output-translation (gtos)
+  "Output translation to the posframe tooltip using `posframe'
+package."
+  (require 'posframe)
+  (let ((text
+         (with-temp-buffer
+           (google-translate-insert-translation gtos)
+           (google-translate--trim-string
+            (buffer-substring (point-min) (point-max)))))
+        (cleanup-hook nil))
+    (with-current-buffer (get-buffer-create " *google-translate-posframe*")
+      (erase-buffer)
+      (insert text))
+    (posframe-show " *google-translate-posframe*"
+                   :position (point)
+                   :internal-border-width 10
+                   ;; Don't use `:foreground-color', the package must color
+                   ;; the text itself, otherwise it may break
+                   ;; `google-translate-phonetic-face' and etc.
+                   :background-color (face-background 'google-translate-posframe-face nil t)
+                   )
+    (when (use-region-p)
+      (deactivate-mark))
+    (setq cleanup-hook
+          (lambda ()
+            (posframe-delete " *google-translate-posframe*")
+            (remove-hook 'pre-command-hook cleanup-hook)))
+    (add-hook 'pre-command-hook cleanup-hook)))
 
 (defun google-translate-popup-output-translation (gtos)
   "Output translation to the popup tooltip using `popup'
