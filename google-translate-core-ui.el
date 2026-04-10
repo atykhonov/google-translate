@@ -5,7 +5,7 @@
 ;; Author: Oleksandr Manzyuk <manzyuk@gmail.com>
 ;; Maintainer: Andrey Tykhonov <atykhonov@gmail.com>
 ;; URL: https://github.com/atykhonov/google-translate
-;; Package-Requires: ((emacs "24.3") (popup "0.5.8"))
+;; Package-Requires: ((emacs "24.3"))
 ;; Version: 0.12.0
 ;; Keywords: convenience
 
@@ -170,8 +170,6 @@
 
 (eval-when-compile (require 'cl-lib))
 (require 'google-translate-core)
-(require 'ido)
-(require 'popup)
 (require 'color)
 (require 'facemenu)
 
@@ -947,6 +945,7 @@ The input is guaranteed to be non-null."
 
 If `google-translate-enable-ido-completion' is non-NIL, use
 ido-style completion."
+  (require 'ido)
   (funcall (if google-translate-enable-ido-completion
                #'ido-completing-read
              #'completing-read)
