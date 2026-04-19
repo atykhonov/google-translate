@@ -36,6 +36,10 @@
          (f-expand "google-translate-default-ui"
                    google-translate-test/root-path))
 
+(require 'google-translate-posframe
+         (f-expand "google-translate-posframe"
+                   google-translate-test/root-path))
+
 (defun th-google-translate-load-fixture (file)
   (with-temp-buffer
     (insert-file-contents file)
