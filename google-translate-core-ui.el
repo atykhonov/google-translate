@@ -174,7 +174,8 @@
 (require 'facemenu)
 
 (defvar google-translate-supported-languages-alist
-  '(("Afrikaans"           . "af")
+  '(("Auto detect"      . "#auto")
+    ("Afrikaans"           . "af")
     ("Albanian"            . "sq")
     ("Amharic"             . "am")
     ("Arabic"              . "ar")
@@ -221,6 +222,7 @@
     ("Italian"             . "it")
     ("Japanese"            . "ja")
     ("Javanese"            . "jw")
+    ("Kalaallisut"         . "kl")
     ("Kannada"             . "kn")
     ("Kazakh"              . "kk")
     ("Khmer"               . "km")
