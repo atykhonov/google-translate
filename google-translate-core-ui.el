@@ -312,15 +312,20 @@ query parameter in HTTP requests.")
                  (const :tag "Yes" t)))
 
 (defcustom google-translate-listen-program
-  (executable-find "mplayer")
+  (executable-find "ffplay")
   "The program to use to listen translations.
 
-By default the program looks for `mplayer' in the PATH, if
-`mplayer' is found then listening function will be available and
-you'll see `Listen' button in the buffer with the translation.
+By default the program looks for `ffplay' (included in ffmpeg) in the PATH, if
+the exec found, listening function will be available and
+`Listen' button in the buffer provided with the translation.
 You can use any other suitable program."
   :group 'google-translate-core-ui
   :type '(string))
+
+(defcustom google-translate-listen-program-args '("-nodisp" "-autoexit" "-loglevel" "quiet")
+  "Arguments to pass to the listen program before the urls."
+  :group 'google-translate-core-ui
+  :type '(repeat string))
 
 (defcustom google-translate-output-destination
   nil
@@ -663,19 +668,31 @@ clicked."
         (language (button-get button 'language)))
     (google-translate-listen-translation language text)))
 
+
 (defun google-translate-listen-translation (language text)
-  (let ((buf "*mplayer output*"))
+  "Play audio of TEXT spoken in LANGUAGE using external program.
+
+Retrieves audio from Google Translate's text-to-speech service
+and plays it using `google-translate-listen-program' with
+optional arguments from `google-translate-listen-program-args'.
+
+LANGUAGE is the language code (e.g., \"en\", \"es\", \"fr\").
+TEXT is the string to be spoken."
+  (let ((buf (format "*%s output*" google-translate-listen-program))
+        (urls (google-translate-format-listen-urls text language)))
     (message "Retrieving audio message...")
     (if google-translate-translation-listening-debug
         (with-current-buffer (get-buffer-create buf)
           (insert (format "Listen program: %s\r\n" google-translate-listen-program))
-          (mapc (lambda (x) (insert (format "Listen URL: %s\r\n" x)))
-                (google-translate-format-listen-urls text language))
+          (mapc (lambda (x) (insert (format "Listen URL: %s\r\n" x))) urls)
           (apply 'call-process google-translate-listen-program nil t nil
-                 (google-translate-format-listen-urls text language))
+                 (append google-translate-listen-program-args urls))
           (switch-to-buffer buf))
-      (apply 'call-process google-translate-listen-program nil nil nil
-             (google-translate-format-listen-urls text language)))))
+      ;; Use start-process for non-blocking playback
+      (apply 'start-process "google-translate-listen" nil
+             google-translate-listen-program
+             (append google-translate-listen-program-args urls)))))
+
 
 (defun google-translate-translate (source-language target-language text &optional output-destination)
   "Translate TEXT from SOURCE-LANGUAGE to TARGET-LANGUAGE.

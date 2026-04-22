@@ -242,12 +242,11 @@ variable to t.
 
 The variable `google-translate-listen-program` determines the program
 to use to listen translations. By default the program looks for
-`mplayer` in the PATH, if `mplayer` is found then listening function
-will be available and you'll see `Listen` button in the buffer with
-the translation. You can use any other suitable program. If you use
-Windows please download and unpack `mplayer` and add its path
-(directory) to to the system PATH variable. Please note that
-translation listening is not available if
+`ffplay` in the PATH. `ffplay` is part of ffmpeg bundle, if executable
+found then listening command will be available and you'll see
+`Listen` button in the translation buffer. You can use any
+other suitable program. 
+Please note that translation listening is not available if
 `google-translate-output-destination` is set to `echo-area` or
 `pop-up`.
 
