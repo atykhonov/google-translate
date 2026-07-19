@@ -12,4 +12,6 @@
  (depends-on "el-mock")
  (depends-on "ert-runner")
  (depends-on "ecukes")
- (depends-on "espuds"))
+ (depends-on "espuds")
+ (depends-on "posframe")
+ (depends-on "markdown-mode"))
