@@ -126,6 +126,132 @@
     (goto-char 3) ; at 'H'
     (should (google-translate-posframe--at-paragraph-boundary-p))))
 
+;;; Org-mode text detection tests
+
+(ert-deftest test-google-translate-posframe--org-heading ()
+  "Org heading yields the clean title, stripping stars, TODO and tags."
+  (with-temp-buffer
+    (delay-mode-hooks (org-mode))
+    (insert "* TODO [#A] My Heading :work:\n\nBody paragraph text here.\n")
+    (goto-char (point-min))
+    (search-forward "My Heading")
+    (goto-char (match-beginning 0))
+    (should (string-equal "My Heading"
+                          (google-translate-posframe--get-text-to-translate)))))
+
+(ert-deftest test-google-translate-posframe--org-paragraph-under-heading ()
+  "A paragraph under an Org heading is detected at its start."
+  (with-temp-buffer
+    (delay-mode-hooks (org-mode))
+    (insert "* Heading\n\nAlpha beta gamma. Delta epsilon.\n")
+    (goto-char (point-min))
+    (search-forward "Alpha")
+    (goto-char (match-beginning 0))
+    (should (string-equal "Alpha beta gamma. Delta epsilon."
+                          (google-translate-posframe--get-text-to-translate)))))
+
+(ert-deftest test-google-translate-posframe--org-paragraph-second-sentence ()
+  "The second sentence of an Org paragraph is detected."
+  (with-temp-buffer
+    (delay-mode-hooks (org-mode))
+    (insert "* Heading\n\nAlpha beta gamma. Delta epsilon.\n")
+    (goto-char (point-min))
+    (search-forward "Delta")
+    (goto-char (match-beginning 0))
+    (should (string-equal "Delta epsilon."
+                          (google-translate-posframe--get-text-to-translate)))))
+
+(ert-deftest test-google-translate-posframe--org-list-item ()
+  "An Org list item is detected without its bullet."
+  (with-temp-buffer
+    (delay-mode-hooks (org-mode))
+    (insert "* H\n\n- First item here. Second sentence.\n- Next item.\n")
+    (goto-char (point-min))
+    (search-forward "First item")
+    (goto-char (match-beginning 0))
+    (should (string-equal "First item here. Second sentence."
+                          (google-translate-posframe--get-text-to-translate)))))
+
+(ert-deftest test-google-translate-posframe--org-checkbox-item ()
+  "An Org checkbox item is detected without bullet or checkbox."
+  (with-temp-buffer
+    (delay-mode-hooks (org-mode))
+    (insert "* H\n\n- [ ] Buy milk today. And eggs.\n")
+    (goto-char (point-min))
+    (search-forward "Buy milk")
+    (goto-char (match-beginning 0))
+    (should (string-equal "Buy milk today. And eggs."
+                          (google-translate-posframe--get-text-to-translate)))))
+
+(ert-deftest test-google-translate-posframe--org-sentence-at-line-start ()
+  "A sentence beginning on a hard-wrapped line is detected in Org."
+  (with-temp-buffer
+    (delay-mode-hooks (org-mode))
+    (insert "* H\n\nSentence one ends here.\nSentence two at line start.\n")
+    (goto-char (point-min))
+    (search-forward "Sentence two")
+    (goto-char (match-beginning 0))
+    (should (string-equal "Sentence two at line start."
+                          (google-translate-posframe--get-text-to-translate)))))
+
+(ert-deftest test-google-translate-posframe--org-heading-text-nil-on-body ()
+  "Heading detection does not fire on ordinary Org text."
+  (with-temp-buffer
+    (delay-mode-hooks (org-mode))
+    (insert "Just a normal line of text.\n")
+    (goto-char 6)
+    (should (null (google-translate-posframe--heading-text)))))
+
+;;; Markdown-mode text detection tests
+
+(ert-deftest test-google-translate-posframe--markdown-atx-heading ()
+  "Markdown ATX heading yields the clean title."
+  (skip-unless (fboundp 'markdown-mode))
+  (with-temp-buffer
+    (delay-mode-hooks (markdown-mode))
+    (insert "## My Heading\n\nBody text here.\n")
+    (goto-char (point-min))
+    (search-forward "My Heading")
+    (goto-char (match-beginning 0))
+    (should (string-equal "My Heading"
+                          (google-translate-posframe--get-text-to-translate)))))
+
+(ert-deftest test-google-translate-posframe--markdown-setext-heading ()
+  "Markdown Setext heading yields the title line."
+  (skip-unless (fboundp 'markdown-mode))
+  (with-temp-buffer
+    (delay-mode-hooks (markdown-mode))
+    (insert "Setext Title\n============\n\nBody text.\n")
+    (goto-char (point-min))
+    (search-forward "Setext Title")
+    (goto-char (match-beginning 0))
+    (should (string-equal "Setext Title"
+                          (google-translate-posframe--get-text-to-translate)))))
+
+(ert-deftest test-google-translate-posframe--markdown-list-item ()
+  "Markdown list item is detected without its bullet."
+  (skip-unless (fboundp 'markdown-mode))
+  (with-temp-buffer
+    (delay-mode-hooks (markdown-mode))
+    (insert "# H\n\n- First item here. Second sentence.\n- Next item.\n")
+    (goto-char (point-min))
+    (search-forward "First item")
+    (goto-char (match-beginning 0))
+    (should (string-equal "First item here. Second sentence."
+                          (google-translate-posframe--get-text-to-translate)))))
+
+(ert-deftest test-google-translate-posframe--markdown-paragraph ()
+  "A Markdown paragraph is detected at its start."
+  (skip-unless (fboundp 'markdown-mode))
+  (with-temp-buffer
+    (delay-mode-hooks (markdown-mode))
+    (insert "# H\n\nAlpha beta gamma. Delta epsilon.\n")
+    (goto-char (point-min))
+    (search-forward "Alpha")
+    (goto-char (match-beginning 0))
+    (should (string-equal "Alpha beta gamma. Delta epsilon."
+                          (google-translate-posframe--get-text-to-translate)))))
+
 ;;; Formatting tests
 
 (ert-deftest test-google-translate-posframe--format-translation ()

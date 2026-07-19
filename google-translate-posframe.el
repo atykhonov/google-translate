@@ -67,6 +67,11 @@
 (declare-function evil-normal-state-p "evil-states")
 (declare-function evil-visual-state-p "evil-states")
 
+(declare-function org-at-heading-p "org")
+(declare-function org-element-at-point "org-element")
+(declare-function org-element-property "org-element")
+(declare-function org-element-type "org-element")
+
 (defvar google-translate-default-source-language)
 (defvar google-translate-default-target-language)
 
@@ -213,55 +218,142 @@ Returns truncated text, or original if already within limits."
             (substring text 0 (min (length text) google-translate-posframe-max-paragraph-length))
           result)))))
 
+(defun google-translate-posframe--heading-text ()
+  "Return the clean heading title when point is on a heading line, else nil.
+Handles Org headings and Markdown ATX/Setext headings, stripping the
+markup markers and, for Org, TODO keywords, priorities and tags."
+  (cond
+   ((and (derived-mode-p 'org-mode)
+         (fboundp 'org-at-heading-p)
+         (org-at-heading-p))
+    (let ((title (org-element-property :raw-value (org-element-at-point))))
+      (and title (not (string-blank-p title)) (string-trim title))))
+   ((derived-mode-p 'markdown-mode)
+    (save-excursion
+      (beginning-of-line)
+      (cond
+       ((looking-at "[ \t]*#+[ \t]+\\(.*?\\)[ \t]*#*[ \t]*$")
+        (let ((title (match-string-no-properties 1)))
+          (and (not (string-blank-p title)) (string-trim title))))
+       ;; Setext heading: a non-blank title line underlined by = or -.
+       ((and (not (looking-at "[ \t]*$"))
+             (not (looking-at "[ \t]*[-=]+[ \t]*$"))
+             (save-excursion (forward-line 1) (looking-at "[ \t]*[-=]+[ \t]*$")))
+        (string-trim (buffer-substring-no-properties
+                      (line-beginning-position) (line-end-position)))))))))
+
+(defun google-translate-posframe--generic-block-bounds ()
+  "Return (START . END) of the paragraph at point via paragraph movement."
+  (let ((end (save-excursion (forward-paragraph 1) (point)))
+        (start (save-excursion
+                 (forward-paragraph 1)
+                 (backward-paragraph 1)
+                 (skip-chars-forward " \t\n")
+                 (point))))
+    (cons start end)))
+
+(defun google-translate-posframe--org-block-bounds ()
+  "Return (START . END) of the Org paragraph or list item at point.
+List bullets and checkboxes are excluded from the returned bounds."
+  (let* ((el (org-element-at-point))
+         (type (org-element-type el)))
+    ;; On a list marker point resolves to the whole list; step past the
+    ;; bullet so the element becomes the item's own paragraph.
+    (when (memq type '(plain-list item))
+      (save-excursion
+        (beginning-of-line)
+        (when (looking-at "[ \t]*\\(?:[-+*]\\|[0-9]+[.)]\\)[ \t]+\\(?:\\[[ Xx-]\\][ \t]+\\)?")
+          (goto-char (match-end 0)))
+        (setq el (org-element-at-point)
+              type (org-element-type el))))
+    (when (eq type 'paragraph)
+      (let ((cb (org-element-property :contents-begin el))
+            (ce (org-element-property :contents-end el)))
+        (when (and cb ce) (cons cb ce))))))
+
+(defun google-translate-posframe--markdown-block-bounds ()
+  "Return (START . END) of the Markdown paragraph or list item at point.
+Leading list bullets, checkboxes and blockquote markers are excluded."
+  (let ((bounds (google-translate-posframe--generic-block-bounds)))
+    (save-excursion
+      (goto-char (car bounds))
+      (when (looking-at (concat "[ \t]*\\(?:[-+*]\\|[0-9]+[.)]\\)[ \t]+"
+                                "\\(?:\\[[ xX]\\][ \t]+\\)?"
+                                "\\|[ \t]*>[ \t]?"))
+        (setcar bounds (match-end 0))))
+    bounds))
+
+(defun google-translate-posframe--block-bounds ()
+  "Return (START . END) of the current text block, major-mode aware.
+The block is the current paragraph or list item with structural markers
+excluded.  Returns nil when no block is found."
+  (cond
+   ((and (derived-mode-p 'org-mode) (fboundp 'org-element-at-point))
+    (google-translate-posframe--org-block-bounds))
+   ((derived-mode-p 'markdown-mode)
+    (google-translate-posframe--markdown-block-bounds))
+   (t
+    (google-translate-posframe--generic-block-bounds))))
+
 (defun google-translate-posframe--at-paragraph-boundary-p ()
-  "Return non-nil if point is within 5 characters of a paragraph boundary."
-  (save-excursion
-    (let ((orig-point (point))
-          (threshold 5))
-      (or
-       (progn
-         (forward-paragraph -1)
-         (skip-chars-forward " \t\n")
-         (<= (abs (- (point) orig-point)) threshold))
-       (progn
-         (goto-char orig-point)
-         (forward-paragraph 1)
-         (skip-chars-backward " \t\n")
-         (<= (abs (- (point) orig-point)) threshold))))))
+  "Return non-nil if point is within 5 characters of the current block edge."
+  (when-let* ((bounds (google-translate-posframe--block-bounds)))
+    (let ((threshold 5))
+      (or (<= (abs (- (point) (car bounds))) threshold)
+          (<= (abs (- (point) (cdr bounds))) threshold)))))
 
 (defun google-translate-posframe--get-paragraph-text ()
-  "Get the current paragraph text, truncated if too long."
-  (save-excursion
-    (let* ((start (save-excursion
-                    (forward-paragraph 1)
-                    (backward-paragraph 1)
-                    (point)))
-           (end (save-excursion
-                  (forward-paragraph 1)
-                  (point)))
-           (text (string-trim (buffer-substring-no-properties start end))))
+  "Get the current paragraph or list item text, truncated if too long."
+  (when-let* ((bounds (google-translate-posframe--block-bounds))
+              (text (string-trim (buffer-substring-no-properties
+                                  (car bounds) (cdr bounds)))))
+    (unless (string-empty-p text)
       (google-translate-posframe--truncate-to-max-length text))))
+
+(defun google-translate-posframe--at-sentence-start-p (&optional min-pos)
+  "Return non-nil when point is at the beginning of a sentence.
+The preceding sentence terminator may be separated by whitespace and at
+most one line break, so sentences that begin on a wrapped line are still
+recognized.  MIN-POS bounds how far back the terminator may be."
+  (and (looking-at "[[:upper:][:digit:]]")
+       (< (or min-pos (point-min)) (point))
+       (save-excursion
+         (skip-chars-backward " \t")
+         (when (eq (char-before) ?\n)
+           (backward-char)
+           (skip-chars-backward " \t"))
+         (and (or (null min-pos) (<= min-pos (point)))
+              (memq (char-before) '(?. ?? ?!))))))
+
+(defun google-translate-posframe--get-sentence-text ()
+  "Return the sentence starting at point, bounded by the current block.
+Returns nil when point is not at a sentence start."
+  (when-let* ((bounds (google-translate-posframe--block-bounds)))
+    (when (google-translate-posframe--at-sentence-start-p (car bounds))
+      (save-excursion
+        (let* ((start (point))
+               (end (min (cdr bounds) (progn (forward-sentence) (point))))
+               (text (string-trim (buffer-substring-no-properties start end))))
+          (unless (string-empty-p text)
+            (google-translate-posframe--truncate-to-max-length text)))))))
 
 (defun google-translate-posframe--get-text-to-translate ()
   "Get text to translate based on context.
-Priority: active region > paragraph (if at boundary) >
-sentence (if at start) > word at point.  Returns a string or nil."
+Priority: active region > heading > paragraph or list item (if at its
+boundary) > sentence (if at its start) > word at point.  Detection is
+major-mode aware for Org and Markdown.  Returns a string or nil."
   (cond
    ;; Active region
    ((use-region-p)
     (string-trim
      (buffer-substring-no-properties (region-beginning) (region-end))))
-   ;; Paragraph if at boundary
+   ;; Heading line (Org/Markdown)
+   ((google-translate-posframe--heading-text))
+   ;; Paragraph or list item if at boundary
    ((google-translate-posframe--at-paragraph-boundary-p)
     (google-translate-posframe--get-paragraph-text))
-   ;; Sentence if at beginning of one
-   ((and (looking-at "[A-Z0-9]")
-         (looking-back "[.?!]\\s-+" (line-beginning-position)))
-    (save-excursion
-      (let* ((start (point))
-             (end (progn (forward-sentence) (point)))
-             (text (string-trim (buffer-substring-no-properties start end))))
-        (google-translate-posframe--truncate-to-max-length text))))
+   ;; Sentence if at its beginning
+   ((google-translate-posframe--get-sentence-text))
    ;; Word at point
    ((word-at-point)
     (substring-no-properties (word-at-point)))
@@ -418,9 +510,14 @@ Called from `post-command-hook' when the minor mode is active."
   "Minor mode showing Google Translate translations in a posframe popup.
 Automatically translates text at point based on context:
 - Active region (if selected)
-- Current paragraph (if at beginning or end)
+- Heading title (on an Org or Markdown heading line)
+- Current paragraph or list item (if at beginning or end)
 - Current sentence (if at beginning)
 - Word at point (fallback)
+
+Detection is major-mode aware: in Org and Markdown buffers headings,
+list items and their sentences are recognized, with structural markers
+such as stars, bullets and checkboxes excluded from the translated text.
 
 Uses `google-translate-default-source-language' and
 `google-translate-default-target-language' for translation direction."
